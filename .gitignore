@@ -1,7 +1,7 @@
-./external_dependencies/glm
-./external_dependencies/cmake-modules
-./build/*
-.swp
+./external_dependencies/glm/
+./external_dependencies/cmake-modules/
+./build/*.exe
+*.swp
 CMakeCache.txt
 CMakeFiles
 CMakeScripts

@@ -1,5 +1,6 @@
 external_dependencies/glm/
 external_dependencies/cmake-modules/
+external_dependencies/imgui/
 build/*.exe
 *.swp
 CMakeCache.txt

@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
-project(SDL2_App)
+project(Neutrino)
 
 # includes cmake/FindSDL2.cmake
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external_dependencies/cmake-modules/)
 set(BIN_DIR ${PROJECT_SOURCE_DIR}/build/NeutrinoBuild/)
 
+
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
@@ -26,6 +27,8 @@ include_directories(
 					)
 
 add_executable(Neutrino source/Neutrino.cpp)
-target_link_libraries(Neutrino ${SDL2_LIBRARY})
+target_link_libraries(
+						Neutrino ${SDL2_LIBRARY}
+					 )
 
 install(TARGETS Neutrino RUNTIME DESTINATION ${BIN_DIR})

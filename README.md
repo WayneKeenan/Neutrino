@@ -11,9 +11,11 @@ Neutrino requires the following code to build and run:
 - IMGUI, immediate mode GUI 
 - FindSDL2 cmake modules
 
-All external dependencies can be brought into the project by running:
+All external dependencies can be brought into the project (via git clone) by running:
 
 `./external_dependencies/SetupDeps.sh`
+
+IMGUI & GLM are header only libraries so require no additional build steps.
 
 ##Documentation
 

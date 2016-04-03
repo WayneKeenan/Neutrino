@@ -19,7 +19,11 @@ endif()
 
 
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
+include_directories(
+					${SDL2_INCLUDE_DIR} 
+					${PROJECT_SOURCE_DIR}/external_dependencies/glm/
+					${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
+					)
 
 add_executable(Neutrino source/Neutrino.cpp)
 target_link_libraries(Neutrino ${SDL2_LIBRARY})

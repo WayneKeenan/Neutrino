@@ -37,6 +37,7 @@ flags = [
     '-x',
     'c++',
     '-I/home/kor/Development/Neutrino/external_dependencies/glm',
+    '-I/home/kor/Development/Neutrino/external_dependencies/glew',
     '-I/home/kor/Development/Neutrino/external_dependencies/imgui',
     '-I/usr/include/SDL2',
     '-Wall',

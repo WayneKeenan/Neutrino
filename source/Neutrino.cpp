@@ -1,6 +1,11 @@
+#include <stdio.h>
 #include <iostream>
-#include <glm/glm.hpp>
+#include <string>
+#include <GL/glew.h>
+
 #include <SDL.h>
+#include <SDL_opengl.h>
+
 
 int main(int, char**)
 {

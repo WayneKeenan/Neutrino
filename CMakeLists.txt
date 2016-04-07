@@ -4,6 +4,7 @@ project(Neutrino)
 # includes cmake/FindSDL2.cmake
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external_dependencies/cmake-modules/)
 set(BIN_DIR ${PROJECT_SOURCE_DIR}/build/NeutrinoBuild/)
+set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
@@ -18,13 +19,19 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	endif()
 endif()
 
-
 find_package(SDL2 REQUIRED)
 include_directories(
 					${SDL2_INCLUDE_DIR} 
 					${PROJECT_SOURCE_DIR}/external_dependencies/glm/
+					${PROJECT_SOURCE_DIR}/external_dependencies/glew/
 					${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
 					)
+
+find_package(GLEW REQUIRED)
+if (GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+endif()
 
 add_executable(Neutrino source/Neutrino.cpp)
 target_link_libraries(

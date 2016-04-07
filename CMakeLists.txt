@@ -21,11 +21,11 @@ endif()
 
 find_package(SDL2 REQUIRED)
 include_directories(
-					${SDL2_INCLUDE_DIR} 
-					${PROJECT_SOURCE_DIR}/external_dependencies/glm/
-					${PROJECT_SOURCE_DIR}/external_dependencies/glew/
-					${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
-					)
+    ${SDL2_INCLUDE_DIR} 
+    ${PROJECT_SOURCE_DIR}/external_dependencies/glm/
+    ${PROJECT_SOURCE_DIR}/external_dependencies/glew/
+    ${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
+)
 
 find_package(GLEW REQUIRED)
 if (GLEW_FOUND)
@@ -33,9 +33,12 @@ if (GLEW_FOUND)
     link_libraries(${GLEW_LIBRARIES})
 endif()
 
-add_executable(Neutrino source/Neutrino.cpp)
+FILE( GLOB_RECURSE NEUTRINO_SOURCES source/*.cpp )
+FILE( GLOB_RECURSE NEUTRINO_HEADERS source/*.h )
+
+add_executable(Neutrino ${NEUTRINO_SOURCES})
 target_link_libraries(
-						Neutrino ${SDL2_LIBRARY}
-					 )
+    Neutrino ${SDL2_LIBRARY} ${GLEW_LIBRARIES}
+ )
 
 install(TARGETS Neutrino RUNTIME DESTINATION ${BIN_DIR})

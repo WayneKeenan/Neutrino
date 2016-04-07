@@ -6,6 +6,10 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include "framework/Framework.h"
+
+const int SCREEN_WIDTH 		= 1280;
+const int SCREEN_HEIGHT 	= 720;
 
 int main(int, char**)
 {
@@ -17,7 +21,10 @@ int main(int, char**)
 	else
 	{
 		std::cout << "SDL Init OK!\n\n";
+		Neutrino::CoreInit();
 	}
+
+	Neutrino::CoreKill();
 	SDL_Quit();
 	return 0;
 }

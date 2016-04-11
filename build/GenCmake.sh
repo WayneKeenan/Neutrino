@@ -1,3 +1,3 @@
 #!/bin/bash
 rm -rf CMake*
-cmake -G "Unix Makefiles" ../
+cmake -D CMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../

@@ -13,9 +13,6 @@ const int SCREEN_HEIGHT 	= 720;
 
 int main(int, char**)
 {
-	dmesg("Neutrino started in DEBUG MODE\n");
-	
-
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;

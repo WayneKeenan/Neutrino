@@ -1,4 +1,5 @@
 #include "sdl_wrapper.h"
+#include "../Log.h"
 
 namespace Neutrino
 {
@@ -8,7 +9,7 @@ namespace Neutrino
 
 	bool InitSDL()
 	{
-		printf("Init SDL Called...\n");
+		LOG_INFO("Init SDL Called");
 		return true;
 	}
 }

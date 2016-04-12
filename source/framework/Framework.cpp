@@ -5,8 +5,8 @@ namespace Neutrino
 
 	bool CoreInit()
 	{
+		LOG_INFO("Neutrino Framework, Bootstrapping...");
 		InitSDL();
-		printf("Neutrino Framework Init...\n");
 		return true;
 	}
 
@@ -20,7 +20,7 @@ namespace Neutrino
 
 	bool CoreKill()
 	{
-		printf("Terminating framework\n");
+		LOG_INFO("Terminating framework");
 		return true;
 	}
 }

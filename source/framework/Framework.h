@@ -2,7 +2,10 @@
 #define NEUTRINO_FRAMEWORK
 
 #include "sdl/sdl_wrapper.h"
-#include "dmesg.h"
+#include "Log.h"
+#include "Types.h"
+#include "Assert.h"
+#include "Memory.h"
 
 
 

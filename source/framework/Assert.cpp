@@ -2,20 +2,20 @@
 #include "Log.h"
 #include <stdio.h>
 
-#if defined _DEBUG
+#if defined DEBUG
 
 int ShowAssert(const char * _sMsg, ...)
 {
-	char sBuffer[256] = {'\0'};
+	char sBuffer[1024] = {'\0'};
 
 	va_list marker;
 	va_start (marker, _sMsg);
 	{
-		vsnprintf_s(sBuffer, _TRUNCATE, _sMsg, marker);
+		vsnprintf(sBuffer, 1024, _sMsg, marker);
 	}
 	va_end (marker);
 
-	SYSLOG(Framework::LOG_ERROR, sBuffer);
+	SYSLOG(Neutrino::LOG_ERROR, sBuffer);
 
 	// return...
 	//	0 to always ignore,

@@ -9,6 +9,7 @@ namespace Neutrino
 
 	bool InitSDL()
 	{
+		ASSERT(false, "Testing");
 		LOG_INFO("Init SDL Called");
 		return true;
 	}

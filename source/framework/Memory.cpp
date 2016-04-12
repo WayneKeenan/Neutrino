@@ -43,3 +43,39 @@ void operator delete[](void* _mem, size_t _align)
 }
 
 #endif
+
+#if defined(__linux__)
+
+void *operator new(size_t _size)
+{
+	return ::aligned_alloc(ALIGN_DEFAULT, _size);
+}
+
+void *operator new[](size_t _size)
+{
+	return ::aligned_alloc(ALIGN_DEFAULT, _size);
+}
+
+void operator delete(void* _mem)
+{
+	::free(_mem);
+}
+
+void operator delete[](void* _mem)
+{
+	::free(_mem);
+}
+
+void *operator new(size_t _size, size_t _align)
+{
+	return ::aligned_alloc(_align, _size);
+}
+
+void *operator new[](size_t _size, size_t _align)
+{
+	return ::aligned_alloc(_align, _size);
+}
+
+
+
+#endif

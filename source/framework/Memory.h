@@ -1,5 +1,6 @@
 #pragma once
 #include "Types.h"
+#include <stdlib.h>
 
 #define ALIGN_DEFAULT	(16)
 #if defined(WIN32)
@@ -25,6 +26,19 @@ void *operator new(size_t _size, size_t _align);
 void *operator new[](size_t _size, size_t _align);
 void operator delete(void* _mem, size_t _align);
 void operator delete[](void* _mem, size_t _align);
+
+#endif
+
+
+#if defined(__linux__)
+
+void *operator new(size_t _size);
+void *operator new[](size_t _size);
+void operator delete(void* _mem);
+void operator delete[](void* _mem);
+
+void *operator new(size_t _size, size_t _align);
+void *operator new[](size_t _size, size_t _align);
 
 #endif
 

@@ -11,4 +11,7 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 install_manifest.txt
+Neutrino.log
+compile_commands.json
+
 

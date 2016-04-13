@@ -3,13 +3,8 @@
 #include <stdlib.h>
 
 #define ALIGN_DEFAULT	(16)
-#if defined(WIN32)
-	#define NEWX		::new(ALIGN_DEFAULT)
-	#define DELETEX		::delete
-#else
-	#define NEWX		::new
-	#define DELETEX		::delete
-#endif //defined(WIN32)
+#define NEWX			::new(ALIGN_DEFAULT)
+#define DELETEX			::delete
 
 #define SAFE_FREE(p)			do{ if(p) { free(p); (p)=0; } }while(0)
 #define SAFE_DELETE(p)			do{ if(p) { DELETEX(p); (p)=0; } }while(0)
@@ -28,7 +23,6 @@ void operator delete(void* _mem, size_t _align);
 void operator delete[](void* _mem, size_t _align);
 
 #endif
-
 
 #if defined(__linux__)
 

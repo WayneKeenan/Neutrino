@@ -29,8 +29,9 @@ find_package(SDL2 REQUIRED)
 include_directories(
     ${SDL2_INCLUDE_DIR} 
     ${PROJECT_SOURCE_DIR}/external_dependencies/glm/
-    ${PROJECT_SOURCE_DIR}/external_dependencies/glew/
     ${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
+    ${PROJECT_SOURCE_DIR}/external_dependencies/inih/
+    ${PROJECT_SOURCE_DIR}/external_dependencies/inih/cpp/
 )
 
 find_package(GLEW REQUIRED)

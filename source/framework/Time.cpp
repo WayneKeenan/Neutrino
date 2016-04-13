@@ -79,7 +79,6 @@ namespace Neutrino
 
 	const char* GetTimeStamp()
 	{
-		ASSERT(s_bInitialized,"GetTimeStamp() Called before TimeInit()");
 		return s_sTimeStamp;
 	}
 }

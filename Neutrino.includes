@@ -1,0 +1,17 @@
+external_dependencies/imgui
+external_dependencies/imgui/examples/allegro5_example
+external_dependencies/imgui/examples/directx10_example
+external_dependencies/imgui/examples/directx11_example
+external_dependencies/imgui/examples/directx9_example
+external_dependencies/imgui/examples/ios_example/imguiex
+external_dependencies/imgui/examples/libs/gl3w/GL
+external_dependencies/imgui/examples/libs/glfw/include/GLFW
+external_dependencies/imgui/examples/libs/usynergy
+external_dependencies/imgui/examples/marmalade_example
+external_dependencies/imgui/examples/opengl3_example
+external_dependencies/imgui/examples/opengl_example
+external_dependencies/imgui/examples/sdl_opengl3_example
+external_dependencies/imgui/examples/sdl_opengl_example
+external_dependencies/imgui/examples/vulkan_example
+source/framework
+source/framework/sdl

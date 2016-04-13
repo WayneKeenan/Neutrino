@@ -7,10 +7,17 @@
 
 namespace Neutrino
 {
-	extern SDL_Window* g_SDL_WindowHandle;
-	extern SDL_GLContext g_SDL_GLContext;
+	// SDLInit():
+	// 		Starts SDL and needed subsystems
+	bool SDLInit(const char * const pOrgName, const char * const pGameName);
 
-	bool InitSDL();
+	// SDLKill():
+	// 		Performs a clean shutdown of SDL and any open GL contexts
+	bool SDLKill();
+
+	const char* SDLGetBasePath();
+	const char* SDLGetPrefPath();
+
 }
 
 #endif

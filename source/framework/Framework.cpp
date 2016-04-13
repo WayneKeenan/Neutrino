@@ -3,11 +3,33 @@
 namespace Neutrino 
 {
 
-	bool CoreInit()
+	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
+
+	static const char* const s_pOrganisation = "TripleEh\0";
+
+	bool CoreInit( const char* const pGameName )
 	{
-		if(	!InitSDL() ) return false;
-		TimeInit();
-		GetSystemLog();
+		if(	!SDLInit(s_pOrganisation, pGameName) ) return false;
+
+		// Init timing and logging facility
+		//
+		{
+			TimeInit();
+			GetSystemLog();
+		}
+
+		
+		// Get prefs.ini for this game, parse it and populate engine preferences
+		//
+		{
+			NeutrinoPreferences = NEWX(NeutrinioPreferences_t);
+			NeutrinoPreferences->s_pPrefsPath = SDLGetPrefPath();
+			NeutrinoPreferences->s_pResourcePath = SDLGetBasePath();
+
+			LOG_INFO("Found resource path: %s", NeutrinoPreferences->s_pResourcePath);
+			LOG_INFO("Found userdata path: %s", NeutrinoPreferences->s_pPrefsPath);
+		}
+
 		return true;
 	}
 
@@ -15,13 +37,16 @@ namespace Neutrino
 
 	bool CoreUpdate()
 	{
+		TimeUpdate();
 		return true;
 	}
 
 
 	bool CoreKill()
 	{
-		LOG_INFO("Terminating framework");
+		DELETEX(NeutrinoPreferences);
+		SDLKill();
+		LOG_WARNING("Framework terminated (CoreKill)");
 		return true;
 	}
 }

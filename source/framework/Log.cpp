@@ -2,6 +2,7 @@
 #include "Memory.h"
 #include <string.h>
 #include <stdarg.h>
+#include "Time.h"
 
 namespace Neutrino
 {
@@ -9,7 +10,9 @@ namespace Neutrino
 	Log *GetSystemLog()
 	{
 		if(!s_pSysLog)
+		{
 			s_pSysLog = NEWX Log("Neutrino.log");
+		}
 
 		return s_pSysLog;
 	}
@@ -69,7 +72,7 @@ namespace Neutrino
 		va_list ap;
 		va_start(ap, _sFmt);
 		{
-			vsnprintf(sBuff, 1024-1, _sFmt, ap);
+			vsnprintf(sBuff, 4096-1, _sFmt, ap);
 		}
 		va_end(ap);
 
@@ -82,17 +85,10 @@ namespace Neutrino
 		if(!m_pFile)
 			return;
 
-//		char sBuff[1024]={'\0'};
-
-//		SYSTEMTIME sysTime;
-//		GetSystemTime(&sysTime);
-//		_snprintf_s(
-//			sBuff, _TRUNCATE, 
-//			"LOG v1.0.0\n"
-//			"%0.2d/%0.2d/%0.4d\n"
-//			"\n",
-//			sysTime.wDay, sysTime.wMonth, sysTime.wYear);
-//		Write(sBuff);
+		char sBuff[4096]={'\0'};
+		sprintf(sBuff, "Neutrino Framework started: %s", GetTimeStamp());
+		Write(sBuff);
+		Write("\n");
 	}
 
 	void Log::Write(const char *_sBuff)

@@ -9,7 +9,11 @@ namespace Neutrino
 
 	bool InitSDL()
 	{
-		LOG_INFO("Init SDL Called");
+		if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_GAMECONTROLLER) != 0)
+		{
+			fprintf(stderr, "Unable to initialise SDL systems");
+			return false;
+		}
 		return true;
 	}
 }

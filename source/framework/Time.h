@@ -43,6 +43,11 @@ namespace Neutrino
 	// TimeUpdate()
 	// 		Should be called once per tick to make sure all timers are current
 	void TimeUpdate();
+
+
+	// GetTimeStamp()
+	// 		Returns human readable string for the current datetime
+	const char* GetTimeStamp();
 }
 
 

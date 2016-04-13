@@ -5,8 +5,9 @@ namespace Neutrino
 
 	bool CoreInit()
 	{
-		LOG_INFO("Neutrino Framework, Bootstrapping...");
-		InitSDL();
+		if(	!InitSDL() ) return false;
+		TimeInit();
+		GetSystemLog();
 		return true;
 	}
 

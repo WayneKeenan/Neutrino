@@ -1,4 +1,7 @@
 #include "Framework.h"
+#include "libconfig.h"
+#include <sys/stat.h>
+#include <stdio.h>
 
 namespace Neutrino 
 {
@@ -6,6 +9,7 @@ namespace Neutrino
 	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
 
 	static const char* const s_pOrganisation = "TripleEh\0";
+	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 
 	bool CoreInit( const char* const pGameName )
 	{
@@ -19,16 +23,68 @@ namespace Neutrino
 		}
 
 		
-		// Get prefs.ini for this game, parse it and populate engine preferences
+		// Get PlayerPrefs.tdi for this game, parse it and populate engine preferences
 		//
 		{
 			NeutrinoPreferences = NEWX(NeutrinioPreferences_t);
 			NeutrinoPreferences->s_pPrefsPath = SDLGetPrefPath();
 			NeutrinoPreferences->s_pResourcePath = SDLGetBasePath();
 
-			LOG_INFO("Found resource path: %s", NeutrinoPreferences->s_pResourcePath);
-			LOG_INFO("Found userdata path: %s", NeutrinoPreferences->s_pPrefsPath);
+			LOG_INFO("Resource path: %s", NeutrinoPreferences->s_pResourcePath);
+			LOG_INFO("Userdata path: %s", NeutrinoPreferences->s_pPrefsPath);
+
+
+			FILE* pPlayerPrefsFile;
+			char pPlayerPrefsFilename[4096]={'\0'};
+			sprintf(pPlayerPrefsFilename, "%s/%s", NeutrinoPreferences->s_pPrefsPath, s_pPrefsFilename);
+
+			struct stat fileBuf;
+			if( stat(pPlayerPrefsFilename, &fileBuf) == 0)
+			{
+				// Parse existing player preferences file...
+				//
+
+				config_t cfg;
+				config_init(&cfg);
+
+				if(! config_read_file(&cfg, pPlayerPrefsFilename)) 
+				{
+					config_destroy(&cfg);
+					LOG_ERROR("Unable to parse Player Prefs file, exiting...");
+					return false;
+				}
+
+				if( !config_lookup_int(&cfg, "screenheight", &NeutrinoPreferences->s_iScreenHeight))
+					LOG_ERROR("Unable to parse screenhieght from Player Prefs file, exiting...");
+
+				if( !config_lookup_int(&cfg, "screenwidth", &NeutrinoPreferences->s_iScreenWidth ))
+					LOG_ERROR("Unable to parse screenwidth from Player Prefs file, exiting...");
+			}
+			else
+			{
+				// write out a default player prefs file since this is likely the first run
+				//
+				LOG_WARNING("No player prefs file found, creating defaults...");
+				if( (pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")) )
+				{
+					const char* _pPrefsText = "screenheight: 720\nscreenwidth: 1280\n";
+					fwrite(_pPrefsText, strlen(_pPrefsText), 1, pPlayerPrefsFile);
+					fflush(pPlayerPrefsFile);
+ 
+					NeutrinoPreferences->s_iScreenHeight = 720;
+					NeutrinoPreferences->s_iScreenWidth = 1280;
+				}
+				else
+				{
+					LOG_ERROR("Unable to write a default preferences file. Exiting...");
+					return false;
+				}
+			}
 		}
+
+		LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+
+		SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 
 		return true;
 	}
@@ -49,4 +105,5 @@ namespace Neutrino
 		LOG_WARNING("Framework terminated (CoreKill)");
 		return true;
 	}
+
 }

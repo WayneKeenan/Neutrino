@@ -86,9 +86,8 @@ namespace Neutrino
 			return;
 
 		char sBuff[4096]={'\0'};
-		sprintf(sBuff, "Neutrino Framework started: %s", GetTimeStamp());
+		sprintf(sBuff, "\n\nNeutrino Framework started: %s\n", GetTimeStamp());
 		Write(sBuff);
-		Write("\n");
 	}
 
 	void Log::Write(const char *_sBuff)

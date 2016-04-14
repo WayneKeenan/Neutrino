@@ -17,7 +17,7 @@ namespace Neutrino
 			return false;
 		}
 
-		s_pPrefsPath = SDL_GetPrefPath( pOrgName, pGameName);
+		s_pPrefsPath = SDL_GetPrefPath(pOrgName, pGameName);
 		s_pBasePath = SDL_GetBasePath();
 		return true;
 	}

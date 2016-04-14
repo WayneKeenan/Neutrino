@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(Neutrino)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external_dependencies/cmake-modules/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/external_dependencies/tdi-cmake-modules/)
 set(BIN_DIR ${PROJECT_SOURCE_DIR}/build/NeutrinoBuild/)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 
@@ -38,6 +39,13 @@ find_package(GLEW REQUIRED)
 if (GLEW_FOUND)
     include_directories(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
+endif()
+
+
+find_package(LIBCONFIG REQUIRED)
+if(LIBCONFIG_FOUND)
+    include_directories(${LIBCONFIG_INCLUDE_DIR})
+    link_libraries(${LIBCONFIG_LIBRARY})
 endif()
 
 # Add source files (this means regenerating CMake files every time we add new source files)

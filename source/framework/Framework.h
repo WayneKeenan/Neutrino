@@ -21,7 +21,6 @@ namespace Neutrino {
 
 	extern NeutrinioPreferences_t* NeutrinoPreferences;
 
-	// Add resource path
 	
 	bool CoreInit(const char* const pGameName);
 	bool CoreUpdate();

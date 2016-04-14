@@ -33,7 +33,14 @@ namespace Neutrino
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 
 		// Create SDL window
-		pSDL_WindowHandle = SDL_CreateWindow( s_pGameName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, iScreenWidth, iScreenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+		pSDL_WindowHandle = SDL_CreateWindow( 
+									s_pGameName, 
+									SDL_WINDOWPOS_UNDEFINED, 
+									SDL_WINDOWPOS_UNDEFINED, 
+									iScreenWidth, 
+									iScreenHeight, 
+									SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+
 		if( NULL == pSDL_WindowHandle )
 		{
 			LOG_ERROR( "Game window could not be created. SDL Error: %s\n", SDL_GetError() );
@@ -59,6 +66,7 @@ namespace Neutrino
 			return false;
 		}
 
+
 		// Use Vsync
 		if( SDL_GL_SetSwapInterval( 1 ) < 0 )
 		{
@@ -66,15 +74,6 @@ namespace Neutrino
 			return false;
 		}
 
-		/*
-		//Initialize OpenGL
-		if( !initGL() )
-		{
-			printf( "Unable to initialize OpenGL!\n" );
-			success = false;
-		A
-		}
-		*/
 
 		return true;
 	}

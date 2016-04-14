@@ -15,11 +15,11 @@ namespace Neutrino
 	// 		Performs a clean shutdown of SDL and any open GL contexts
 	bool SDLKill();
 
-
-	// SDLCreateWindowAndContext()
+	// SDLCreateWindowAndContext():
 	// 		Attempts to open an SDL window of given dimensions with an OGL3.1 context
 	bool SDLCreateWindowAndContext(int iScreenWidth, int iScreenHeight); 	
-	
+
+	// Populate the engine's resource and preferences paths:
 	const char* SDLGetBasePath();
 	const char* SDLGetPrefPath();
 

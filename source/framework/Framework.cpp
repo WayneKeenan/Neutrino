@@ -8,7 +8,7 @@ namespace Neutrino
 
 	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
 
-	static const char* const s_pOrganisation = "TripleEh\0";
+	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 
 	bool CoreInit( const char* const pGameName )
@@ -43,7 +43,6 @@ namespace Neutrino
 			{
 				// Parse existing player preferences file...
 				//
-
 				config_t cfg;
 				config_init(&cfg);
 
@@ -82,9 +81,24 @@ namespace Neutrino
 			}
 		}
 
-		LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 
-		SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+
+		// Create an SDL window with an OGL 3.1 Context
+		// 
+		{
+			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+			
+			SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+			/*
+			//Initialize OpenGL
+			if( !initGL() )
+			{
+				printf( "Unable to initialize OpenGL!\n" );
+				success = false;
+			}
+			*/
+		}
+
 
 		return true;
 	}
@@ -102,7 +116,7 @@ namespace Neutrino
 	{
 		DELETEX(NeutrinoPreferences);
 		SDLKill();
-		LOG_WARNING("Framework terminated (CoreKill)");
+		LOG_INFO("Framework terminated (CoreKill) cleanly. Have a nice day!");
 		return true;
 	}
 

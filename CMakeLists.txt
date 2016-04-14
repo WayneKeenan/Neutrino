@@ -25,6 +25,12 @@ endif()
 
 
 # Setup the package requirements
+find_package(OpenGL REQUIRED)
+if ( OPENGL_FOUND )
+    include_directories(${OPENGL_INCLUDE_DIRS})
+    link_libraries(${OPENGL_LIBRARIES})
+endif()
+
 find_package(SDL2 REQUIRED)
 include_directories(
     ${SDL2_INCLUDE_DIR} 

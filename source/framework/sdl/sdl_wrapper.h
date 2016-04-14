@@ -19,6 +19,11 @@ namespace Neutrino
 	// 		Attempts to open an SDL window of given dimensions with an OGL3.1 context
 	bool SDLCreateWindowAndContext(int iScreenWidth, int iScreenHeight); 	
 
+
+	// SDLPresent()
+	// 		Swap buffer...
+	void SDLPresent();
+
 	// Populate the engine's resource and preferences paths:
 	const char* SDLGetBasePath();
 	const char* SDLGetPrefPath();

@@ -12,7 +12,7 @@ namespace Neutrino
 
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
-		if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_GAMECONTROLLER) != 0)
+		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
 			LOG_ERROR("Unable to initialise SDL systems, exiting...");
 			return false;
@@ -29,8 +29,10 @@ namespace Neutrino
 	{
 		// Define OpenGL 3.1 core
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 		// Create SDL window
 		pSDL_WindowHandle = SDL_CreateWindow( 
@@ -55,6 +57,7 @@ namespace Neutrino
 			LOG_ERROR( "OpenGL context could not be created. SDL Error: %s\n", SDL_GetError() );
 			return false;
 		}
+		SDL_GL_MakeCurrent( pSDL_WindowHandle, SDL_GLContext);
 				
 		
 		// Initialize GLEW
@@ -74,13 +77,22 @@ namespace Neutrino
 			return false;
 		}
 
+		SDL_StartTextInput();
+
 
 		return true;
 	}
 
 
+	void SDLPresent()
+	{
+		SDL_GL_SwapWindow( pSDL_WindowHandle );
+	}
+
+
 	bool SDLKill()
 	{
+		SDL_DestroyWindow( pSDL_WindowHandle );
 		SDL_Quit();
 		return true;
 	}

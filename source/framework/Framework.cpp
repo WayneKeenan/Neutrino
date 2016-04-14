@@ -87,18 +87,9 @@ namespace Neutrino
 		// 
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			
 			SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			/*
-			//Initialize OpenGL
-			if( !initGL() )
-			{
-				printf( "Unable to initialize OpenGL!\n" );
-				success = false;
-			}
-			*/
+			if(! GLInit()) return false;
 		}
-
 
 		return true;
 	}
@@ -108,6 +99,8 @@ namespace Neutrino
 	bool CoreUpdate()
 	{
 		TimeUpdate();
+		TestRender();
+		SDLPresent();
 		return true;
 	}
 

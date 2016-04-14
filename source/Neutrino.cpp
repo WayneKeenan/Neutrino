@@ -11,7 +11,24 @@ int main(int, char**)
 {
 	if( !Neutrino::CoreInit("Neutrino") ) return 1;
 
+	bool bRunning = true;
+	while(bRunning)
+	{
+		Neutrino::CoreUpdate();
+
+		SDL_Event e;
+		while( SDL_PollEvent( &e ) != 0 )
+		{
+			//User requests quit
+			if( e.type == SDL_QUIT )
+			{
+				bRunning = false;
+			}	
+		}
+	}
+
 	Neutrino::CoreKill();
-	return 0;
+
+    return 0;
 }
 

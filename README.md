@@ -10,16 +10,19 @@ Neutrino requires the following code to build and run:
 - The GLM math library
 - IMGUI, immediate mode GUI 
 - libconfig9, C Library to parse config files. 
+- GLEW, GL extension library.
 
-With the exception of libconfig, external dependencies can be brought into the project (via git clone) by running:
+External dependencies can be brought into the project (via git clone) by running:
 
 `./external_dependencies/SetupDeps.sh`
 
-IMGUI & GLM are header only libraries so require no additional build steps.  Libconfig9 should be installed via package manager, or windows binary. 
+IMGUI & GLM are header only libraries so require no additional build steps.  
 
 The external dependencies folder can be emptied by running:
 
 `./external_dependencies/RemoveDeps.sh`
+
+Libconfig and GLEW are package dependencies that should be installed via your package manager. 
 
 ##Building
 

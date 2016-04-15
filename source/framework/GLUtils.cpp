@@ -24,53 +24,52 @@ namespace Neutrino {
         glEnd();
 	}
 
-	void GLProgramInfoLog( GLuint iProgramID )
+	void GLLogCompilationInfo(bool bIsShader, GLuint iID)
 	{
-		if( glIsProgram( iProgramID ))
+		if (bIsShader && !glIsShader(iID))
 		{
-			int iProgramLogLength = 0, iMaxLength = 0;
-		
-			glGetProgramiv( iProgramID, GL_INFO_LOG_LENGTH, &iMaxLength );
-			char* pProgramLog = new char[ iMaxLength ];
-			glGetProgramInfoLog( iProgramID, iMaxLength, &iProgramLogLength, pProgramLog );
+			LOG_ERROR("GL Shader ID: %d does not point to valid shader", iID);
+			return;
+		}
+		else if (!bIsShader && !glIsProgram(iID))
+		{
+			LOG_ERROR("GL Program ID: %d does not point to a valid program", iID);
+			return;
+		}
 
-			if( iProgramLogLength > 0 )
-				LOG_INFO("GL Program Log %d: %s", iProgramID, pProgramLog);
-			else
-				LOG_WARNING("GL Program Log empty for Program ID %d", iProgramID);
-		
-			delete[] pProgramLog;
+		int iLength = 0, iMaxLength = 0;
+		char* pLog;
+
+		if( bIsShader)
+		{
+			glGetShaderiv( iID, GL_INFO_LOG_LENGTH, &iMaxLength );
+			pLog = new char[ iMaxLength ];
+			glGetShaderInfoLog( iID, iMaxLength, &iLength, pLog );
 		}
 		else
 		{
-			LOG_ERROR("GL Program %d is not a program!", iProgramID);
+			glGetProgramiv( iID, GL_INFO_LOG_LENGTH, &iMaxLength );
+			pLog = new char[ iMaxLength ];
+			glGetProgramInfoLog( iID, iMaxLength, &iLength, pLog );
 		}
-	}
 
-
-	void GLShaderInfoLog( GLuint iShaderID )
-	{
-		if( glIsShader( iShaderID ))
+		if( iLength > 0 )
 		{
-			int iShaderLogLength = 0, iMaxLength = 0;
-		
-			glGetShaderiv( iShaderID, GL_INFO_LOG_LENGTH, &iMaxLength );
-			char* pShaderLog = new char[ iMaxLength ];
-			glGetProgramInfoLog( iShaderID, iMaxLength, &iShaderLogLength, pShaderLog );
-
-			if( iShaderLogLength > 0 )
-				LOG_INFO("GL Shader Log %d: %s", iShaderID, pShaderLog);
+			if(bIsShader)
+				LOG_INFO("Compilation Log for shader %d: %s", iID, pLog);
 			else
-				LOG_WARNING("GL Shader Log empty for Shader ID %d", iShaderID);
-		
-			delete[] pShaderLog;
+				LOG_INFO("Compilation Log for program %d: %s", iID, pLog);
 		}
 		else
 		{
-			LOG_ERROR("GL Shader %d is not a Shader!", iShaderID);
+			if(bIsShader)
+				LOG_WARNING("Compilation Log for shader %d: %s", iID, pLog);
+			else
+				LOG_WARNING("Compilation Log for program %d: %s", iID, pLog);
 		}
+	
+		delete[] pLog;
 	}
-
 
 	void GLKill()
 	{

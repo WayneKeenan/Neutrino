@@ -9,7 +9,6 @@ namespace Neutrino {
 
 	void GLKill();
 
-	void GLShaderInfoLog( GLuint iShaderID );
+	void GLLogCompilationInfo(bool bIsShader, GLuint iID);
 
-	void GLProgramInfoLog( GLuint iProgramID );
 }

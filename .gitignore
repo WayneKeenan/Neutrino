@@ -17,3 +17,4 @@ compile_commands.json
 
 
 .tags_sorted_by_file
+.sublime-build

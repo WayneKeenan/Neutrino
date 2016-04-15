@@ -88,7 +88,6 @@ namespace Neutrino
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 			SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			if(! GLInit()) return false;
 		}
 
 		return true;

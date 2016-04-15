@@ -5,6 +5,7 @@ build/Neutrino
 *.swp
 *.swo
 tags
+.tags
 CMakeCache.txt
 CMakeFiles
 CMakeScripts

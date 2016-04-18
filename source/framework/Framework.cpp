@@ -82,12 +82,19 @@ namespace Neutrino
 
 
 
-		// Create an SDL window with an OGL 3.1 Context
+		// Create an SDL window with an OGL 3.1 Context and compile standard shaders
 		// 
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+			
+			if( !SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight) )
+				return false;
+			
+			if( !LoadEngineShaders() )
+				return false;
 		}
+
+
 
 		return true;
 	}

@@ -1,5 +1,6 @@
 #include "File.h"
 #include <sys/stat.h>
+#include "Log.h"
 
 namespace Neutrino {
 
@@ -12,7 +13,7 @@ namespace Neutrino {
 
 
 
-	uint32 GetFileByteSize( const char * pFilename )
+	uint32 GetFileSizeBytes( const char * pFilename )
 	{
     	struct stat fileBuf; 
 
@@ -20,5 +21,13 @@ namespace Neutrino {
         	return fileBuf.st_size;
 
     	return 0; 
+	}
+
+
+
+	const char* LoadResource(const char* filename)
+	{
+		LOG_INFO("Trying to load file:");
+		return NULL;
 	}
 }

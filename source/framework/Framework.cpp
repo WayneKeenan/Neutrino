@@ -1,6 +1,6 @@
 #include "Framework.h"
 #include "libconfig.h"
-#include <sys/stat.h>
+
 #include <stdio.h>
 
 namespace Neutrino 
@@ -38,8 +38,7 @@ namespace Neutrino
 			char pPlayerPrefsFilename[4096]={'\0'};
 			sprintf(pPlayerPrefsFilename, "%s/%s", NeutrinoPreferences->s_pPrefsPath, s_pPrefsFilename);
 
-			struct stat fileBuf;
-			if( stat(pPlayerPrefsFilename, &fileBuf) == 0)
+			if( FileExists(pPlayerPrefsFilename) )
 			{
 				// Parse existing player preferences file...
 				//

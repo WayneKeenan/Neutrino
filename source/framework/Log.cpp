@@ -63,7 +63,8 @@ namespace Neutrino
 			return;
 
 		// [hh:mm:ss][INF/WRN/ERR] message
-		// TODO: Add Sytem Time to this buffer...
+		// TO_DO: Add Sytem Time to this buffer...
+		// TO_DO: Add framecount to this...
 
 		char sBuff[4096]={'\0'};
 		snprintf(sBuff, 8, "%s: ", s_asTypeNameLUT[_nType]);

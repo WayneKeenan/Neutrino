@@ -13,3 +13,10 @@ typedef signed int int32;
 typedef int64_t int64;
 
 static const float fEPSILON = 0.00001f;
+static const float fASPECT_RATIO = 1.6f;
+static const float fPI = 3.141592653589f;
+static const float fHALF_PI = fPI / 2.0f;
+static const float fQUARTER_PI = fPI / 4.0f;
+static const float fTWO_PI = fPI * 2.0f;
+
+

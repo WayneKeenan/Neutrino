@@ -1,8 +1,12 @@
 #include "File.h"
 #include <sys/stat.h>
 #include "Log.h"
+#include "Memory.h"
+#include "Assert.h"
 
 namespace Neutrino {
+
+
 
 
 	bool FileExists( const char * pFilename )
@@ -25,9 +29,24 @@ namespace Neutrino {
 
 
 
-	const char* LoadResource(const char* filename)
+	const char* LoadResourceBytes(const char* pFilename)
 	{
-		LOG_INFO("Trying to load file:");
-		return NULL;
+		if (!FileExists(pFilename))
+			return NULL;
+
+		FILE *pFile = fopen(pFilename, "r");
+		ASSERT( NULL != pFile, "Unable to load resource: %s", pFilename);
+
+		fseek(pFile, 0, SEEK_END);
+		long fSize = ftell(pFile);
+		fseek(pFile, 0, SEEK_SET);
+
+		char *pResource = NEWX char[fSize + 1];
+		fread(pResource, fSize, 1, pFile);
+		fclose(pFile);
+
+		pResource[fSize] = 0;
+
+		return pResource;
 	}
 }

@@ -1,11 +1,19 @@
 #include "GLUtils.h"
 #include "Log.h"
+#include <glm/vec3.hpp>
+#include <glm/gtc/matrix_transform.hpp> 
 
 namespace Neutrino {
 
         namespace GLUtils {
+
+                static glm::mat4 mCameraMatrix;
+                static glm::mat4 mModelViewMatrix;
+
+
                 void SetViewport(const int iScreenWidth, const int iScreenHeight)
                 {
+                        LOG_WARNING("GLUtils::SetViewport working with fixed aspect ratio in ortho ProjectionMatrix calc...");
                         glViewport(0, 0, iScreenWidth, iScreenHeight);        
                         glEnable(GL_DEPTH_TEST);
                         glEnable(GL_BLEND);
@@ -16,37 +24,20 @@ namespace Neutrino {
 
                         glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                        // Vector3D rotationVector;
-                        // rotationVector.x = 0.0f;
-                        // rotationVector.y = 0.0f;
-                        // rotationVector.z = 0.0f;
+                        glm::mat4 mRotationMatrix = glm::rotate(glm::mat4(), 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+                        glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
+                        glm::mat4 mProjectionMatrix = glm::ortho(0.0f, (float)((float)iScreenWidth/(float)iScreenHeight), 0.0f, 1.0f, 0.1f, 10.0f );
 
-                        // Matrix3DSetRotationByDegrees(rotationMatrix, 0.0f, rotationVector);
-                        // Matrix3DSetTranslation(translationMatrix, 0.f, 0.f, 0.0f);
-                        // Matrix3DMultiply(translationMatrix, rotationMatrix, modelViewMatrix);
-
-                        // Matrix3DSetOrthoProjection(projectionMatrix, 0.0f, OGL_X_RANGE, 0.0f, OGL_Y_RANGE, 1.0f, -1.0f);
-                        // Matrix3DMultiply(projectionMatrix, modelViewMatrix, matrix);
-
-                        // Reshape( bounds.size.width, bounds.size.height );
+                        mModelViewMatrix = mTranslationMatrix * mRotationMatrix;
+                        mCameraMatrix = mProjectionMatrix * mModelViewMatrix;
                 }
 
                 void TestRender()
                 {
-                        glClearColor(0.0, 0.0, 0.0, 1.0);
-                        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-                        glMatrixMode(GL_PROJECTION);
-                        glLoadIdentity();
-                        gluPerspective(45, 1280/720, 1.0, 500.0);
-
-                        glMatrixMode(GL_MODELVIEW);
-                        glLoadIdentity();
-
                         glBegin(GL_TRIANGLES);
-                        glVertex3f(0.0, 2.0, -5.0);
-                        glVertex3f(-2.0, -2.0, -5.0);
-                        glVertex3f(2.0, -2.0, -5.0);
+                        glVertex3f(0.0, 2.0, 1.0);
+                        glVertex3f(-2.0, -2.0, 1.0);
+                        glVertex3f(2.0, -2.0, 1.0);
                         glEnd();
                 }
 

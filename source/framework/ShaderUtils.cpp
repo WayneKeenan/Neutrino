@@ -176,8 +176,8 @@ namespace Neutrino {
 			ASSERT(iFragSourceSize > 0, "GetFileSizeBytes returned 0 when attempting to load: %s", pFragFilename );
 			ASSERT(iVertSourceSize > 0, "GetFileSizeBytes returned 0 when attempting to load: %s", pVertFilename );
 
-			aLoadedShaders[ iNumShadersLoaded ]._FragSource = LoadResource( pFragFilename );
-			aLoadedShaders[ iNumShadersLoaded ]._VertSource = LoadResource( pVertFilename );
+			aLoadedShaders[ iNumShadersLoaded ]._FragSource = LoadResourceBytes( pFragFilename );
+			aLoadedShaders[ iNumShadersLoaded ]._VertSource = LoadResourceBytes( pVertFilename );
 			aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID	= glCreateProgram();
 		}
 

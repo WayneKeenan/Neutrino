@@ -53,10 +53,16 @@ namespace Neutrino
 				}
 
 				if( !config_lookup_int(&cfg, "screenheight", &NeutrinoPreferences->s_iScreenHeight))
+				{
 					LOG_ERROR("Unable to parse screenhieght from Player Prefs file, exiting...");
+					return false;
+				}
 
 				if( !config_lookup_int(&cfg, "screenwidth", &NeutrinoPreferences->s_iScreenWidth ))
+				{
 					LOG_ERROR("Unable to parse screenwidth from Player Prefs file, exiting...");
+					return false;
+				}
 			}
 			else
 			{
@@ -92,6 +98,8 @@ namespace Neutrino
 			
 			if( !LoadEngineShaders() )
 				return false;
+
+			GLUtils::SetViewport(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 		}
 
 
@@ -104,7 +112,7 @@ namespace Neutrino
 	bool CoreUpdate()
 	{
 		TimeUpdate();
-		TestRender();
+		GLUtils::TestRender();
 		SDLPresent();
 		return true;
 	}

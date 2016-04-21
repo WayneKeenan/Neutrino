@@ -10,6 +10,7 @@ namespace Neutrino
 
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
+	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
 	bool CoreInit( const char* const pGameName )
 	{
@@ -87,6 +88,19 @@ namespace Neutrino
 		}
 
 
+
+		// Mount the resources pack file. Must do this prior to OGL setup as shaders will need to be loaded
+		// from it.
+		{
+			char pResourcesFilename[4096]={'\0'};
+			sprintf(pResourcesFilename, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+			if (!MountResources(pResourcesFilename))
+			{
+				LOG_ERROR("Unable to mount resources file, exiting.");
+				return false;
+			} 
+		}
+	
 
 		// Create an SDL window with an OGL 3.1 Context and compile standard shaders
 		// 

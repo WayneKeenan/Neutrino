@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(Neutrino)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external_dependencies/cmake-modules/)
-set(BIN_DIR ${PROJECT_SOURCE_DIR}/build/NeutrinoBuild/)
+set(BIN_DIR ${PROJECT_SOURCE_DIR}/build/bin/)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 
 # Default build type will be release (No build type provided to CMAKE)
@@ -52,6 +52,13 @@ if(LIBCONFIG_FOUND)
     MESSAGE("LibConfig found...")
     include_directories(${LIBCONFIG_INCLUDE_DIR})
     link_libraries(${LIBCONFIG_LIBRARY})
+endif()
+
+find_package(PhysFS REQUIRED)
+if(PHYSFS_FOUND)
+    MESSAGE("Phyfs found...")
+    include_directories(${PHYSFS_INCLUDE_DIR})
+    link_libraries(${PHYSFS_LIBRARY})
 endif()
 
 # Add source files (this means regenerating CMake files every time we add new source files)

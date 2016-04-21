@@ -11,6 +11,7 @@ Neutrino requires the following code to build and run:
 - IMGUI, immediate mode GUI 
 - libconfig9, C Library to parse config files. 
 - GLEW, GL extension library.
+- PhysFS, pack file manager
 
 External dependencies can be brought into the project (via git clone) by running:
 
@@ -22,15 +23,16 @@ The external dependencies folder can be emptied by running:
 
 `./external_dependencies/RemoveDeps.sh`
 
-Libconfig and GLEW are package dependencies that should be installed via your package manager. 
+Libconfig, GLEW and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
 
 ##Building
 
 To build the game and engine:
 
-- cd build/
-- ./GenCmake.sh
-- make
+- `cd build/`
+- `./GenCmake.sh`
+- `./MakePackfile.sh`
+- `./BuildAndRun.sh`
 
 This will leave the Neutrino executable in the build folder. To clean the build folder (remove executable and all cmake/make related files) run the following from the build folder:
 
@@ -38,7 +40,10 @@ This will leave the Neutrino executable in the build folder. To clean the build 
 
 To make a release build, run:
 
-`./Release_GenCmake.sh`
+- `cd build/`
+- `./Release_GenCmake.sh`
+- `./MakePackfile.sh`
+- `./BuildAndRun.sh`
 
 
 ##Documentation

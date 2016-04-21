@@ -20,6 +20,7 @@ namespace Neutrino {
 		int s_iScreenHeight;
 		const char* s_pResourcePath;
 		const char* s_pPrefsPath;
+		
 	} NeutrinioPreferences_t;
 
 	extern NeutrinioPreferences_t* NeutrinoPreferences;

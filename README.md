@@ -9,7 +9,7 @@ Neutrino requires the following code to build and run:
 
 - The GLM math library
 - IMGUI, immediate mode GUI 
-- libconfig9, C Library to parse config files. 
+- Libconfig, C Library to parse config files. 
 - GLEW, GL extension library.
 - PhysFS, pack file manager
 

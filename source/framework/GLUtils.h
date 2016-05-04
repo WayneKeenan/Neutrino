@@ -9,6 +9,6 @@ namespace Neutrino {
 		void TestRender();
 		void SetViewport(const int iScreenWidth, const int iScreenHeight);
 		void Term();
-		inline glm::mat4* GetCameraMatrix();
+		float* GetCameraMatrix();
 	};
 }

@@ -10,8 +10,7 @@
 #include "GLUtils.h"
 #include "File.h"
 #include "ShaderUtils.h"
-
- 
+#include "GameStateManager.h"
 
 namespace Neutrino {
 	

@@ -8,6 +8,23 @@
 
 namespace Neutrino {
 
+	enum eStandardShaders
+	{
+	  DEFAULT_SHADER,
+	  BLOOM_SHADER,
+	  BLUR_HORIZ,
+	  BLUR_VERTICAL,
+	  NUM_SHADERS
+	};
+
+	const char* const s_pDefaultShaderFragFilename = "default-shader.fsh";
+	const char* const s_pDefaultShaderVertFilename = "default-shader.vsh";
+	const char* const s_pBloomShaderFragFilename = "bloom-shader.fsh";
+	const char* const s_pBloomShaderVertFilename = "bloom-shader.vsh";
+	const char* const s_pBlurHorizShaderFragFilename = "blur-horiz-shader.fsh";
+	const char* const s_pBlurHorizShaderVertFilename = "blur-horiz-shader.vsh";
+	const char* const s_pBlurVertShaderFragFilename = "blur-vert-shader.fsh";
+	const char* const s_pBlurVertShaderVertFilename = "blur-vert-shader.vsh";
 
 
 	// LoadEngineShaders()
@@ -15,6 +32,6 @@ namespace Neutrino {
 	//		Startup will fail if this function doesn't complete. 
 	bool LoadEngineShaders();
 
-	void SetActiveShader(const uint8 iIndex);
+	void SetActiveShader(eStandardShaders iIndex);
 	inline GLint* GetActiveUniforms ();
 }

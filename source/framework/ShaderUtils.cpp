@@ -29,90 +29,46 @@ namespace Neutrino {
 	};
 
 
-	struct _LoadedShader_t
-	{
-		const char*	_FragSource;
-		const char*	_VertSource;
-		_ShaderSettings_t _ShaderSettings;
-	};
-
 	static _ShaderSettings_t* pActiveShader = NULL;
-	static _LoadedShader_t* aLoadedShaders = NEWX _LoadedShader_t[MAX_SHADER_COUNT];
+	static _ShaderSettings_t* aLoadedShaders = NEWX _ShaderSettings_t[NUM_SHADERS];
 	static uint8 iNumShadersLoaded = 0;
 
 
 	// LogShader()
-	//		Output the GL log info for compilation/link stage of shader loading process
+	//		Output the GL log info for shader compile
 	//
-	static bool LogShader(bool bIsShader, GLuint iID)
+	static void LogShader(GLuint iID)
 	{
-		if (bIsShader && !glIsShader(iID))
-		{
-			LOG_ERROR("GL Shader ID: %d does not point to valid shader", iID);
-			return false;
-		}
-		else if (!bIsShader && !glIsProgram(iID))
-		{
-			LOG_ERROR("GL Program ID: %d does not point to a valid program", iID);
-			return false;
-		}
-
-		int iLength = 0, iMaxLength = 0;
-		char* pLog;
-
-		if( bIsShader)
-		{
-			glGetShaderiv( iID, GL_INFO_LOG_LENGTH, &iMaxLength );
-			pLog = new char[ iMaxLength ];
-			glGetShaderInfoLog( iID, iMaxLength, &iLength, pLog );
-		}
-		else
-		{
-			glGetProgramiv( iID, GL_INFO_LOG_LENGTH, &iMaxLength );
-			pLog = new char[ iMaxLength ];
-			glGetProgramInfoLog( iID, iMaxLength, &iLength, pLog );
-		}
-
-		if( iLength > 0 )
-		{
-			if(bIsShader)
-				LOG_INFO("Compilation Log for shader %d: %s", iID, pLog);
-			else
-				LOG_INFO("Compilation Log for program %d: %s", iID, pLog);
-		}
-		else
-		{
-			if(bIsShader)
-				LOG_WARNING("Compilation Log for shader %d: %s", iID, pLog);
-			else
-				LOG_WARNING("Compilation Log for program %d: %s", iID, pLog);
-		}	
-
-		return true;
-		delete[] pLog;
+		GLint iLogLength;
+  		glGetShaderiv(iID, GL_INFO_LOG_LENGTH, &iLogLength);
+  		if (iLogLength > 1)
+  		{
+    		GLchar *pLog = (GLchar *)malloc(iLogLength);
+    		glGetShaderInfoLog(iID, iLogLength, &iLogLength, pLog);
+    		LOG_INFO("Shader compile log: %s", pLog);
+    		free(pLog);
+  		}	
 	}
 	 
 
-	// ValidateShader()
-	//		Debug function to validate loaded shader
+	// LogProgram()
+	//		Output the GL log for the program compile
 	//
-	static bool ValidateShader ( GLuint iProg )
+	static void LogProgram ( GLuint iProg )
 	{
-		GLint iStatus;
-
-		glValidateProgram(iProg);
-		LogShader(false, iProg);
-
-		glGetProgramiv(iProg, GL_VALIDATE_STATUS, &iStatus);
-
-		if(iStatus == GL_TRUE)
-			return true;
-		else
-			return false;
+		GLint iLogLength;
+		glGetProgramiv(iProg, GL_INFO_LOG_LENGTH, &iLogLength);
+		if (iLogLength > 1)
+		{
+			GLchar *pLog = (GLchar *)malloc(iLogLength);
+			glGetProgramInfoLog(iProg, iLogLength, &iLogLength, pLog);
+    		LOG_INFO("Program compile log: %s", pLog);
+			free(pLog);
+		}
 	}
 
 	//	LinkShader()
-	//		Link and optionally validate the loaded shader. 
+	//		Link and optionally validate. 
 	//
 	static bool LinkShader ( GLuint iProg )
 	{
@@ -120,15 +76,17 @@ namespace Neutrino {
 		glLinkProgram(iProg);
 
 #if defined(DEBUG)
-		LogShader(true, iProg);
-		ASSERT( ValidateShader( iProg ), "Shader validation failed." );
+		LogProgram( iProg );
 #endif
 		glGetProgramiv(iProg, GL_LINK_STATUS, &iStatus);
 		
-		if(iStatus == GL_TRUE)
-			return true;
-		else
+		if(iStatus != GL_TRUE)
+		{
+			glDeleteProgram(iProg);
 			return false;
+		}
+
+		return true;
 	}
 
 
@@ -136,22 +94,22 @@ namespace Neutrino {
 	// CompileShader()
 	//		Take C-String shader source and compile it. With optional debug validation and logging
 	//
-	static bool CompileShader ( GLuint* pShader, GLenum iType, const char* pShaderSource, const int iBytes )
+	static bool CompileShader ( GLuint iShader, GLenum iType, const char* pShaderSource, const int iBytes )
 	{
  		GLint iStatus;
-		*pShader = glCreateShader(iType);
+		iShader = glCreateShader(iType);
 
-		glShaderSource(*pShader, 1, &pShaderSource, &iBytes);
-		glCompileShader(*pShader);
+		glShaderSource(iShader, 1, &pShaderSource, &iBytes);
+		glCompileShader(iShader);
 
 #if defined(DEBUG)
-		LogShader(true, *pShader);
+		LogShader(iShader);
 #endif
 
-		glGetShaderiv(*pShader, GL_COMPILE_STATUS, &iStatus);
-		if (iStatus == 0)
+		glGetShaderiv(iShader, GL_COMPILE_STATUS, &iStatus);
+		if (iStatus != GL_TRUE)
 		{
-			glDeleteShader(*pShader);
+			glDeleteShader(iShader);
 			return false;
 		}
 
@@ -163,10 +121,14 @@ namespace Neutrino {
 	// 		Load a fixed set of shaders from the Resource folder
 	// 		Currently shaders are predefined and loaded in a fixed order...
 	//		TO_DO: all resources need to be put in, and loaded from, a PHYSFS pack file
-	static bool LoadShader( const char* pVertFilename, const char* pFragFilename )
+	static bool LoadShader( const char* pFragFilename, const char* pVertFilename )
 	{
-		GLuint iVertShader, iFragShader;
-		int iFragSourceSize, iVertSourceSize = 0;
+		ASSERT(iNumShadersLoaded < NUM_SHADERS, "Attempting to load more shaders than currently defined");
+
+		GLuint iVertShader = 0, iFragShader = 0;
+		int iFragSourceSize = 0, iVertSourceSize = 0;
+		const char* FragSource = NULL;
+		const char* VertSource = NULL;
 
 		// Load both components of he shader
 		{
@@ -176,48 +138,57 @@ namespace Neutrino {
 			ASSERT(iFragSourceSize > 0, "GetFileSizeBytes returned 0 when attempting to load: %s", pFragFilename );
 			ASSERT(iVertSourceSize > 0, "GetFileSizeBytes returned 0 when attempting to load: %s", pVertFilename );
 
-			aLoadedShaders[ iNumShadersLoaded ]._FragSource = LoadResourceBytes( pFragFilename );
-			aLoadedShaders[ iNumShadersLoaded ]._VertSource = LoadResourceBytes( pVertFilename );
-			aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID	= glCreateProgram();
+
+			FragSource = LoadResourceBytes( pFragFilename );
+			ASSERT(NULL != FragSource, "LoadResourceBytes for %s returned null", pFragFilename);
+			VertSource = LoadResourceBytes( pVertFilename );
+			ASSERT(NULL != FragSource, "LoadResourceBytes for %s returned null", pVertFilename);
 		}
 
 
+		aLoadedShaders[ iNumShadersLoaded ]._ProgramID	= glCreateProgram();
+
 		// Compile the shaders...
 		{
-			ASSERT( CompileShader (&iFragShader, GL_FRAGMENT_SHADER, aLoadedShaders[ iNumShadersLoaded ]._FragSource, iFragSourceSize ), "Failed to compile fragment shader!");
-			ASSERT( CompileShader (&iVertShader, GL_VERTEX_SHADER, aLoadedShaders[ iNumShadersLoaded ]._VertSource, iVertSourceSize ), "Failed to compile vertex shader!");  
+			ASSERT( CompileShader (iFragShader, GL_FRAGMENT_SHADER, FragSource, iFragSourceSize ), "Failed to compile fragment shader!");
+			ASSERT( CompileShader (iVertShader, GL_VERTEX_SHADER, VertSource, iVertSourceSize ), "Failed to compile vertex shader!");  
 
 			// Attach shaders to program ID
-			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, iFragShader);
-			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, iVertShader);  
+			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iFragShader);
+			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iVertShader);  
 
 			// TO_DO: Need these to be custom for each shader as well...
-			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, ATTRIB_VERTEX, "position");
-			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, ATTRIB_COLOR, "color");
-			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
+			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
+			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
+			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
 		}
 
 
 		// Link program
-		if ( !LinkShader( aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID ) )
+		if ( !LinkShader( aLoadedShaders[ iNumShadersLoaded ]._ProgramID ) )
 		{    
 				glDeleteShader(iVertShader);
 				iVertShader = 0;
 				glDeleteShader(iFragShader);
 		  		iFragShader = 0;
-			 	glDeleteProgram(aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID);
-		  		aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID = 0;
+			 	glDeleteProgram(aLoadedShaders[ iNumShadersLoaded ]._ProgramID);
+		  		aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
+
+		  		DELETEX FragSource;
+		  		DELETEX VertSource;
 		  		return false;
 		}
 
 		// Get uniform locations
-		aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, "translate");
-		aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, "texture" );
-		aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ShaderSettings._ProgramID, "matrix" );
+		aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
+		aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "texture" );
+		aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "matrix" );
 
 		// Release vertex and fragment shaders
 		glDeleteShader(iVertShader);
 		glDeleteShader(iFragShader);
+  		DELETEX FragSource;
+  		DELETEX VertSource;
 
 		// We've loaded a shader
 		++iNumShadersLoaded;
@@ -227,6 +198,13 @@ namespace Neutrino {
 
 	bool LoadEngineShaders()
 	{
+		LoadShader(s_pDefaultShaderFragFilename, s_pDefaultShaderVertFilename);
+		LoadShader(s_pBloomShaderFragFilename, s_pBloomShaderVertFilename);
+		LoadShader(s_pBlurHorizShaderFragFilename, s_pBlurHorizShaderVertFilename);
+		LoadShader(s_pBlurVertShaderFragFilename, s_pBlurVertShaderVertFilename);
+
+		SetActiveShader(DEFAULT_SHADER);
+
 		return true;
 	}
 
@@ -235,13 +213,11 @@ namespace Neutrino {
 		return pActiveShader->_Uniforms; 
 	};
 
-	void SetActiveShader(const uint8 iIndex)
+	void SetActiveShader(eStandardShaders iIndex)
 	{
-		/*
-		pActiveShader = &aLoadedShaders[iIndex]._ShaderSettings;
+		pActiveShader = &aLoadedShaders[iIndex];
 
 		glUseProgram( pActiveShader->_ProgramID );
-		glUniformMatrix4fv( pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, matrix);
-		*/
+		glUniformMatrix4fv( pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());
 	}
 }

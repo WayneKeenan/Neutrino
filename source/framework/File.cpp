@@ -36,7 +36,7 @@ namespace Neutrino {
 
 	uint32 GetFileSizeBytes( const char * pFilename )
 	{
-		ASSERT( PHYSFS_exists(pFilename)  && "Filename doesn't exist in resource bundle"  );
+		ASSERT( PHYSFS_exists(pFilename), "Filename doesn't exist in resource bundle: %s", pFilename  );
 
 		PHYSFS_file *pFileHandle = PHYSFS_openRead( pFilename );
 		uint32 iLength = (uint32)PHYSFS_fileLength( pFileHandle );

@@ -10,6 +10,10 @@ namespace Neutrino {
                 static glm::mat4 mCameraMatrix;
                 static glm::mat4 mModelViewMatrix;
 
+                float* GetCameraMatrix()
+                {
+                        return &mCameraMatrix[0][0];
+                }
 
                 void SetViewport(const int iScreenWidth, const int iScreenHeight)
                 {

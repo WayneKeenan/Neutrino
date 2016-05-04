@@ -37,8 +37,8 @@ namespace Neutrino
 		// Create SDL window
 		pSDL_WindowHandle = SDL_CreateWindow( 
 									s_pGameName, 
-									SDL_WINDOWPOS_UNDEFINED, 
-									SDL_WINDOWPOS_UNDEFINED, 
+									SDL_WINDOWPOS_CENTERED, 
+									SDL_WINDOWPOS_CENTERED, 
 									iScreenWidth, 
 									iScreenHeight, 
 									SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );

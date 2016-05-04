@@ -118,6 +118,9 @@ namespace Neutrino
 
 
 
+		// Enter Initial Gamestate
+		GameStateInit();
+
 		return true;
 	}
 
@@ -126,6 +129,7 @@ namespace Neutrino
 	bool CoreUpdate()
 	{
 		TimeUpdate();
+		GameStateUpdate();
 		GLUtils::TestRender();
 		SDLPresent();
 		return true;

@@ -44,10 +44,5 @@ namespace Neutrino {
                         glVertex3f(2.0, -2.0, 1.0);
                         glEnd();
                 }
-
-
-                void Term()
-                {
-                }
         }
 }

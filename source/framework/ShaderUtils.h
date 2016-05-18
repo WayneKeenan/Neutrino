@@ -32,6 +32,12 @@ namespace Neutrino {
 	//		Startup will fail if this function doesn't complete. 
 	bool LoadEngineShaders();
 
+
+	// SetActiveShader
+	// 		Set shader pair for current OGL state from list of standard shaders defined in enum above
 	void SetActiveShader(eStandardShaders iIndex);
+
+	// GetActiveUniforms
+	// 		Returns the address of the current shader uniforms (see: struct _ShaderSettings_t in cpp file)
 	inline GLint* GetActiveUniforms ();
 }

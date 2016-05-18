@@ -34,6 +34,22 @@ namespace Neutrino {
 	}
 
 
+	bool UnmountResources( const char* pFilename)
+	{
+		PHYSFS_removeFromSearchPath( pFilename );
+		const char* err = PHYSFS_getLastError();
+	
+		if ( err != NULL )
+		{
+			LOG_ERROR("Unable to unmount: %s", err );		
+			return false;		
+		}
+
+		LOG_INFO("Unmounted resource bundle: %s", pFilename);
+		return true;
+	}
+
+
 	uint32 GetFileSizeBytes( const char * pFilename )
 	{
 		ASSERT( PHYSFS_exists(pFilename), "Filename doesn't exist in resource bundle: %s", pFilename  );

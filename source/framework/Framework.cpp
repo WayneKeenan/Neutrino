@@ -55,15 +55,20 @@ namespace Neutrino
 
 				if( !config_lookup_int(&cfg, "screenheight", &NeutrinoPreferences->s_iScreenHeight))
 				{
+					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse screenhieght from Player Prefs file, exiting...");
 					return false;
 				}
 
 				if( !config_lookup_int(&cfg, "screenwidth", &NeutrinoPreferences->s_iScreenWidth ))
 				{
+					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse screenwidth from Player Prefs file, exiting...");
 					return false;
 				}
+
+				// Think we've got what we need from the config file for now
+				config_destroy(&cfg);
 			}
 			else
 			{
@@ -75,6 +80,7 @@ namespace Neutrino
 					const char* _pPrefsText = "screenheight: 720\nscreenwidth: 1280\n";
 					fwrite(_pPrefsText, strlen(_pPrefsText), 1, pPlayerPrefsFile);
 					fflush(pPlayerPrefsFile);
+					fclose(pPlayerPrefsFile);
  
 					NeutrinoPreferences->s_iScreenHeight = 720;
 					NeutrinoPreferences->s_iScreenWidth = 1280;
@@ -138,8 +144,20 @@ namespace Neutrino
 
 	bool CoreKill()
 	{
-		DELETEX(NeutrinoPreferences);
+		// Unmount resources bundle
+		{
+			char pResourcesFilename[4096]={'\0'};
+			sprintf(pResourcesFilename, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+			if (!UnmountResources(pResourcesFilename))
+				LOG_ERROR("Unable to unmount resources file: %s", pResourcesFilename);
+	
+			DELETEX(NeutrinoPreferences);
+		}
+
+
+		GameStateKill();
 		SDLKill();
+		
 		LOG_INFO("Framework terminated (CoreKill) cleanly. Have a nice day!");
 		return true;
 	}

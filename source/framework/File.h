@@ -14,6 +14,12 @@ namespace Neutrino {
 	//   	This should be mounted as early as possible in the bootstrapping of the engine
 	bool MountResources( const char* pFilename );
 
+
+	// UnountResources()
+	// 		Attempt to remove pFilename (previously mounted bundle) from the PHYSFS search path. 
+	bool UnmountResources( const char* pFilename );
+
+
 	// GetFileSizeBytes()
 	// 		This returns the file size in bytes of a given file in the RESOURCES bundle (not the filesystem)
 	uint32 GetFileSizeBytes(const char * pFilename);

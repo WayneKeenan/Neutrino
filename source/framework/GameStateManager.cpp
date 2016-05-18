@@ -32,4 +32,9 @@ namespace Neutrino
     	pActiveGameState = pNextState;
 	}
 
+	void GameStateKill()
+	{
+		pActiveGameState->Kill();
+		DELETEX pActiveGameState;
+	}
 };

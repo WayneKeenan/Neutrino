@@ -11,7 +11,7 @@ namespace Neutrino
 
 	// GetMSDelta() 
 	// 		returns milliseconds passed since last Framework tick
-	uint32 GetMSDelta();
+	float GetMSDelta();
 
 
 	// GetGameMSDelta() 
@@ -19,11 +19,6 @@ namespace Neutrino
 	// 		Game tick normally matches framework tick, but can be paused, spedup or slowed down
 	float GetGameMSDelta();
 
-
-	// GetGameMSElapsed()
-	// 		returns milliseconds elapsed over total duration of game ticks
-	// 		Note, if game tick is paused then MS elapsed does not increment
-	uint32 GetGameMSElapsed();
 
 	// GetUIMSDelta()
 	// 		returns milliseconds passed since last UI tick
@@ -48,6 +43,17 @@ namespace Neutrino
 	// GetTimeStamp()
 	// 		Returns human readable string for the current datetime
 	const char* GetTimeStamp();
+
+
+	// SetGameTimerIsPaused()
+	// 		Will pause or unpause the GameMS timers so GetGameMSDelta can be locked to simulate pausing the game
+	void SetGameTimerIsPaused( const bool bState );
+
+
+	// SetUITimerIsPaused()
+	// 		Will pause or unpause the UIMS timers so GetUIMSDelta can be locked to simulate pausing the UI 
+	void SetUITimerIsPaused( const bool bState );
+
 }
 
 

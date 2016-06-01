@@ -6,20 +6,21 @@
 namespace Neutrino
 {
 	static uint32 s_iSystemMS_Elapsed;
-	static uint32 s_iGameMS_Elapsed;
-	static uint32 s_iSystemMS_Delta;
 	static uint64 s_iFrameCount;
 
+	static float s_fSystemMS_Delta;
 	static float s_fGameMS_Delta;
 	static float s_fUIMS_Delta;
  
-	static uint32 s_iMaxDelta = 15 * 1000;
-	static uint32 s_iMinDelta = 60 * 1000;		// Really?
+	static float s_fMaxDelta = 1.0f/15.0f;
+	static float s_fMinDelta = 1.0f/60.0f;		// Really?
 
 	static time_t _Rawtime;
 	static const char* s_sTimeStamp;
 
 	static bool s_bInitialized = false;
+	static bool s_bGameTimerPaused = false;
+	static bool s_bUITimerPaused = false;
 	
 	// 13.4.16 [GN]
 	// 		Assume SDL will always be present, don't put an interface class in as middle man
@@ -36,22 +37,29 @@ namespace Neutrino
 	{
 		ASSERT(s_bInitialized, "TimeUpdate called before TimeInit()!");
 
+		// _TODO: Take this out if you don't end up using the timestamp in the logfile output!
 		time(&_Rawtime);
 		s_sTimeStamp = ctime(&_Rawtime);
 
 		uint32 iCurrentTime = SDL_GetTicks();
-		s_iSystemMS_Delta = iCurrentTime - s_iSystemMS_Elapsed;
+
+		// Calc the MS delta for this tick
+		s_fSystemMS_Delta = clamp( (float)(iCurrentTime - s_iSystemMS_Elapsed) / 1000.0f, s_fMinDelta, s_fMaxDelta);
 		s_iSystemMS_Elapsed = iCurrentTime;
 
-		// 13.4.16 [GN]
-		// 	_TODO: Need to add Timestep multipliers for UI and Game Timers
-		//
-		//	_TODO: These need to be converted into a float that we can multiply against in code...
-		//s_fGameMS_Delta = clamp(s_fSystemMS_Delta, s_fMinDelta, s_fMaxDelta);
-		//s_iGameMS_Elapsed += s_fGameMS_Delta;		
+		// Allow for independent pause of Game Time and UI Timer
+		{
+			if( s_bGameTimerPaused )
+				s_fGameMS_Delta = 0.0f;
+			else
+				s_fGameMS_Delta = s_fSystemMS_Delta;
 
-		
-		//s_fUIMS_Delta = clamp(s_fSystemMS_Delta, s_fMinDelta, s_fMaxDelta);
+
+			if( s_bUITimerPaused )
+				s_fUIMS_Delta = 0.0f;
+			else
+				s_fUIMS_Delta = s_fSystemMS_Delta;
+		}
 	}
 
 
@@ -60,19 +68,14 @@ namespace Neutrino
 		return s_iSystemMS_Elapsed;
 	}
 
-	uint32 GetMSDelta()
+	float GetMSDelta()
 	{
-		return s_iSystemMS_Delta;
+		return s_fSystemMS_Delta;
 	}
 
 	float GetGameMSDelta()
 	{
 		return s_fGameMS_Delta;
-	}
-
-	uint32 GetGameMSElapsed()
-	{
-		return s_iGameMS_Elapsed;
 	}
 
 	float GetUIMSDelta()
@@ -87,7 +90,16 @@ namespace Neutrino
 
 	const char* GetTimeStamp()
 	{
-
 		return s_sTimeStamp;
+	}
+
+	void SetGameTimerIsPaused(const bool bState)
+	{
+		s_bGameTimerPaused = bState;
+	}
+
+	void SetUITimerIsPaused(const bool bState)
+	{
+		s_bUITimerPaused = bState;
 	}
 }

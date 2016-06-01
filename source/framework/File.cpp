@@ -76,7 +76,8 @@ namespace Neutrino {
 		fseek(pFile, 0, SEEK_SET);
 
 		char *pResource = NEWX char[fSize + 1];
-		fread(pResource, fSize, 1, pFile);
+		ASSERT( fSize == (long)fread(pResource, fSize, 1, pFile), "Possible read error or unexpected EOF hit during fread of: ", pFilename);
+
 		fclose(pFile);
 
 		pResource[fSize] = 0;
@@ -94,7 +95,7 @@ namespace Neutrino {
 
 		LOG_INFO("Loading: %s, Bytes: %d", pFilename, iSize);
 
-		PHYSFS_read(pFileHandle, pLoadedResource, iSize, 1);
+		PHYSFS_read(pFileHandle, pLoadedResource, (PHYSFS_uint32)iSize, 1);
 		PHYSFS_close(pFileHandle);
 
 		return pLoadedResource;

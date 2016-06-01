@@ -7,11 +7,11 @@ namespace Neutrino
 {
 	// GetMSSinceStartup() 
 	// 		returns the milliseconds passed since Framework init
-	float GetMSSinceStartup();
+	uint32 GetMSSinceStartup();
 
 	// GetMSDelta() 
 	// 		returns milliseconds passed since last Framework tick
-	float GetMSDelta();
+	uint32 GetMSDelta();
 
 
 	// GetGameMSDelta() 
@@ -23,7 +23,7 @@ namespace Neutrino
 	// GetGameMSElapsed()
 	// 		returns milliseconds elapsed over total duration of game ticks
 	// 		Note, if game tick is paused then MS elapsed does not increment
-	float GetGameMSElapsed();
+	uint32 GetGameMSElapsed();
 
 	// GetUIMSDelta()
 	// 		returns milliseconds passed since last UI tick
@@ -32,7 +32,7 @@ namespace Neutrino
 
 	// GetFrameCount()
 	// 		returns current frame number
-	uint32 GetFrameCount();
+	uint64 GetFrameCount();
 
 
 	// TimeInit()

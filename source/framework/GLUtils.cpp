@@ -22,7 +22,7 @@ namespace Neutrino {
                         glEnable(GL_DEPTH_TEST);
                         glEnable(GL_BLEND);
                         glActiveTexture(GL_TEXTURE0);
-                        glClearColor( 0.05, 0.15, 0.25, 1.0 );
+                        glClearColor( 0.05f, 0.15f, 0.25f, 1.0f );
                         glClearDepth(1.0f);
                         glDepthFunc(GL_LEQUAL);
 
@@ -39,9 +39,9 @@ namespace Neutrino {
                 void TestRender()
                 {
                         glBegin(GL_TRIANGLES);
-                        glVertex3f(0.0, 2.0, 1.0);
-                        glVertex3f(-2.0, -2.0, 1.0);
-                        glVertex3f(2.0, -2.0, 1.0);
+                        glVertex3f(0.0f, 2.0f, 1.0f);
+                        glVertex3f(-2.0f, -2.0f, 1.0f);
+                        glVertex3f(2.0f, -2.0f, 1.0f);
                         glEnd();
                 }
         }

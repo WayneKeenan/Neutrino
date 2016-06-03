@@ -34,7 +34,12 @@ To build the game and engine:
 - `./MakePackfile.sh`
 - `./BuildAndRun.sh`
 
-This will leave the Neutrino executable in the build folder. To clean the build folder (remove executable and all cmake/make related files) run the following from the build folder:
+Or, alternatively:
+
+- `cd build/`
+- `./FullBiuld.sh`
+
+This will leave the Neutrino executable in the build/bin folder. To clean the build folder (remove executable and all cmake/make related files) run the following from the build folder:
 
 `./CleanAll.sh` 
 

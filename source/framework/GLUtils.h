@@ -5,6 +5,8 @@
 #include <glm/mat4x4.hpp>
 #include "Types.h"
 
+// Macros for glError Wrapper
+//
 #if defined(DEBUG)
 	#define GL_ERROR do{GLUtils::LogGlError(__FILE__,__LINE__);}while(0)
 	#define ASSERT_GL_ERROR do{ASSERT(!GLUtils::LogGlError(__FILE__,__LINE__));}while(0)
@@ -18,6 +20,8 @@ namespace Neutrino
 
 	namespace GLUtils 
 	{
+
+		// Temporary MAX_SPRITES setting
 		static const uint16 s_iMaxSprites = 4096*2;
 
 		typedef struct Vertex_t

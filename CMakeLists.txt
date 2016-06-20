@@ -62,8 +62,9 @@ if(PHYSFS_FOUND)
 endif()
 
 # Add source files (this means regenerating CMake files every time we add new source files)
-FILE( GLOB_RECURSE NEUTRINO_SOURCES source/*.cpp )
 FILE( GLOB_RECURSE NEUTRINO_HEADERS source/*.h )
+FILE( GLOB_RECURSE NEUTRINO_SOURCES source/*.cpp )
+
 
 add_executable(Neutrino ${NEUTRINO_SOURCES})
 target_link_libraries(

@@ -1,4 +1,5 @@
 #include "Framework.h"
+#include "GLUtils.h"
 #include "libconfig.h"
 
 #include <stdio.h>
@@ -120,6 +121,7 @@ namespace Neutrino
 				return false;
 
 			GLUtils::SetViewport(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+			GLUtils::CreateVBO();
 		}
 
 
@@ -148,6 +150,7 @@ namespace Neutrino
 		{
 			char pResourcesFilename[4096]={'\0'};
 			sprintf(pResourcesFilename, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+
 			if (!UnmountResources(pResourcesFilename))
 				LOG_ERROR("Unable to unmount resources file: %s", pResourcesFilename);
 	

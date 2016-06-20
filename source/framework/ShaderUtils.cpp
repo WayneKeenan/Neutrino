@@ -24,7 +24,7 @@ namespace Neutrino {
 
 	struct _ShaderSettings_t
 	{
-	  GLint _Uniforms   [NUM_UNIFORMS];
+	  GLint _Uniforms[NUM_UNIFORMS];
 	  GLint _ProgramID; 
 	};
 
@@ -79,7 +79,6 @@ namespace Neutrino {
 		LogProgram( iProg );
 #endif
 		glGetProgramiv(iProg, GL_LINK_STATUS, &iStatus);
-		
 		if(iStatus != GL_TRUE)
 		{
 			glDeleteProgram(iProg);
@@ -94,10 +93,9 @@ namespace Neutrino {
 	// CompileShader()
 	//		Take C-String shader source and compile it. With optional debug validation and logging
 	//
-	static bool CompileShader ( GLuint iShader, GLenum iType, const char* pShaderSource, const int iBytes )
+	static bool CompileShader ( GLuint iShader, const char* pShaderSource, const int iBytes )
 	{
  		GLint iStatus;
-		iShader = glCreateShader(iType);
 
 		glShaderSource(iShader, 1, &pShaderSource, &iBytes);
 		glCompileShader(iShader);
@@ -125,8 +123,10 @@ namespace Neutrino {
 	{
 		ASSERT(iNumShadersLoaded < NUM_SHADERS, "Attempting to load more shaders than currently defined");
 
-		GLuint iVertShader = 0, iFragShader = 0;
-		int iFragSourceSize = 0, iVertSourceSize = 0;
+		GLuint iVertShader = 0;
+		GLuint iFragShader = 0;
+		int iFragSourceSize = 0;
+		int iVertSourceSize = 0;
 		const char* FragSource = NULL;
 		const char* VertSource = NULL;
 
@@ -146,49 +146,87 @@ namespace Neutrino {
 		}
 
 
-		aLoadedShaders[ iNumShadersLoaded ]._ProgramID	= glCreateProgram();
-
-		// Compile the shaders...
+		// Generate the program and shader objects we need
 		{
-			ASSERT( CompileShader (iFragShader, GL_FRAGMENT_SHADER, FragSource, iFragSourceSize ), "Failed to compile fragment shader!");
-			ASSERT( CompileShader (iVertShader, GL_VERTEX_SHADER, VertSource, iVertSourceSize ), "Failed to compile vertex shader!");  
+			aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
+			aLoadedShaders[ iNumShadersLoaded ]._ProgramID = glCreateProgram();
+
+			if( aLoadedShaders[ iNumShadersLoaded ]._ProgramID == 0 )
+			{
+				LOG_ERROR("LoadShader: %s -- glCreateProgram failed...");
+				return false;
+			}
+
+			iFragShader = glCreateShader(GL_FRAGMENT_SHADER);
+			if( iFragShader == 0 )
+			{
+				LOG_ERROR("LoadShader: %s -- glCreateShader failed for GL_FRAGMENT_SHADER...");
+				return false;
+			}
+
+			iVertShader = glCreateShader(GL_VERTEX_SHADER);
+			if( iVertShader == 0 )
+			{
+				LOG_ERROR("LoadShader: %s -- glCreateShader failed for GL_VERTEX_SHADER...");
+				return false;
+			}
+		}
+
+
+
+		// Compile and link the shaders...
+		{
+			ASSERT( CompileShader (iFragShader, FragSource, iFragSourceSize ), "Failed to compile fragment shader!");
+			ASSERT( CompileShader (iVertShader, VertSource, iVertSourceSize ), "Failed to compile vertex shader!");  
 
 			// Attach shaders to program ID
 			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iFragShader);
+	  		ASSERT_GL_ERROR;
 			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iVertShader);  
+  			ASSERT_GL_ERROR;
 
+			// Link program
+			if ( !LinkShader( aLoadedShaders[ iNumShadersLoaded ]._ProgramID ) )
+			{    
+					glDeleteShader(iVertShader);
+					iVertShader = 0;
+					glDeleteShader(iFragShader);
+			  		iFragShader = 0;
+				 	glDeleteProgram(aLoadedShaders[ iNumShadersLoaded ]._ProgramID);
+			  		aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
+
+			  		DELETEX FragSource;
+			  		DELETEX VertSource;
+			  		return false;
+			}
+		}
+
+
+		// Setup the uniforms so we can access them later
+		{
 			// TO_DO: Need these to be custom for each shader as well...
 			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
+	  		GL_ERROR;
 			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
+	  		GL_ERROR;
 			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
+	  		GL_ERROR;
+
+			// Get uniform locations
+			aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
+			aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "texture" );
+			aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "matrix" );
 		}
 
 
-		// Link program
-		if ( !LinkShader( aLoadedShaders[ iNumShadersLoaded ]._ProgramID ) )
-		{    
-				glDeleteShader(iVertShader);
-				iVertShader = 0;
-				glDeleteShader(iFragShader);
-		  		iFragShader = 0;
-			 	glDeleteProgram(aLoadedShaders[ iNumShadersLoaded ]._ProgramID);
-		  		aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
-
-		  		DELETEX FragSource;
-		  		DELETEX VertSource;
-		  		return false;
+		// Clean up
+		{
+			glDeleteShader(iVertShader);
+			glDeleteShader(iFragShader);
+	  		DELETEX FragSource;
+	  		DELETEX VertSource;
 		}
 
-		// Get uniform locations
-		aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
-		aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "texture" );
-		aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "matrix" );
-
-		// Release vertex and fragment shaders
-		glDeleteShader(iVertShader);
-		glDeleteShader(iFragShader);
-  		DELETEX FragSource;
-  		DELETEX VertSource;
 
 		// We've loaded a shader
 		++iNumShadersLoaded;
@@ -218,6 +256,8 @@ namespace Neutrino {
 		pActiveShader = &aLoadedShaders[iIndex];
 
 		glUseProgram( pActiveShader->_ProgramID );
+  		GL_ERROR;
 		glUniformMatrix4fv( pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());
+  		GL_ERROR;
 	}
 }

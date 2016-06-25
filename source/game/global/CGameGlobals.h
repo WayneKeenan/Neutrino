@@ -9,4 +9,5 @@ class CGameGlobals : public CSingleton<CGameGlobals>
 
 
 		CGameGlobals() {LOG_INFO("Game Globals created");};
+		~CGameGlobals() {LOG_INFO("Game Globals destroyed");};
 };

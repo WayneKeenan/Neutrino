@@ -8,7 +8,7 @@ namespace Neutrino
 {
 
 	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
-	CGameGlobals* GameGlobals = NULL;
+	CGameGlobals* pGameGlobals;		// Remove this, just a test...
 
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
@@ -125,8 +125,10 @@ namespace Neutrino
 			GLUtils::CreateVBO();
 		}
 
-		// Create GameGlobals singleton so the rest of the game can reference it
-		GameGlobals = NEWX CGameGlobals();
+		// Create any Singletons we need
+		//
+		CGameGlobals::Create();
+		pGameGlobals = CGameGlobals::InstancePtr(); // Remove this, just a test...
 
 
 		// Enter Initial Gamestate
@@ -157,6 +159,8 @@ namespace Neutrino
 			if (!UnmountResources(pResourcesFilename))
 				LOG_ERROR("Unable to unmount resources file: %s", pResourcesFilename);
 	
+			// Remove any singletons we created...
+			CGameGlobals::Destroy();
 			DELETEX(NeutrinoPreferences);
 		}
 

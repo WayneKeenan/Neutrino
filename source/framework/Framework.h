@@ -24,8 +24,7 @@ namespace Neutrino {
 	} NeutrinioPreferences_t;
 
 	extern NeutrinioPreferences_t* NeutrinoPreferences;
-	extern CGameGlobals* GameGlobals;
-
+	extern CGameGlobals* pGameGlobals;
 	
 	bool CoreInit(const char* const pGameName);
 	bool CoreUpdate();

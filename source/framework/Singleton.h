@@ -11,6 +11,7 @@
 // Nicked from MSD :D
 
 #pragma once
+#include "Memory.h"
 
 template <typename T> class CSingleton
 {
@@ -43,14 +44,14 @@ public:
   static void Create()
   {
     ASSERT( InstancePtr() == NULL);
-    s_pSingleton = new T;
+    s_pSingleton = NEWX T;
   }
   
   //! Destroy this singleton
   static void Destroy()
   {
     ASSERT( InstancePtr() != NULL );
-    delete s_pSingleton;
+    DELETEX s_pSingleton;
     s_pSingleton = NULL;
   }
 };

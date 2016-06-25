@@ -237,11 +237,12 @@ namespace Neutrino {
 	bool LoadEngineShaders()
 	{
 		LoadShader(s_pDefaultShaderFragFilename, s_pDefaultShaderVertFilename);
+		LoadShader(s_pDefaultUntexturedFragFilename, s_pDefaultUntexturedVertFilename);
 		LoadShader(s_pBloomShaderFragFilename, s_pBloomShaderVertFilename);
 		LoadShader(s_pBlurHorizShaderFragFilename, s_pBlurHorizShaderVertFilename);
 		LoadShader(s_pBlurVertShaderFragFilename, s_pBlurVertShaderVertFilename);
 
-		SetActiveShader(DEFAULT_SHADER);
+		SetActiveShader(DEFAULT_UNTEXTURED);
 
 		return true;
 	}

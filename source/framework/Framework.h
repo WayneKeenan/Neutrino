@@ -11,6 +11,7 @@
 #include "File.h"
 #include "ShaderUtils.h"
 #include "GameStateManager.h"
+#include "../game/global/CGameGlobals.h"
 
 namespace Neutrino {
 	
@@ -23,6 +24,7 @@ namespace Neutrino {
 	} NeutrinioPreferences_t;
 
 	extern NeutrinioPreferences_t* NeutrinoPreferences;
+	extern CGameGlobals* GameGlobals;
 
 	
 	bool CoreInit(const char* const pGameName);

@@ -8,6 +8,7 @@ namespace Neutrino
 {
 
 	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
+	CGameGlobals* GameGlobals = NULL;
 
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
@@ -124,6 +125,8 @@ namespace Neutrino
 			GLUtils::CreateVBO();
 		}
 
+		// Create GameGlobals singleton so the rest of the game can reference it
+		GameGlobals = NEWX CGameGlobals();
 
 
 		// Enter Initial Gamestate

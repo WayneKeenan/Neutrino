@@ -6,6 +6,7 @@
 #include "Types.h"
 #include "Assert.h"
 
+
 // Macros for glError Wrapper
 //
 #if defined(DEBUG)
@@ -47,7 +48,7 @@ namespace Neutrino
 		bool LogGlError(const char *pFile, int iLine);
 
 		// CreateVBO
-		//		TODO:
+		//		TO_DO:
 		//			Return a struct of 3 VBOs (triple buffering) of s_iMaxSprites in size
 		void CreateVBO();
 

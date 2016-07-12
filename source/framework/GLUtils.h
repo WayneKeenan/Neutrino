@@ -5,7 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include "Types.h"
 #include "Assert.h"
-
+#include "Colour.h"
 
 // Macros for glError Wrapper
 //

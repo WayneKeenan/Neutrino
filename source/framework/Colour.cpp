@@ -5,9 +5,13 @@ namespace Neutrino
 {
 	uint32 GetPackedColour(const float fR, const float fG, const float fB, const float fA)
 	{
-		return (uint32)((uint8)( fA * 255.0f) << 24) | ((uint8)( fB * 255.0f) << 16) | ((uint8)( fG * 255.0f) << 8) | (uint8)(fR * 255.0f);
+		return (uint32)((uint8)(fA * 255.0f) << 24) | ((uint8)(fB * 255.0f) << 16) | ((uint8)(fG * 255.0f) << 8) | (uint8)(fR * 255.0f);
 	}
 
+	uint32 GetPackedColourV4(const glm::vec4 vColour)
+	{
+		return (uint32)((uint8)(vColour.w * 255.0f) << 24) | ((uint8)(vColour.z * 255.0f) << 16) | ((uint8)(vColour.y * 255.0f) << 8) | (uint8)(vColour.x * 255.0f);
+	}
 
 	uint32 GetPackedColourHSV(const float fH, const float fS, const float fV, const float fA)
 	{

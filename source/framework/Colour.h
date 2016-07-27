@@ -20,10 +20,4 @@ namespace Neutrino
 	// GetPackedColourHSV
 	// 		Returns colour from HSV (0.0f -> 1.0f range) inputs to AABBGGRR packed int.
 	uint32 GetPackedColourHSV(const float fH, const float fS, const float fV, const float fA);
-
-
-
-	// TO_DO:
-	// 		
-	// 		Colour functions should also operate on glm::vec4
 }

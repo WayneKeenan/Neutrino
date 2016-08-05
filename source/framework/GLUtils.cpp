@@ -64,8 +64,6 @@ namespace Neutrino {
             glVertex3f(-2.0f, -2.0f, 1.0f);
             glVertex3f(2.0f, -2.0f, 1.0f);
             glEnd();
-
-            LOG_INFO("Packed colour:" FOUR_BYTE_HEX, GetPackedColour(0.5f, 0.5f,0.5f,1.0f));
         }
 
 

@@ -8,6 +8,9 @@ namespace Neutrino {
         static glm::mat4 mCameraMatrix;
         static glm::mat4 mModelViewMatrix;
 
+        float OGL_X_RATIO;
+        float OGL_Y_RATIO;
+
         float* GetCameraMatrix()
         {
             return &mCameraMatrix[0][0];
@@ -34,6 +37,9 @@ namespace Neutrino {
 
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             GL_ERROR;
+
+            OGL_X_RATIO = (float)iScreenWidth / (float)iScreenHeight;
+            OGL_Y_RATIO = 1.0f;
         }
 
         void GenerateMVCMatrices( const int iScreenWidth, const int iScreenHeight)

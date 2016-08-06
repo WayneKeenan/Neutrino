@@ -31,6 +31,13 @@ namespace Neutrino
 
 		static const uint16 s_iMaxSprites = 2048;		// Temporary, need to find a balance of the amount we're copying vs number needed.
 		
+		extern float OGL_X_RATIO;
+		extern float OGL_Y_RATIO;
+		extern float DISPLAY_X_SCALE;
+		extern float DISPLAY_Y_SCALE;
+		extern uint16 INTERNAL_PIXEL_X;
+		extern uint16 INTERNAL_PIXEL_Y;
+
 		// Temporary
 		void TestRender();
 

@@ -147,9 +147,11 @@ namespace Neutrino
 	bool CoreUpdate()
 	{
 		TimeUpdate();
+		ResetSpriteCount();
 		GameStateUpdate();
 		GLUtils::GenerateMVCMatrices(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 		GLUtils::TestRender();
+		TestSprite();
 		SDLPresent();
 		return true;
 	}

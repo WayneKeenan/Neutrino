@@ -2,6 +2,7 @@
 
 #if defined(DEBUG)
 
+/*
 FILE *pLogfile = stderr; 
 
 void dmesg_SetOutputStream(FILE *pFile)
@@ -20,4 +21,6 @@ void dmesg(const char* msg, ...)
 	vfprintf(pLogfile, msg, args); 
 	va_end(args); 
 };
+
+*/
 #endif

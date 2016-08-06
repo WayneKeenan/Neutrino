@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+/*
 extern FILE *pLogfile;
 
 #if defined(DEBUG)
@@ -11,3 +12,4 @@ extern FILE *pLogfile;
 	#define dmesg_SetOutputStream(FILE *pFILE) { do{} while(0); }
 	#define dmesg(msg, ...)	{ do {} while(0); }
 #endif
+*/

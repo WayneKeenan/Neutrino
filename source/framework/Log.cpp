@@ -67,6 +67,25 @@ namespace Neutrino
 		// TO_DO: Add framecount to this...
 
 		char sBuff[4096]={'\0'};
+
+		switch(_nType)
+		{
+			case Neutrino::LOG_INFO:
+				snprintf(sBuff, 8, "%s", ANSI_COLOUR_GREEN);
+				Write(sBuff);
+			break;
+
+			case Neutrino::LOG_WARNING:
+				snprintf(sBuff, 8, "%s", ANSI_COLOUR_YELLOW);
+				Write(sBuff);
+			break;
+
+			case Neutrino::LOG_ERROR:
+				snprintf(sBuff, 8, "%s", ANSI_COLOUR_RED);
+				Write(sBuff);
+			break;
+		}
+
 		snprintf(sBuff, 8, "%s: ", s_asTypeNameLUT[_nType]);
 		Write(sBuff);
 

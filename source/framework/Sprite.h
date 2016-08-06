@@ -16,19 +16,6 @@ namespace Neutrino
 		glm::vec3* 	_vPosition;
 	} Sprite_t;
 
-
-	typedef struct SpriteArrayBase_t
-	{
-		float* a_fHalfWidth;
-		float* a_fHalfHeight;
-		float* a_fSpriteRotRadians;
-		float* a_fSpriteScale;
-		uint32* a_u32SprColours;
-		glm::vec3* a_vSprPositions;
-	} SpriteArrayBase_t;
-
-	extern SpriteArrayBase_t sSpriteBase;
-
 	void AllocateSpriteArrays(uint16_t iSpriteCount);
 
 	void DeallocateSpriteArrays();

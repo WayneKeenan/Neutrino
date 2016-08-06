@@ -12,7 +12,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 # Set our build type compiler flags
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wcast-qual -Wwrite-strings -std=c++11 -Wno-c++14-compat -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wcast-qual -Wwrite-strings -std=c++11 -Wno-c++14-compat")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g -DDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O3")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")

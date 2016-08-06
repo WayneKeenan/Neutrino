@@ -2,10 +2,18 @@
 #include "Log.h"
 #include "Memory.h"
 #include "Colour.h"
+#include <string.h>
 
 namespace Neutrino 
 {
-	SpriteArrayBase_t* sSpriteArrayBase = NULL;
+
+    static float* a_fHalfWidth;
+    static float* a_fHalfHeight;
+    static float* a_fSpriteRotRadians;
+    static float* a_fSpriteScale;
+    static uint32* a_u32SprColours;
+    static glm::vec3* a_vSprPositions;
+
 	static Sprite_t* a_sSprite = NULL;
 	static uint16 iActiveSpriteCount = 0;
 
@@ -14,56 +22,55 @@ namespace Neutrino
 	{
 		iActiveSpriteCount = 0;
 
-		sSpriteArrayBase = NEWX SpriteArrayBase_t;
-		LOG_INFO("Allocated %d bytes [%dK] for sprite array base", sizeof(SpriteArrayBase_t), (sizeof(SpriteArrayBase_t) * iSpriteCount) / 1024 );		
-
-		sSpriteArrayBase->a_fHalfWidth = NEWX float[iSpriteCount];
+        a_fHalfWidth = (float*) malloc(sizeof(float)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-		sSpriteArrayBase->a_fHalfHeight = NEWX float[iSpriteCount];
+        a_fHalfHeight = (float*) malloc(sizeof(float)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-		sSpriteArrayBase->a_fSpriteRotRadians = NEWX float[iSpriteCount];
+        a_fSpriteRotRadians = (float*) malloc(sizeof(float)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for sprite rotatoins", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-		sSpriteArrayBase->a_fSpriteScale = NEWX float[iSpriteCount];
+        a_fSpriteScale = (float*) malloc(sizeof(float)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-		sSpriteArrayBase->a_u32SprColours = NEWX uint32[iSpriteCount];
+        a_u32SprColours = (uint32*) malloc(sizeof(uint32)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(uint32) * iSpriteCount, (sizeof(uint32) * iSpriteCount) / 1024 );		
 
-		sSpriteArrayBase->a_vSprPositions = NEWX glm::vec3[iSpriteCount];		
+        a_vSprPositions = (glm::vec3*) malloc(sizeof(glm::vec3)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iSpriteCount, (sizeof(glm::vec3) * iSpriteCount) / 1024);
 
-		a_sSprite = NEWX Sprite_t[iSpriteCount];
+        a_sSprite = (Sprite_t*)malloc(sizeof(Sprite_t)*iSpriteCount);
+        memset (a_sSprite,'0',sizeof(Sprite_t)*iSpriteCount);
 		LOG_INFO("Allocated %d bytes [%dK] for sprite structs", sizeof(Sprite_t) * iSpriteCount, (sizeof(Sprite_t) * iSpriteCount) / 1024);
 	}
 
 	void DeallocateSpriteArrays()
 	{
-		DELETEX sSpriteArrayBase->a_fHalfWidth;
-		DELETEX sSpriteArrayBase->a_fHalfHeight;
-		DELETEX sSpriteArrayBase->a_fSpriteScale;
-		DELETEX sSpriteArrayBase->a_fSpriteRotRadians;
-		DELETEX sSpriteArrayBase->a_u32SprColours;
-		DELETEX sSpriteArrayBase->a_vSprPositions;
+        DELETEX a_fHalfWidth;
+        DELETEX a_fHalfHeight;
+        DELETEX a_fSpriteScale;
+        DELETEX a_fSpriteRotRadians;
+        DELETEX a_u32SprColours;
+        DELETEX a_vSprPositions;
 		DELETEX a_sSprite;
-		DELETEX sSpriteArrayBase;
 	}
 
 
-	Sprite_t* GetNextSprite()
+    Sprite_t* GetNextSprite(Sprite_t* pNextSprite)
 	{
-		a_sSprite[iActiveSpriteCount]._fHalfWidth = &sSpriteArrayBase->a_fHalfWidth[iActiveSpriteCount];
-		a_sSprite[iActiveSpriteCount]._fHalfHeight = &sSpriteArrayBase->a_fHalfHeight[iActiveSpriteCount];
-		a_sSprite[iActiveSpriteCount]._fRotRadians = &sSpriteArrayBase->a_fSpriteRotRadians[iActiveSpriteCount];
-		a_sSprite[iActiveSpriteCount]._fScale = &sSpriteArrayBase->a_fSpriteScale[iActiveSpriteCount];
-		a_sSprite[iActiveSpriteCount]._uPackedColour = &sSpriteArrayBase->a_u32SprColours[iActiveSpriteCount];
-		a_sSprite[iActiveSpriteCount]._vPosition = &sSpriteArrayBase->a_vSprPositions[iActiveSpriteCount];
+        pNextSprite = &a_sSprite[iActiveSpriteCount];
+
+        pNextSprite->_fHalfWidth = &a_fHalfWidth[iActiveSpriteCount];
+        pNextSprite->_fHalfHeight = &a_fHalfHeight[iActiveSpriteCount];
+        pNextSprite->_fRotRadians = &a_fSpriteRotRadians[iActiveSpriteCount];
+        pNextSprite->_fScale = &a_fSpriteScale[iActiveSpriteCount];
+        pNextSprite->_uPackedColour = &a_u32SprColours[iActiveSpriteCount];
+        pNextSprite->_vPosition = &a_vSprPositions[iActiveSpriteCount];
 
 		iActiveSpriteCount++;
 
-		return &a_sSprite[iActiveSpriteCount];
+        return pNextSprite;
 	}
 
 
@@ -74,7 +81,8 @@ namespace Neutrino
 
 	void TestSprite()
 	{
-		Sprite_t* mySprite = GetNextSprite();
-		*mySprite->_uPackedColour = GetPackedColour(1.0f, 1.0f, 0.0f, 1.0f);
+        Sprite_t* mySprite;
+        GetNextSprite(mySprite);
+        *(mySprite->_uPackedColour) = GetPackedColour(1.0f, 1.0f, 0.0f, 1.0f);
 	}
 }

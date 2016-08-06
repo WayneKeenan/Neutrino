@@ -8,6 +8,7 @@
 #include "Memory.h"
 #include "Time.h"
 #include "GLUtils.h"
+#include "Sprite.h"
 #include "File.h"
 #include "ShaderUtils.h"
 #include "GameStateManager.h"

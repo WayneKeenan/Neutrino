@@ -13,6 +13,12 @@ namespace Neutrino {
             return &mCameraMatrix[0][0];
         }
 
+        // TO_DO:
+        // 
+        // May need to calculate these matrices multiple times, especially if we're moving the camera about. 
+        // Split these out into their own function?
+        // 
+        // Should iScreenwidth and height be stored locally here?
 
 
         void SetViewport(const int iScreenWidth, const int iScreenHeight)
@@ -28,7 +34,13 @@ namespace Neutrino {
 
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             GL_ERROR;
+        }
 
+        void GenerateMVCMatrices( const int iScreenWidth, const int iScreenHeight)
+        {
+            // TO_DO:
+            // 
+            // Play with these to work out how to move the camera about...
             glm::mat4 mRotationMatrix = glm::rotate(glm::mat4(), 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
             glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
             glm::mat4 mProjectionMatrix = glm::ortho(0.0f, (float)((float)iScreenWidth/(float)iScreenHeight), 0.0f, 1.0f, 0.1f, 10.0f );
@@ -60,9 +72,9 @@ namespace Neutrino {
         void TestRender()
         {
             glBegin(GL_TRIANGLES);
-            glVertex3f(0.0f, 2.0f, 1.0f);
-            glVertex3f(-2.0f, -2.0f, 1.0f);
-            glVertex3f(2.0f, -2.0f, 1.0f);
+            glVertex3f(0.0f, 1.0f, 1.0f);
+            glVertex3f(-1.0f, -1.0f, 1.0f);
+            glVertex3f(1.0f, -1.0f, 1.0f);
             glEnd();
         }
 
@@ -105,6 +117,11 @@ namespace Neutrino {
                 err=glGetError();
             }
             return bReturnVal;
+        }
+
+        uint16 GetMaxSpriteCount()
+        {
+            return s_iMaxSprites;
         }
     }
 }

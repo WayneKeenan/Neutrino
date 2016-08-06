@@ -24,16 +24,12 @@ namespace Neutrino
 	{
 		typedef struct Vertex_t
 		{
-			uint32_t _colour; 
-			glm::vec2 _uv;
-			glm::vec3 _position;
+			uint32_t 	_colour; 
+			glm::vec2 	_uv;
+			glm::vec3 	_position;
 		} Vertex_t; 
 
-		static const uint16 s_iMaxSprites = 4096*2;		// Temporary, need to find a balance of the amount we're copying vs number needed.
-		static const uint16 s_iSizeOfVertext = sizeof(Vertex_t);
-
-
-
+		static const uint16 s_iMaxSprites = 2048;		// Temporary, need to find a balance of the amount we're copying vs number needed.
 		
 		// Temporary
 		void TestRender();
@@ -41,6 +37,10 @@ namespace Neutrino
 		// SetViewport
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
 		void SetViewport(const int iScreenWidth, const int iScreenHeight);
+
+		// GenerateMatrices
+		// 		Create the new ModelView and Camera Matrices for this tick
+		void GenerateMVCMatrices(const int iScreenWidth, const int iScreenHeight);
 
 		// LogGlError
 		// 	 Wrapper to chcek glError and LOG_ERR to log file in a clean way. 
@@ -61,5 +61,10 @@ namespace Neutrino
 		// DeleteVBO
 		// 		Safely cleans up any created VBOs, with error checking.
 		void DeleteVBO( GLuint iVBO_ID  );
+
+
+		// GetMaxSpriteCount
+		// 		Return maximum number of sprites per VBO
+		uint16 GetMaxSpriteCount();
 	};
 }

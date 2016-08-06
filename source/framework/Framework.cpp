@@ -122,8 +122,13 @@ namespace Neutrino
 				return false;
 
 			GLUtils::SetViewport(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+			GLUtils::GenerateMVCMatrices(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 			GLUtils::CreateVBO();
 		}
+
+
+		// Allocate Sprite Buffers
+		AllocateSpriteArrays(GLUtils::GetMaxSpriteCount());
 
 		// Create any Singletons we need
 		//
@@ -143,6 +148,7 @@ namespace Neutrino
 	{
 		TimeUpdate();
 		GameStateUpdate();
+		GLUtils::GenerateMVCMatrices(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 		GLUtils::TestRender();
 		SDLPresent();
 		return true;
@@ -162,6 +168,10 @@ namespace Neutrino
 			// Remove any singletons we created...
 			CGameGlobals::Destroy();
 			DELETEX(NeutrinoPreferences);
+
+			// Delete shaders 
+			// Delete VOBs
+			DeallocateSpriteArrays();
 		}
 
 

@@ -20,7 +20,7 @@ namespace Neutrino
 
 	void DeallocateSpriteArrays();
 
-	Sprite_t* GetNextSprite();
+	Sprite_t* GetActiveSprite();
 
 	void ResetSpriteCount();
 

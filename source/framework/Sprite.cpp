@@ -26,26 +26,26 @@ namespace Neutrino
 		iMaxSpriteCount = iSpriteCount;
 
         a_fHalfWidth = NEWX float[iSpriteCount];
-		LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+				LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
         a_fHalfHeight = NEWX float[iSpriteCount];
-		LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+				LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
         a_fSpriteRotRadians = NEWX float[iSpriteCount];
-		LOG_INFO("Allocated %d bytes [%dK] for sprite rotatoins", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+				LOG_INFO("Allocated %d bytes [%dK] for sprite rotatoins", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
         a_fSpriteScale = NEWX float[iSpriteCount];
-		LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
-
+				LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+				
         a_u32SprColours = NEWX uint32[iSpriteCount];
         a_u32SprColours[0] = 256;
-		LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(uint32) * iSpriteCount, (sizeof(uint32) * iSpriteCount) / 1024 );		
+				LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(uint32) * iSpriteCount, (sizeof(uint32) * iSpriteCount) / 1024 );		
 
         a_vSprPositions = NEWX glm::vec3[iSpriteCount];
-		LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iSpriteCount, (sizeof(glm::vec3) * iSpriteCount) / 1024);
+				LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iSpriteCount, (sizeof(glm::vec3) * iSpriteCount) / 1024);
 
         a_sSprite = NEWX Sprite_t[iSpriteCount];
-		LOG_INFO("Allocated %d bytes [%dK] for sprite structs", sizeof(Sprite_t) * iSpriteCount, (sizeof(Sprite_t) * iSpriteCount) / 1024);
+				LOG_INFO("Allocated %d bytes [%dK] for sprite structs", sizeof(Sprite_t) * iSpriteCount, (sizeof(Sprite_t) * iSpriteCount) / 1024);
 
 		for(int i = 0; i < iSpriteCount; i ++)
 		{
@@ -99,9 +99,9 @@ namespace Neutrino
 
         *(mySprite->_uPackedColour) = GetPackedColour(1.0f, 1.0f, 0.0f, 1.0f);
 
-        LOG_INFO("Active sprite count: %d", iActiveSpriteCount);
-        LOG_INFO("Packed colour" FOUR_BYTE_HEX, GetPackedColour(1.0f, 1.0f, 0.0f, 1.0f));
-        LOG_INFO("Sprite colour" FOUR_BYTE_HEX, *mySprite->_uPackedColour );
-        LOG_INFO("Array color" FOUR_BYTE_HEX, a_u32SprColours[iActiveSpriteCount-1]);
+//        LOG_INFO("Active sprite count: %d", iActiveSpriteCount);
+//				LOG_INFO("Packed colour" FOUR_BYTE_HEX, GetPackedColour(1.0f, 1.0f, 0.0f, 1.0f));
+//        LOG_INFO("Sprite colour" FOUR_BYTE_HEX, *mySprite->_uPackedColour );
+//        LOG_INFO("Array color" FOUR_BYTE_HEX, a_u32SprColours[iActiveSpriteCount-1]);
 	}
 }

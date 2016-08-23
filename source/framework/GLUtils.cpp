@@ -5,22 +5,24 @@ namespace Neutrino {
 
     namespace GLUtils {
 
-        static glm::mat4 mCameraMatrix;
-        static glm::mat4 mModelViewMatrix;
+        static glm::mat4 s_mCameraMatrix;
+        static glm::mat4 s_mModelViewMatrix;
 
-        static float fOGL_X_RATIO;
-        static float fOGL_Y_RATIO;
+        static float s_fOGL_X_RATIO;
+        static float s_fOGL_Y_RATIO;
 
-        static float fViewportWidth;
-        static float fViewportHeight;
+        static float s_fViewportWidth;
+        static float s_fViewportHeight;
 
-        static float fInternalWidth;
-        static float fInternalHeight;
+        static float s_fInternalWidth;
+        static float s_fInternalHeight;
 
+        static const int s_iSizeOfSprite = 6*sizeof(Vertex_t);
+        
 
         float* GetCameraMatrix()
         {
-            return &mCameraMatrix[0][0];
+            return &s_mCameraMatrix[0][0];
         }
 
         // TO_DO:
@@ -34,7 +36,6 @@ namespace Neutrino {
         void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
         {
             LOG_WARNING("GLUtils::SetViewport working with fixed aspect ratio in ortho ProjectionMatrix calc...");
-
 
             // Create an OGL viewport with basic settings
             {
@@ -50,17 +51,15 @@ namespace Neutrino {
                 GL_ERROR;                
             }
 
-
             // Set viewport dimensions, OGL coord range, and internal pixel dimensions
             {
-                fViewportWidth = (float)iViewportWidth;
-                fViewportHeight = (float)iViewportHeight;
-                fOGL_X_RATIO = fViewportWidth / fViewportHeight;
-                fOGL_Y_RATIO = 1.0f;
-                fInternalWidth = fOGL_X_RATIO / (float)iInternalWidth;
-                fInternalHeight = fOGL_Y_RATIO / (float)iInternalHeight;
+                s_fViewportWidth = (float)iViewportWidth;
+                s_fViewportHeight = (float)iViewportHeight;
+                s_fOGL_X_RATIO = s_fViewportWidth / s_fViewportHeight;
+                s_fOGL_Y_RATIO = 1.0f;
+                s_fInternalWidth = s_fOGL_X_RATIO / (float)iInternalWidth;
+                s_fInternalHeight = s_fOGL_Y_RATIO / (float)iInternalHeight;
             }
-
         }
 
         void GenerateMVCMatrices()
@@ -70,10 +69,10 @@ namespace Neutrino {
             // Play with these to work out how to move the camera about...
             glm::mat4 mRotationMatrix = glm::rotate(glm::mat4(), 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
             glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-            glm::mat4 mProjectionMatrix = glm::ortho(0.0f, fViewportWidth/fViewportHeight, 0.0f, 1.0f, 0.1f, 10.0f );
+            glm::mat4 mProjectionMatrix = glm::ortho(0.0f, s_fViewportWidth/s_fViewportHeight, 0.0f, 1.0f, 0.1f, 10.0f );
 
-            mModelViewMatrix = mTranslationMatrix * mRotationMatrix;
-            mCameraMatrix = mProjectionMatrix * mModelViewMatrix;
+            s_mModelViewMatrix = mTranslationMatrix * mRotationMatrix;
+            s_mCameraMatrix = mProjectionMatrix * s_mModelViewMatrix;
         }
 
 
@@ -149,6 +148,12 @@ namespace Neutrino {
         uint16 GetMaxSpriteCount()
         {
             return s_iMaxSprites;
+        }
+
+
+        void RenderSpriteArrays(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount)
+        {
+
         }
     }
 }

@@ -72,5 +72,9 @@ namespace Neutrino
 		// GetMaxSpriteCount
 		// 		Return maximum number of sprites per VBO
 		uint16 GetMaxSpriteCount();
+
+		// RenderSpriteArrays
+		// 		Traverses the sprite settings array and builds the VBO for rendering this frame
+		void RenderSpriteArrays(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount);
 	};
 }

@@ -29,8 +29,8 @@ namespace Neutrino {
 	};
 
 
-	static _ShaderSettings_t* pActiveShader = NULL;
-	static _ShaderSettings_t* aLoadedShaders = NEWX _ShaderSettings_t[NUM_SHADERS];
+	static _ShaderSettings_t* s_pActiveShader = NULL;
+	static _ShaderSettings_t* s_aLoadedShaders = NEWX _ShaderSettings_t[NUM_SHADERS];
 	static uint8 iNumShadersLoaded = 0;
 
 
@@ -148,10 +148,10 @@ namespace Neutrino {
 
 		// Generate the program and shader objects we need
 		{
-			aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
-			aLoadedShaders[ iNumShadersLoaded ]._ProgramID = glCreateProgram();
+			s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
+			s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID = glCreateProgram();
 
-			if( aLoadedShaders[ iNumShadersLoaded ]._ProgramID == 0 )
+			if( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID == 0 )
 			{
 				LOG_ERROR("LoadShader: %s -- glCreateProgram failed...");
 				return false;
@@ -180,20 +180,20 @@ namespace Neutrino {
 			ASSERT( CompileShader (iVertShader, VertSource, iVertSourceSize ), "Failed to compile vertex shader!");  
 
 			// Attach shaders to program ID
-			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iFragShader);
+			glAttachShader(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iFragShader);
 	  		ASSERT_GL_ERROR;
-			glAttachShader(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iVertShader);  
+			glAttachShader(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iVertShader);  
   			ASSERT_GL_ERROR;
 
 			// Link program
-			if ( !LinkShader( aLoadedShaders[ iNumShadersLoaded ]._ProgramID ) )
+			if ( !LinkShader( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID ) )
 			{    
 					glDeleteShader(iVertShader);
 					iVertShader = 0;
 					glDeleteShader(iFragShader);
 			  		iFragShader = 0;
-				 	glDeleteProgram(aLoadedShaders[ iNumShadersLoaded ]._ProgramID);
-			  		aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
+				 	glDeleteProgram(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID);
+			  		s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
 
 			  		DELETEX FragSource;
 			  		DELETEX VertSource;
@@ -205,17 +205,17 @@ namespace Neutrino {
 		// Setup the uniforms so we can access them later
 		{
 			// TO_DO: Need these to be custom for each shader as well...
-			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
+			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
 	  		GL_ERROR;
-			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
+			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
 	  		GL_ERROR;
-			glBindAttribLocation(aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
+			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
 	  		GL_ERROR;
 
 			// Get uniform locations
-			aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
-			aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "texture" );
-			aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "matrix" );
+			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
+			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "texture" );
+			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "matrix" );
 		}
 
 
@@ -249,16 +249,16 @@ namespace Neutrino {
 
 	inline GLint* GetActiveUniforms ()
 	{ 
-		return pActiveShader->_Uniforms; 
+		return s_pActiveShader->_Uniforms; 
 	};
 
 	void SetActiveShader(eStandardShaders iIndex)
 	{
-		pActiveShader = &aLoadedShaders[iIndex];
+		s_pActiveShader = &s_aLoadedShaders[iIndex];
 
-		glUseProgram( pActiveShader->_ProgramID );
+		glUseProgram( s_pActiveShader->_ProgramID );
   		GL_ERROR;
-		glUniformMatrix4fv( pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());
+		glUniformMatrix4fv( s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());
   		GL_ERROR;
 	}
 }

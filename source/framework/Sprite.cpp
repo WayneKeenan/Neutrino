@@ -8,15 +8,15 @@ namespace Neutrino
 {
 
 	// Static allocated arrays for the sprite settings
-    static float* a_fHalfWidth;
-    static float* a_fHalfHeight;
-    static float* a_fSpriteRotRadians;
-    static float* a_fSpriteScale;
-    static glm::vec4* a_vSprColours;
-    static glm::vec3* a_vSprPositions;
+    static float* s_afHalfWidth;
+    static float* s_afHalfHeight;
+    static float* s_afSpriteRotRadians;
+    static float* s_afSpriteScale;
+    static glm::vec4* s_avSprColours;
+    static glm::vec3* s_avSprPositions;
 
     // Array of struct of pointers into the sprite details arrays
-	static Sprite_t* a_sSprite = NULL;
+	static Sprite_t* s_Sprites = NULL;
 
 	// Counters
 	static uint16 iActiveSpriteCount = 0;
@@ -30,25 +30,25 @@ namespace Neutrino
 
 		// Allocate the memory for our sprite settings arrays...
 		{
-	        a_fHalfWidth = NEWX float[iSpriteCount];
+	        s_afHalfWidth = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-	        a_fHalfHeight = NEWX float[iSpriteCount];
+	        s_afHalfHeight = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-	        a_fSpriteRotRadians = NEWX float[iSpriteCount];
+	        s_afSpriteRotRadians = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-	        a_fSpriteScale = NEWX float[iSpriteCount];
+	        s_afSpriteScale = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 					
-	        a_vSprColours = NEWX glm::vec4[iSpriteCount];
+	        s_avSprColours = NEWX glm::vec4[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(glm::vec4) * iSpriteCount, (sizeof(glm::vec4) * iSpriteCount) / 1024 );		
 
-	        a_vSprPositions = NEWX glm::vec3[iSpriteCount];
+	        s_avSprPositions = NEWX glm::vec3[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iSpriteCount, (sizeof(glm::vec3) * iSpriteCount) / 1024);
 
-	        a_sSprite = NEWX Sprite_t[iSpriteCount];
+	        s_Sprites = NEWX Sprite_t[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite structs", sizeof(Sprite_t) * iSpriteCount, (sizeof(Sprite_t) * iSpriteCount) / 1024);
 		}
 
@@ -56,12 +56,12 @@ namespace Neutrino
 		// Setup the pointers in the sprite structs to correct locations in the sprite settings arrays. 
 		for(int i = 0; i < iSpriteCount; i ++)
 		{
-	        a_sSprite[i]._fHalfWidth = &a_fHalfWidth[iActiveSpriteCount];
-	        a_sSprite[i]._fHalfHeight = &a_fHalfHeight[iActiveSpriteCount];
-	        a_sSprite[i]._fRotRadians = &a_fSpriteRotRadians[iActiveSpriteCount];
-	        a_sSprite[i]._fScale = &a_fSpriteScale[iActiveSpriteCount];
-	        a_sSprite[i]._vColour = &a_vSprColours[iActiveSpriteCount];
-	        a_sSprite[i]._vPosition = &a_vSprPositions[iActiveSpriteCount];
+	        s_Sprites[i]._fHalfWidth = &s_afHalfWidth[iActiveSpriteCount];
+	        s_Sprites[i]._fHalfHeight = &s_afHalfHeight[iActiveSpriteCount];
+	        s_Sprites[i]._fRotRadians = &s_afSpriteRotRadians[iActiveSpriteCount];
+	        s_Sprites[i]._fScale = &s_afSpriteScale[iActiveSpriteCount];
+	        s_Sprites[i]._vColour = &s_avSprColours[iActiveSpriteCount];
+	        s_Sprites[i]._vPosition = &s_avSprPositions[iActiveSpriteCount];
 		}
 	}
 
@@ -70,13 +70,13 @@ namespace Neutrino
 
 	void DeallocateSpriteArrays()
 	{
-        DELETEX [] a_fHalfWidth;
-        DELETEX [] a_fHalfHeight;
-        DELETEX [] a_fSpriteScale;
-        DELETEX [] a_fSpriteRotRadians;
-        DELETEX [] a_vSprColours;
-        DELETEX [] a_vSprPositions;
-		DELETEX [] a_sSprite;
+        DELETEX [] s_afHalfWidth;
+        DELETEX [] s_afHalfHeight;
+        DELETEX [] s_afSpriteScale;
+        DELETEX [] s_afSpriteRotRadians;
+        DELETEX [] s_avSprColours;
+        DELETEX [] s_avSprPositions;
+		DELETEX [] s_Sprites;
 	}
 
 
@@ -88,7 +88,7 @@ namespace Neutrino
 
 		if ( iActiveSpriteCount < iMaxSpriteCount)
 		{
-			pRet = &a_sSprite[iActiveSpriteCount]; 
+			pRet = &s_Sprites[iActiveSpriteCount]; 
 			iActiveSpriteCount++;
 		}
 		else

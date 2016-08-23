@@ -19,6 +19,8 @@ namespace Neutrino {
 	typedef struct NeutrinioPreferences_t {
 		int s_iScreenWidth;
 		int s_iScreenHeight;
+		int s_iInternalWidth;
+		int s_iInternalHeight;
 		const char* s_pResourcePath;
 		const char* s_pPrefsPath;
 		

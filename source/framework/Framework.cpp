@@ -69,6 +69,20 @@ namespace Neutrino
 					return false;
 				}
 
+				if( !config_lookup_int(&cfg, "internalheight", &NeutrinoPreferences->s_iInternalHeight))
+				{
+					config_destroy(&cfg);
+					LOG_ERROR("Unable to parse internalhieght from Player Prefs file, exiting...");
+					return false;
+				}
+
+				if( !config_lookup_int(&cfg, "internalwidth", &NeutrinoPreferences->s_iInternalWidth ))
+				{
+					config_destroy(&cfg);
+					LOG_ERROR("Unable to parse internalwidth from Player Prefs file, exiting...");
+					return false;
+				}
+
 				// Think we've got what we need from the config file for now
 				config_destroy(&cfg);
 			}
@@ -79,13 +93,15 @@ namespace Neutrino
 				LOG_WARNING("No player prefs file found, creating defaults...");
 				if( (pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")) )
 				{
-					const char* _pPrefsText = "screenheight: 720\nscreenwidth: 1280\n";
+					const char* _pPrefsText = "screenheight: 720\nscreenwidth: 1280\ninternalwidth: 320\ninternalheight: 180\n";
 					fwrite(_pPrefsText, strlen(_pPrefsText), 1, pPlayerPrefsFile);
 					fflush(pPlayerPrefsFile);
 					fclose(pPlayerPrefsFile);
  
 					NeutrinoPreferences->s_iScreenHeight = 720;
 					NeutrinoPreferences->s_iScreenWidth = 1280;
+					NeutrinoPreferences->s_iInternalWidth = 320;
+					NeutrinoPreferences->s_iInternalHeight = 180;
 				}
 				else
 				{
@@ -114,7 +130,8 @@ namespace Neutrino
 		// 
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			
+			LOG_INFO("Internal dimensions: %d x %d", NeutrinoPreferences->s_iInternalWidth, NeutrinoPreferences->s_iInternalHeight);
+
 			if( !SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight) )
 				return false;
 			

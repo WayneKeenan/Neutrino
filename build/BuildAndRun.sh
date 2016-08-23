@@ -1,6 +1,7 @@
 #/bin/bash
 mkdir ./bin
 make clean
+rm -rf ./bin/Neutrino
 make 
 make install
 rm -rf ./Neutrino

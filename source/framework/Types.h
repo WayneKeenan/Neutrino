@@ -20,3 +20,5 @@ static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
 
 
+#define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
+#define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)

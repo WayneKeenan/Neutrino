@@ -7,6 +7,7 @@
 #include "Assert.h"
 #include "Memory.h"
 #include "Time.h"
+#include "GL/glew.h"
 #include "GLUtils.h"
 #include "Sprite.h"
 #include "File.h"

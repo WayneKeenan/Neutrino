@@ -27,9 +27,9 @@ namespace Neutrino
 		// 
 		typedef struct Vertex_t
 		{
-			uint32_t 	_colour; 
-			glm::vec2 	_uv;
-			glm::vec3 	_position;
+			uint32 	_colour; 
+			GLfloat _uv[2];
+			GLfloat _position[3];
 		} Vertex_t; 
 
 		// Temporary, need to find a balance of the amount we're copying vs number needed.
@@ -73,8 +73,13 @@ namespace Neutrino
 		// 		Return maximum number of sprites per VBO
 		uint16 GetMaxSpriteCount();
 
-		// RenderSpriteArrays
-		// 		Traverses the sprite settings array and builds the VBO for rendering this frame
-		void RenderSpriteArrays(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount);
+		// PopulateVBO
+		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame
+		void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount);
+
+
+		// RenderVBO
+		// 		Bind the current VBO and call GLDrawArrays
+		void RenderVBO(const int iSpriteCount);
 	};
 }

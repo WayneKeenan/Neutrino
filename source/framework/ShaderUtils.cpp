@@ -2,24 +2,17 @@
 #include "Log.h"
 #include "Assert.h"
 #include "File.h"
+#include "GLUtils.h"
 
 
 namespace Neutrino {
 
-	enum 
-	{
-		ATTRIB_VERTEX,
-		ATTRIB_COLOR,
-		ATTRIB_TEXTURE,
-		NUM_ATTRIBUTES
-	};
-
 	enum _ShaderUniforms
 	{
-	  UNIFORM_TRANSLATE,
-	  UNIFORM_MATRIX,
-	  UNIFORM_TEXTURE,
-	  NUM_UNIFORMS
+		UNIFORM_TRANSLATE,
+		UNIFORM_MATRIX,
+		UNIFORM_TEXTURE,
+		NUM_UNIFORMS
 	};
 
 	struct _ShaderSettings_t
@@ -41,10 +34,12 @@ namespace Neutrino {
 	{
 		GLint iLogLength;
   		glGetShaderiv(iID, GL_INFO_LOG_LENGTH, &iLogLength);
+  		ASSERT_GL_ERROR;
   		if (iLogLength > 1)
   		{
     		GLchar *pLog = (GLchar *)malloc(iLogLength);
     		glGetShaderInfoLog(iID, iLogLength, &iLogLength, pLog);
+    		ASSERT_GL_ERROR;
     		LOG_INFO("Shader compile log: %s", pLog);
     		free(pLog);
   		}	
@@ -58,10 +53,12 @@ namespace Neutrino {
 	{
 		GLint iLogLength;
 		glGetProgramiv(iProg, GL_INFO_LOG_LENGTH, &iLogLength);
+		ASSERT_GL_ERROR;
 		if (iLogLength > 1)
 		{
 			GLchar *pLog = (GLchar *)malloc(iLogLength);
 			glGetProgramInfoLog(iProg, iLogLength, &iLogLength, pLog);
+			ASSERT_GL_ERROR;
     		LOG_INFO("Program compile log: %s", pLog);
 			free(pLog);
 		}
@@ -74,11 +71,13 @@ namespace Neutrino {
 	{
 		GLint iStatus;
 		glLinkProgram(iProg);
+		ASSERT_GL_ERROR;
 
 #if defined(DEBUG)
 		LogProgram( iProg );
 #endif
 		glGetProgramiv(iProg, GL_LINK_STATUS, &iStatus);
+		ASSERT_GL_ERROR;
 		if(iStatus != GL_TRUE)
 		{
 			glDeleteProgram(iProg);
@@ -98,16 +97,20 @@ namespace Neutrino {
  		GLint iStatus;
 
 		glShaderSource(iShader, 1, &pShaderSource, &iBytes);
+		ASSERT_GL_ERROR;
 		glCompileShader(iShader);
+		ASSERT_GL_ERROR;
 
 #if defined(DEBUG)
 		LogShader(iShader);
 #endif
 
 		glGetShaderiv(iShader, GL_COMPILE_STATUS, &iStatus);
+		ASSERT_GL_ERROR;
 		if (iStatus != GL_TRUE)
 		{
 			glDeleteShader(iShader);
+			ASSERT_GL_ERROR;
 			return false;
 		}
 
@@ -158,6 +161,7 @@ namespace Neutrino {
 			}
 
 			iFragShader = glCreateShader(GL_FRAGMENT_SHADER);
+			ASSERT_GL_ERROR;
 			if( iFragShader == 0 )
 			{
 				LOG_ERROR("LoadShader: %s -- glCreateShader failed for GL_FRAGMENT_SHADER...");
@@ -165,6 +169,7 @@ namespace Neutrino {
 			}
 
 			iVertShader = glCreateShader(GL_VERTEX_SHADER);
+			ASSERT_GL_ERROR;
 			if( iVertShader == 0 )
 			{
 				LOG_ERROR("LoadShader: %s -- glCreateShader failed for GL_VERTEX_SHADER...");
@@ -176,8 +181,8 @@ namespace Neutrino {
 
 		// Compile and link the shaders...
 		{
-			ASSERT( CompileShader (iFragShader, FragSource, iFragSourceSize ), "Failed to compile fragment shader!");
-			ASSERT( CompileShader (iVertShader, VertSource, iVertSourceSize ), "Failed to compile vertex shader!");  
+			ASSERT( CompileShader (iFragShader, FragSource, iFragSourceSize ), "Failed to compile fragment shader! %s", pFragFilename);
+			ASSERT( CompileShader (iVertShader, VertSource, iVertSourceSize ), "Failed to compile vertex shader! %s", pVertFilename);  
 
 			// Attach shaders to program ID
 			glAttachShader(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iFragShader);
@@ -238,16 +243,18 @@ namespace Neutrino {
 	{
 		LoadShader(s_pDefaultShaderFragFilename, s_pDefaultShaderVertFilename);
 		LoadShader(s_pDefaultUntexturedFragFilename, s_pDefaultUntexturedVertFilename);
+
+		/*
 		LoadShader(s_pBloomShaderFragFilename, s_pBloomShaderVertFilename);
 		LoadShader(s_pBlurHorizShaderFragFilename, s_pBlurHorizShaderVertFilename);
 		LoadShader(s_pBlurVertShaderFragFilename, s_pBlurVertShaderVertFilename);
-
+*/
 		SetActiveShader(DEFAULT_UNTEXTURED);
 
 		return true;
 	}
 
-	inline GLint* GetActiveUniforms ()
+	GLint* GetActiveUniforms ()
 	{ 
 		return s_pActiveShader->_Uniforms; 
 	};
@@ -255,7 +262,7 @@ namespace Neutrino {
 	void SetActiveShader(eStandardShaders iIndex)
 	{
 		s_pActiveShader = &s_aLoadedShaders[iIndex];
-
+		GL_ERROR;
 		glUseProgram( s_pActiveShader->_ProgramID );
   		GL_ERROR;
 		glUniformMatrix4fv( s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());

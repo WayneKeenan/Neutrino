@@ -1,0 +1,199 @@
+Searching 1047 files for "gl.h"
+
+/home/kor/Development/Neutrino/build/CMakeFiles/Neutrino.dir/CXX.includecache:
+  686  SDL.h
+  687  -
+  688: SDL_opengl.h
+  689  -
+  690  framework/Framework.h
+  ...
+  952  SDL.h
+  953  -
+  954: SDL_opengl.h
+  955  -
+  956  ../Assert.h
+  ...
+ 1315  /usr/include/SDL2/close_code.h
+ 1316  
+ 1317: /usr/include/SDL2/SDL_opengl.h
+ 1318  SDL_config.h
+ 1319  /usr/include/SDL2/SDL_config.h
+
+/home/kor/Development/Neutrino/build/CMakeFiles/Neutrino.dir/depend.internal:
+  130   /usr/include/SDL2/SDL_mouse.h
+  131   /usr/include/SDL2/SDL_mutex.h
+  132:  /usr/include/SDL2/SDL_opengl.h
+  133   /usr/include/SDL2/SDL_opengl_glext.h
+  134   /usr/include/SDL2/SDL_pixels.h
+  ...
+  373   /usr/include/SDL2/SDL_mouse.h
+  374   /usr/include/SDL2/SDL_mutex.h
+  375:  /usr/include/SDL2/SDL_opengl.h
+  376   /usr/include/SDL2/SDL_opengl_glext.h
+  377   /usr/include/SDL2/SDL_pixels.h
+  ...
+  537   /usr/include/SDL2/SDL_mouse.h
+  538   /usr/include/SDL2/SDL_mutex.h
+  539:  /usr/include/SDL2/SDL_opengl.h
+  540   /usr/include/SDL2/SDL_opengl_glext.h
+  541   /usr/include/SDL2/SDL_pixels.h
+  ...
+  782   /usr/include/SDL2/SDL_mouse.h
+  783   /usr/include/SDL2/SDL_mutex.h
+  784:  /usr/include/SDL2/SDL_opengl.h
+  785   /usr/include/SDL2/SDL_opengl_glext.h
+  786   /usr/include/SDL2/SDL_pixels.h
+  ...
+  920   /usr/include/SDL2/SDL_mouse.h
+  921   /usr/include/SDL2/SDL_mutex.h
+  922:  /usr/include/SDL2/SDL_opengl.h
+  923   /usr/include/SDL2/SDL_opengl_glext.h
+  924   /usr/include/SDL2/SDL_pixels.h
+
+/home/kor/Development/Neutrino/build/CMakeFiles/Neutrino.dir/depend.make:
+  129  CMakeFiles/Neutrino.dir/source/Neutrino.cpp.o: /usr/include/SDL2/SDL_mouse.h
+  130  CMakeFiles/Neutrino.dir/source/Neutrino.cpp.o: /usr/include/SDL2/SDL_mutex.h
+  131: CMakeFiles/Neutrino.dir/source/Neutrino.cpp.o: /usr/include/SDL2/SDL_opengl.h
+  132  CMakeFiles/Neutrino.dir/source/Neutrino.cpp.o: /usr/include/SDL2/SDL_opengl_glext.h
+  133  CMakeFiles/Neutrino.dir/source/Neutrino.cpp.o: /usr/include/SDL2/SDL_pixels.h
+  ...
+  372  CMakeFiles/Neutrino.dir/source/framework/Framework.cpp.o: /usr/include/SDL2/SDL_mouse.h
+  373  CMakeFiles/Neutrino.dir/source/framework/Framework.cpp.o: /usr/include/SDL2/SDL_mutex.h
+  374: CMakeFiles/Neutrino.dir/source/framework/Framework.cpp.o: /usr/include/SDL2/SDL_opengl.h
+  375  CMakeFiles/Neutrino.dir/source/framework/Framework.cpp.o: /usr/include/SDL2/SDL_opengl_glext.h
+  376  CMakeFiles/Neutrino.dir/source/framework/Framework.cpp.o: /usr/include/SDL2/SDL_pixels.h
+  ...
+  536  CMakeFiles/Neutrino.dir/source/framework/Log.cpp.o: /usr/include/SDL2/SDL_mouse.h
+  537  CMakeFiles/Neutrino.dir/source/framework/Log.cpp.o: /usr/include/SDL2/SDL_mutex.h
+  538: CMakeFiles/Neutrino.dir/source/framework/Log.cpp.o: /usr/include/SDL2/SDL_opengl.h
+  539  CMakeFiles/Neutrino.dir/source/framework/Log.cpp.o: /usr/include/SDL2/SDL_opengl_glext.h
+  540  CMakeFiles/Neutrino.dir/source/framework/Log.cpp.o: /usr/include/SDL2/SDL_pixels.h
+  ...
+  781  CMakeFiles/Neutrino.dir/source/framework/Time.cpp.o: /usr/include/SDL2/SDL_mouse.h
+  782  CMakeFiles/Neutrino.dir/source/framework/Time.cpp.o: /usr/include/SDL2/SDL_mutex.h
+  783: CMakeFiles/Neutrino.dir/source/framework/Time.cpp.o: /usr/include/SDL2/SDL_opengl.h
+  784  CMakeFiles/Neutrino.dir/source/framework/Time.cpp.o: /usr/include/SDL2/SDL_opengl_glext.h
+  785  CMakeFiles/Neutrino.dir/source/framework/Time.cpp.o: /usr/include/SDL2/SDL_pixels.h
+  ...
+  919  CMakeFiles/Neutrino.dir/source/framework/sdl/sdl_wrapper.cpp.o: /usr/include/SDL2/SDL_mouse.h
+  920  CMakeFiles/Neutrino.dir/source/framework/sdl/sdl_wrapper.cpp.o: /usr/include/SDL2/SDL_mutex.h
+  921: CMakeFiles/Neutrino.dir/source/framework/sdl/sdl_wrapper.cpp.o: /usr/include/SDL2/SDL_opengl.h
+  922  CMakeFiles/Neutrino.dir/source/framework/sdl/sdl_wrapper.cpp.o: /usr/include/SDL2/SDL_opengl_glext.h
+  923  CMakeFiles/Neutrino.dir/source/framework/sdl/sdl_wrapper.cpp.o: /usr/include/SDL2/SDL_pixels.h
+
+/home/kor/Development/Neutrino/external_dependencies/imgui/examples/apple_example/imguiex-ios/imgui_impl_ios.mm:
+    4  // Refer to other examples to get an easier understanding of how to integrate ImGui into your existing application.
+    5  
+    6: #import <OpenGLES/ES3/gl.h>
+    7  #import <OpenGLES/ES3/glext.h>
+    8  
+
+/home/kor/Development/Neutrino/external_dependencies/imgui/examples/libs/gl3w/GL/glcorearb.h:
+   36   * RELEASE NOTES - 2012/09/19
+   37   *
+   38:  * glcorearb.h should be placed in the same directory as gl.h and
+   39   * included as
+   40   * '<GL/glcorearb.h>'.
+   ..
+   47   *
+   48   * It is not possible to #include both <GL/glcorearb.h> and either of
+   49:  * <GL/gl.h> or <GL/glext.h> in the same source file.
+   50   *
+   51   * Feedback can be given by registering for the Khronos Bugzilla
+
+/home/kor/Development/Neutrino/external_dependencies/imgui/examples/libs/glfw/include/GLFW/glfw3.h:
+  135     #define GL_GLEXT_LEGACY
+  136    #endif
+  137:   #include <OpenGL/gl.h>
+  138   #endif
+  139   #if defined(GLFW_INCLUDE_GLU)
+  ...
+  144    #include <GL/glcorearb.h>
+  145   #elif defined(GLFW_INCLUDE_ES1)
+  146:   #include <GLES/gl.h>
+  147    #if defined(GLFW_INCLUDE_GLEXT)
+  148     #include <GLES/glext.h>
+  ...
+  166    #include <vulkan/vulkan.h>
+  167   #elif !defined(GLFW_INCLUDE_NONE)
+  168:   #include <GL/gl.h>
+  169    #if defined(GLFW_INCLUDE_GLEXT)
+  170     #include <GL/glext.h>
+
+/home/kor/Development/Neutrino/external_dependencies/imgui/examples/libs/glfw/include/GLFW/glfw3native.h:
+  113  #endif
+  114  #if defined(GLFW_EXPOSE_NATIVE_EGL)
+  115:  #include <EGL/egl.h>
+  116  #endif
+  117  
+
+/home/kor/Development/Neutrino/external_dependencies/imgui/examples/sdl_opengl_example/imgui_impl_sdl.cpp:
+    9  #include <SDL.h>
+   10  #include <SDL_syswm.h>
+   11: #include <SDL_opengl.h>
+   12  #include <imgui.h>
+   13  #include "imgui_impl_sdl.h"
+
+/home/kor/Development/Neutrino/external_dependencies/imgui/examples/sdl_opengl_example/main.cpp:
+    6  #include <stdio.h>
+    7  #include <SDL.h>
+    8: #include <SDL_opengl.h>
+    9  
+   10  int main(int, char**)
+
+/home/kor/Development/Neutrino/source/Neutrino.cpp:
+    4  //#include <GL/glew.h>
+    5  #include <SDL.h>
+    6: #include <SDL_opengl.h>
+    7  
+    8  #include "framework/Framework.h"
+
+/home/kor/Development/Neutrino/source/framework/ShaderUtils.h:
+    2  #include "File.h"
+    3  //#include "GL/glew.h"
+    4: //#include <GL/gl.h>
+    5  #include "glad/glad.h"
+    6  #include "Memory.h"
+
+/home/kor/Development/Neutrino/source/framework/sdl/sdl_wrapper.h:
+    3  //#include <GL/glew.h>
+    4  #include <SDL.h>
+    5: #include <SDL_opengl.h>
+    6  #include "../Assert.h"
+    7  
+
+25 matches across 12 files
+
+
+Searching 1021 files for "#include <GL/glew.h>"
+
+/home/kor/Development/Neutrino/source/Neutrino.cpp:
+    2  #include <iostream>
+    3  #include <string>
+    4: #include <GL/glew.h>
+    5  #include <SDL.h>
+    6  #include <SDL_opengl.h>
+
+/home/kor/Development/Neutrino/source/framework/sdl/sdl_wrapper.h:
+    1  #ifndef SDL_WRAPPER
+    2  #define SDL_WRAPPER
+    3: //#include <GL/glew.h>
+    4  #include <SDL.h>
+    5  #include <SDL_opengl.h>
+
+<untitled 96>:
+   96   #include <iostream>
+   97   #include <string>
+   98: -#include <GL/glew.h>
+   99: +//#include <GL/glew.h>
+  100   #include <SDL.h>
+  101   #include <SDL_opengl.h>
+  ...
+  986   #ifndef SDL_WRAPPER
+  987   #define SDL_WRAPPER
+  988: -#include <GL/glew.h>
+  989: +//#include <GL/glew.h>
+  990   #include <SDL.h>
+  991   #include <SDL_opengl.h>
+
+6 matches across 3 files

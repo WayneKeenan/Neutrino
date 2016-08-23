@@ -10,7 +10,7 @@ namespace Neutrino
 	// Static allocated arrays for the sprite settings
     static float* s_afHalfWidth;
     static float* s_afHalfHeight;
-    static float* s_afSpriteRotRadians;
+    static float* s_afSpriteRotDegrees;
     static float* s_afSpriteScale;
     static glm::vec4* s_avSprColours;
     static glm::vec3* s_avSprPositions;
@@ -36,7 +36,7 @@ namespace Neutrino
 	        s_afHalfHeight = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
-	        s_afSpriteRotRadians = NEWX float[iSpriteCount];
+	        s_afSpriteRotDegrees = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
 	        s_afSpriteScale = NEWX float[iSpriteCount];
@@ -58,7 +58,7 @@ namespace Neutrino
 		{
 	        s_Sprites[i]._fHalfWidth = &s_afHalfWidth[iActiveSpriteCount];
 	        s_Sprites[i]._fHalfHeight = &s_afHalfHeight[iActiveSpriteCount];
-	        s_Sprites[i]._fRotRadians = &s_afSpriteRotRadians[iActiveSpriteCount];
+	        s_Sprites[i]._fRotDegrees = &s_afSpriteRotDegrees[iActiveSpriteCount];
 	        s_Sprites[i]._fScale = &s_afSpriteScale[iActiveSpriteCount];
 	        s_Sprites[i]._vColour = &s_avSprColours[iActiveSpriteCount];
 	        s_Sprites[i]._vPosition = &s_avSprPositions[iActiveSpriteCount];
@@ -73,7 +73,7 @@ namespace Neutrino
         DELETEX [] s_afHalfWidth;
         DELETEX [] s_afHalfHeight;
         DELETEX [] s_afSpriteScale;
-        DELETEX [] s_afSpriteRotRadians;
+        DELETEX [] s_afSpriteRotDegrees;
         DELETEX [] s_avSprColours;
         DELETEX [] s_avSprPositions;
 		DELETEX [] s_Sprites;
@@ -109,31 +109,41 @@ namespace Neutrino
 	}
 
 
+	uint16 GetSpriteCount()
+	{
+		return iActiveSpriteCount;
+	}
+
+
+	Sprite_t* GetBasePointers()
+	{
+		return &s_Sprites[0];
+	}
 
 
 	void TestSprite()
 	{
-        Sprite_t* mySprite = GetActiveSprite();
-        ASSERT(mySprite, "TestSprite, GetActiveSprite returned NULL");
+		Sprite_t* mySprite = GetActiveSprite();
+		ASSERT(mySprite, "TestSprite, GetActiveSprite returned NULL");
 
-        glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-        glm::vec3* vPos = NEWX glm::vec3(320/2, 180/2, 0);
+		glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+		glm::vec3* vPos = NEWX glm::vec3(320.0f/2,180.0f/2, 1.0f);
 
-        *(mySprite->_vColour) = *vColour;
-        *(mySprite->_vPosition) = *vPos;
-        *(mySprite->_fHalfWidth) = 16.0f;
-        *(mySprite->_fHalfHeight) = 16.0f;
-        *(mySprite->_fScale) = 1.0f;
-        *(mySprite->_fRotRadians) = 0.0f;
-
-//      *(mySprite->_uPackedColour) = GetPackedColour(1.0f, 1.0f, 0.0f, 1.0f);
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = 16.0f;
+		*(mySprite->_fHalfHeight) = 16.0f;
+		*(mySprite->_fScale) = 1.0f;
+		*(mySprite->_fRotDegrees) = 0.0f;
 
 /*
-        LOG_INFO("Active sprite count: %d", iActiveSpriteCount);
+		LOG_INFO("Active sprite count: %d", iActiveSpriteCount);
 		LOG_INFO("x %f", (mySprite->_vColour->x));
 		LOG_INFO("y %f", (mySprite->_vColour->y));
 		LOG_INFO("z %f", (mySprite->_vColour->z));
 		LOG_INFO("w %f", (mySprite->_vColour->w));
+
+		LOG_INFO("Pos: %f, %f, %f", (mySprite->_vPosition->x),(mySprite->_vPosition->y),(mySprite->_vPosition->z));
 */
 
 		DELETEX vColour;

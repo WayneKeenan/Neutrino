@@ -1,6 +1,9 @@
 #include "sdl_wrapper.h"
 #include "../Log.h"
 
+#include "../GLUtils.h"
+
+
 namespace Neutrino
 {
 	SDL_Window* pSDL_WindowHandle = NULL;
@@ -28,9 +31,18 @@ namespace Neutrino
 	bool SDLCreateWindowAndContext(int iScreenWidth, int iScreenHeight)
 	{
 		// Define OpenGL 3.1 core
+
+/*
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+*/
+
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+		ASSERT_GL_ERROR;
+
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
@@ -43,6 +55,7 @@ namespace Neutrino
 									iScreenHeight, 
 									SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
 
+
 		if( NULL == pSDL_WindowHandle )
 		{
 			LOG_ERROR( "Game window could not be created. SDL Error: %s\n", SDL_GetError() );
@@ -52,23 +65,24 @@ namespace Neutrino
 
 		// Create GL context
 		SDL_GLContext = SDL_GL_CreateContext( pSDL_WindowHandle );
+
 		if( NULL == SDL_GLContext )
 		{
 			LOG_ERROR( "OpenGL context could not be created. SDL Error: %s\n", SDL_GetError() );
 			return false;
 		}
 		SDL_GL_MakeCurrent( pSDL_WindowHandle, SDL_GLContext);
-				
-		
+			
+
 		// Initialize GLEW
-		glewExperimental = GL_TRUE; 
+		//glewExperimental = GL_TRUE; 
 		GLenum glewError = glewInit();
 		if( glewError != GLEW_OK )
 		{
 			LOG_ERROR( "Error initializing GLEW! %s\n", glewGetErrorString( glewError ) );
 			return false;
 		}
-
+		GL_ERROR; // see: https://www.opengl.org/wiki/OpenGL_Loading_Library
 
 		// Use Vsync
 		if( SDL_GL_SetSwapInterval( 1 ) < 0 )
@@ -78,7 +92,6 @@ namespace Neutrino
 		}
 
 		SDL_StartTextInput();
-
 
 		return true;
 	}

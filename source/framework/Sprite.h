@@ -19,7 +19,7 @@ namespace Neutrino
 		// Sprite Index
 		float*		_fHalfWidth;	// The pixel dimensions, as mapped to the internal coord system, not the GL pixel output
 		float* 		_fHalfHeight;
-		float*		_fRotRadians;	// Sprite rotation
+		float*		_fRotDegrees;	// Sprite rotation
 		float*		_fScale;		// Sprite's scale
 		glm::vec4*	_vColour;		// Sprite's RGBA colour values
 		glm::vec3* 	_vPosition;		// Sprites position, as mapped to the internal coord system, not the GL pixel output
@@ -44,6 +44,14 @@ namespace Neutrino
 	//    	all sprites from the next VBO that will be sent to the GPU
 	void ResetSpriteCount();
 
+
+	// GetSpriteCount
+	// 		Return the number of active sprites this tick
+	uint16 GetSpriteCount();
+
+	// GetBasePointers
+	// 		Returns a Sprite_t structure that points to the start of all the sprite arrays
+	Sprite_t* GetBasePointers();
 
 	// TestSprite
 	// 		Simple functoin to draw a sprite to the centre of the screen, testing this part

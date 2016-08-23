@@ -16,6 +16,7 @@ namespace Neutrino
 	// 		Returns colour from glm::vec4 input to AABBGGRR packed int.
 	//   	Suitable for the packed VBO vert definition used within the framework.  
 	uint32 GetPackedColourV4(const glm::vec4 vColour);
+	uint32 GetPackedColourV4(const glm::vec4* pColour);
 
 	// GetPackedColourHSV
 	// 		Returns colour from HSV (0.0f -> 1.0f range) inputs to AABBGGRR packed int.

@@ -1,5 +1,4 @@
 #include "Framework.h"
-#include "GLUtils.h"
 #include "libconfig.h"
 
 #include <stdio.h>
@@ -13,6 +12,7 @@ namespace Neutrino
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
+	static Sprite_t* s_pBPtr;
 
 	bool CoreInit( const char* const pGameName )
 	{
@@ -131,6 +131,7 @@ namespace Neutrino
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 			LOG_INFO("Internal dimensions: %d x %d", NeutrinoPreferences->s_iInternalWidth, NeutrinoPreferences->s_iInternalHeight);
+			
 
 			if( !SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight) )
 				return false;
@@ -149,8 +150,10 @@ namespace Neutrino
 		}
 
 
-		// Allocate Sprite Buffers
+		// Allocate Sprite Buffers and grab our pointer to the bottom
 		AllocateSpriteArrays(GLUtils::GetMaxSpriteCount());
+		s_pBPtr = GetBasePointers();
+		ASSERT( NULL != s_pBPtr, "GetBasePointers returned null");
 
 		// Create any Singletons we need
 		//
@@ -168,12 +171,39 @@ namespace Neutrino
 
 	bool CoreUpdate()
 	{
+		// Update clocks 
 		TimeUpdate();
+
+		// Reset active sprite count to zero
 		ResetSpriteCount();
+
+		// Process the active game state (this will process the game objects)
 		GameStateUpdate();
+
+		// Generate new Camera/World matrices for this frame
 		GLUtils::GenerateMVCMatrices();
-		GLUtils::TestRender();
+
+		// Generate some test sprites (TO BE REMOVED)
 		TestSprite();
+
+		// Populate the VBOs
+		GLUtils::PopulateVBO(
+								s_pBPtr->_fHalfWidth, 
+								s_pBPtr->_fHalfHeight, 
+								s_pBPtr->_fRotDegrees, 
+								s_pBPtr->_fScale, 
+								s_pBPtr->_vColour, 
+								s_pBPtr->_vPosition, 
+								GetSpriteCount()
+							);
+
+		// Set the active shader for this pass
+		SetActiveShader(DEFAULT_UNTEXTURED);
+
+		// Bind and draw the active VBO
+		GLUtils::RenderVBO(GetSpriteCount());
+
+		// Let SDL do its magic...
 		SDLPresent();
 		return true;
 	}

@@ -1,33 +1,43 @@
 #pragma once
 #include "File.h"
-#include "GLUtils.h"
-#include <GL/gl.h>
+#include "GL/glew.h"
 #include "Memory.h"
 
 
 namespace Neutrino {
+	enum 
+	{
+		ATTRIB_VERTEX,
+		ATTRIB_COLOR,
+		ATTRIB_TEXTURE,
+		NUM_ATTRIBUTES
+	};
 
 	enum eStandardShaders
 	{
-	  DEFAULT_SHADER,
+	 	DEFAULT_SHADER,
 		DEFAULT_UNTEXTURED,
-	  BLOOM_SHADER,
-	  BLUR_HORIZ,
-	  BLUR_VERTICAL,
-	  NUM_SHADERS
+		/*
+		BLOOM_SHADER,
+		BLUR_HORIZ,
+		BLUR_VERTICAL,
+		*/
+		NUM_SHADERS
 	};
 
 	const char* const s_pDefaultShaderFragFilename = "default-shader.fsh";
 	const char* const s_pDefaultShaderVertFilename = "default-shader.vsh";
 	const char* const s_pDefaultUntexturedFragFilename = "default-untextured-shader.fsh";
 	const char* const s_pDefaultUntexturedVertFilename = "default-untextured-shader.vsh";
+
+	/*
 	const char* const s_pBloomShaderFragFilename = "bloom-shader.fsh";
 	const char* const s_pBloomShaderVertFilename = "bloom-shader.vsh";
 	const char* const s_pBlurHorizShaderFragFilename = "blur-horiz-shader.fsh";
 	const char* const s_pBlurHorizShaderVertFilename = "blur-horiz-shader.vsh";
 	const char* const s_pBlurVertShaderFragFilename = "blur-vert-shader.fsh";
 	const char* const s_pBlurVertShaderVertFilename = "blur-vert-shader.vsh";
-
+*/
 
 	// LoadEngineShaders()
 	//		Framework init function to load the standard shaders (predefined) and validate them. 
@@ -41,5 +51,5 @@ namespace Neutrino {
 
 	// GetActiveUniforms
 	// 		Returns the address of the current shader uniforms (see: struct _ShaderSettings_t in cpp file)
-	inline GLint* GetActiveUniforms ();
+	GLint* GetActiveUniforms ();
 }

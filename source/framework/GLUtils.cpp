@@ -8,8 +8,15 @@ namespace Neutrino {
         static glm::mat4 mCameraMatrix;
         static glm::mat4 mModelViewMatrix;
 
-        float OGL_X_RATIO;
-        float OGL_Y_RATIO;
+        static float fOGL_X_RATIO;
+        static float fOGL_Y_RATIO;
+
+        static float fViewportWidth;
+        static float fViewportHeight;
+
+        static float fInternalWidth;
+        static float fInternalHeight;
+
 
         float* GetCameraMatrix()
         {
@@ -24,32 +31,46 @@ namespace Neutrino {
         // Should iScreenwidth and height be stored locally here?
 
 
-        void SetViewport(const int iScreenWidth, const int iScreenHeight)
+        void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
         {
             LOG_WARNING("GLUtils::SetViewport working with fixed aspect ratio in ortho ProjectionMatrix calc...");
-            glViewport(0, 0, iScreenWidth, iScreenHeight);       
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_BLEND);
-            glActiveTexture(GL_TEXTURE0);
-            glClearColor( 0.05f, 0.15f, 0.25f, 1.0f );
-            glClearDepth(1.0f);
-            glDepthFunc(GL_LEQUAL);
 
-            glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            GL_ERROR;
 
-            OGL_X_RATIO = (float)iScreenWidth / (float)iScreenHeight;
-            OGL_Y_RATIO = 1.0f;
+            // Create an OGL viewport with basic settings
+            {
+                glViewport(0, 0, iViewportWidth, iViewportHeight);       
+                glEnable(GL_DEPTH_TEST);
+                glEnable(GL_BLEND);
+                glActiveTexture(GL_TEXTURE0);
+                glClearColor( 0.05f, 0.15f, 0.25f, 1.0f );
+                glClearDepth(1.0f);
+                glDepthFunc(GL_LEQUAL);
+
+                glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                GL_ERROR;                
+            }
+
+
+            // Set viewport dimensions, OGL coord range, and internal pixel dimensions
+            {
+                fViewportWidth = (float)iViewportWidth;
+                fViewportHeight = (float)iViewportHeight;
+                fOGL_X_RATIO = fViewportWidth / fViewportHeight;
+                fOGL_Y_RATIO = 1.0f;
+                fInternalWidth = fOGL_X_RATIO / (float)iInternalWidth;
+                fInternalHeight = fOGL_Y_RATIO / (float)iInternalHeight;
+            }
+
         }
 
-        void GenerateMVCMatrices( const int iScreenWidth, const int iScreenHeight)
+        void GenerateMVCMatrices()
         {
             // TO_DO:
             // 
             // Play with these to work out how to move the camera about...
             glm::mat4 mRotationMatrix = glm::rotate(glm::mat4(), 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
             glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-            glm::mat4 mProjectionMatrix = glm::ortho(0.0f, (float)((float)iScreenWidth/(float)iScreenHeight), 0.0f, 1.0f, 0.1f, 10.0f );
+            glm::mat4 mProjectionMatrix = glm::ortho(0.0f, fViewportWidth/fViewportHeight, 0.0f, 1.0f, 0.1f, 10.0f );
 
             mModelViewMatrix = mTranslationMatrix * mRotationMatrix;
             mCameraMatrix = mProjectionMatrix * mModelViewMatrix;

@@ -138,8 +138,13 @@ namespace Neutrino
 			if( !LoadEngineShaders() )
 				return false;
 
-			GLUtils::SetViewport(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			GLUtils::GenerateMVCMatrices(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+			GLUtils::SetViewport(	
+									NeutrinoPreferences->s_iScreenWidth, 
+									NeutrinoPreferences->s_iScreenHeight,
+									NeutrinoPreferences->s_iInternalWidth, 
+									NeutrinoPreferences->s_iInternalHeight 
+								);
+			GLUtils::GenerateMVCMatrices();
 			GLUtils::CreateVBO();
 		}
 
@@ -166,7 +171,7 @@ namespace Neutrino
 		TimeUpdate();
 		ResetSpriteCount();
 		GameStateUpdate();
-		GLUtils::GenerateMVCMatrices(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
+		GLUtils::GenerateMVCMatrices();
 		GLUtils::TestRender();
 		TestSprite();
 		SDLPresent();

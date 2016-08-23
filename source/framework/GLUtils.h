@@ -22,6 +22,9 @@ namespace Neutrino
 
 	namespace GLUtils 
 	{
+
+		// Vertex structure defines content placed in the VBO for rendering. 
+		// 
 		typedef struct Vertex_t
 		{
 			uint32_t 	_colour; 
@@ -29,25 +32,21 @@ namespace Neutrino
 			glm::vec3 	_position;
 		} Vertex_t; 
 
-		static const uint16 s_iMaxSprites = 2048;		// Temporary, need to find a balance of the amount we're copying vs number needed.
+		// Temporary, need to find a balance of the amount we're copying vs number needed.
+		// 
+		static const uint16 s_iMaxSprites = 2048;		
 		
-		extern float OGL_X_RATIO;
-		extern float OGL_Y_RATIO;
-		extern float DISPLAY_X_SCALE;
-		extern float DISPLAY_Y_SCALE;
-		extern uint16 INTERNAL_PIXEL_X;
-		extern uint16 INTERNAL_PIXEL_Y;
 
 		// Temporary
 		void TestRender();
 
 		// SetViewport
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
-		void SetViewport(const int iScreenWidth, const int iScreenHeight);
+		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight);
 
 		// GenerateMatrices
 		// 		Create the new ModelView and Camera Matrices for this tick
-		void GenerateMVCMatrices(const int iScreenWidth, const int iScreenHeight);
+		void GenerateMVCMatrices();
 
 		// LogGlError
 		// 	 Wrapper to chcek glError and LOG_ERR to log file in a clean way. 

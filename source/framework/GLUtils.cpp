@@ -27,7 +27,9 @@ namespace Neutrino {
         static const int s_iSizeOfSprite = 6*sizeof(Vertex_t);
         static const int s_iSizeOfVertex = sizeof(Vertex_t);
 
-        GLuint iVBO_ID;
+        static GLuint s_iVBOs[3]; 
+        static uint8 s_iVBOCounter = 0;
+
 
         float* GetCameraMatrix()
         {
@@ -82,15 +84,31 @@ namespace Neutrino {
         }
 
 
-        // TO_DO: create 3 and circle through them...
+        
         void CreateVBO()
         {
-            glGenBuffers(1, &iVBO_ID); 
+            glGenBuffers(1, &s_iVBOs[0]); 
             ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, iVBO_ID); 
+            glBindBuffer(GL_ARRAY_BUFFER, s_iVBOs[0]); 
             ASSERT_GL_ERROR;
             glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
             ASSERT_GL_ERROR;
+
+            glGenBuffers(1, &s_iVBOs[1]); 
+            ASSERT_GL_ERROR;
+            glBindBuffer(GL_ARRAY_BUFFER, s_iVBOs[1]); 
+            ASSERT_GL_ERROR;
+            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
+            ASSERT_GL_ERROR;
+
+            glGenBuffers(1, &s_iVBOs[2]); 
+            ASSERT_GL_ERROR;
+            glBindBuffer(GL_ARRAY_BUFFER, s_iVBOs[2]); 
+            ASSERT_GL_ERROR;
+            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
+            ASSERT_GL_ERROR;
+
+            s_iVBOCounter=0;
         }
 
 
@@ -149,6 +167,24 @@ namespace Neutrino {
         }
 
 
+        // This VBO isn't sent until the DrawArrays() call, should be clear of the driver by then...
+        // Note: this is based on some libGDX profiling data that I've lost the URL to. YMMV
+        // 
+        // (Dynamic Draw sucked balls on iOS 5 so...)
+        GLuint GetActiveVBO()
+        {
+            return s_iVBOs[s_iVBOCounter];
+        }
+
+
+        // Next active VBO was used two frames ago. 
+        void IncVBO()
+        {
+            s_iVBOCounter++;
+            if ( s_iVBOCounter == 3 ) s_iVBOCounter = 0;
+        }
+
+
         void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount)
         {
             ASSERT(iCount < s_iMaxSprites, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
@@ -161,6 +197,9 @@ namespace Neutrino {
 
 
             // Get the position of the first vertex in the VBO
+            
+            GLuint iVBO_ID = GetActiveVBO();
+
             glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
             ASSERT_GL_ERROR;
             Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -309,7 +348,7 @@ namespace Neutrino {
             //glBindTexture( GL_TEXTURE_2D, mVBO_Map[i]->_Texture_ID );
             //glUniform1i (uniforms[UNIFORM_TEXTURE], 0);
 
-            glBindBuffer ( GL_ARRAY_BUFFER, iVBO_ID);
+            glBindBuffer ( GL_ARRAY_BUFFER, GetActiveVBO());
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             ASSERT_GL_ERROR;
                 
@@ -333,6 +372,8 @@ namespace Neutrino {
 
             glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
             ASSERT_GL_ERROR;            
+
+            IncVBO();
         }
     }
 }

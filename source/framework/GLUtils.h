@@ -51,8 +51,14 @@ namespace Neutrino
 		bool LogGlError(const char *pFile, int iLine);
 
 		// CreateVBO
-		//		TO_DO:
-		//			Return a struct of 3 VBOs (triple buffering) of s_iMaxSprites in size
+		//		Generates 3 VBO arrays which we iterate over each frame. 
+		//  	Bit of fluff logic here, as I'm second guessing what the driver is going to do, but
+		//   	avoiding the case where we're doing a data map&copy into a VBO the driver might still 
+		//    	be using by trple-buffering. Can be pretty sure we're only copying data into a buffer
+		//      that the driver has already freed. 
+		//      
+		//      None of this is user facing, Render* functions have to get active VBO which is always
+		//      one that was used two frames ago...
 		void CreateVBO();
 
 

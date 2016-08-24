@@ -18,12 +18,12 @@
 namespace Neutrino {
 	
 	typedef struct NeutrinioPreferences_t {
-		int s_iScreenWidth;
+		int s_iScreenWidth;					// Viewport Dimensions
 		int s_iScreenHeight;
-		int s_iInternalWidth;
+		int s_iInternalWidth;				// Internal coord dimensions
 		int s_iInternalHeight;
-		const char* s_pResourcePath;
-		const char* s_pPrefsPath;
+		const char* s_pResourcePath;		// Packfile locations
+		const char* s_pPrefsPath;			// Player prefs file location
 		
 	} NeutrinioPreferences_t;
 

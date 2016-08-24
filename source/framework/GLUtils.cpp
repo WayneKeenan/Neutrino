@@ -13,6 +13,7 @@ namespace Neutrino {
 
         static glm::mat4 s_mCameraMatrix;
         static glm::mat4 s_mModelViewMatrix;
+        static glm::mat4 s_mProjectionMatrix;
 
         static float s_fOGL_X_RATIO;
         static float s_fOGL_Y_RATIO;
@@ -33,30 +34,20 @@ namespace Neutrino {
             return glm::value_ptr(s_mCameraMatrix);
         }
 
-        // TO_DO:
-        // 
-        // May need to calculate these matrices multiple times, especially if we're moving the camera about. 
-        // Split these out into their own function?
-        // 
-        // Should iScreenwidth and height be stored locally here?
-
 
         void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
         {
-            LOG_WARNING("GLUtils::SetViewport working with fixed aspect ratio in ortho ProjectionMatrix calc...");
-
             // Create an OGL viewport with basic settings
             {
                 glViewport(0, 0, iViewportWidth, iViewportHeight);       
                 glEnable(GL_DEPTH_TEST);
                 glEnable(GL_BLEND);
-                //glActiveTexture(GL_TEXTURE0);
+                glActiveTexture(GL_TEXTURE0);
                 glClearColor( 0.25f, 0.25f, 0.0f, 1.0f );
-                //glClearDepth(1.0f);
+                glClearDepth(1.0f);
                 glDepthFunc(GL_LEQUAL);
-
                 glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                GL_ERROR;                
+                ASSERT_GL_ERROR;                
             }
 
             // Set viewport dimensions, OGL coord range, and internal pixel dimensions
@@ -70,24 +61,28 @@ namespace Neutrino {
                 s_fScaledWidth = s_fOGL_X_RATIO / (float)iInternalWidth;
                 s_fScaledHeight = s_fOGL_Y_RATIO / (float)iInternalHeight;
             }
+
+            // Set the projection matrix for this viewport. 0,0 at bottom left.
+            s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO, 0.0f, s_fOGL_Y_RATIO, 1.0f, -1.0f );
+
         }
 
         void GenerateMVCMatrices()
         {
-            // TO_DO:
+            // TO_DO: pass in the vec3 offset for camera movement...
+            // We're not going to rotate the camera: 
             // 
-            // Play with these to work out how to move the camera about...
-            glm::mat4 mRotationMatrix = glm::rotate(glm::mat4(), 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-            glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
+            // glm::mat4 mRotationMatrix = glm::mat4();
+            // 
+            // We are going to move the camera:
+            glm::mat4 mTranslationMatrix = glm::translate( glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-            // This defines 0,0 to be bottom left...
-            glm::mat4 mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO, 0.0f, s_fOGL_Y_RATIO, 1.0f, -1.0f );
-
-            s_mModelViewMatrix = mTranslationMatrix * mRotationMatrix;
-            s_mCameraMatrix = mProjectionMatrix * glm::mat4();
+            s_mModelViewMatrix = mTranslationMatrix;    // * mRotationMatrix;  // Add in scale? Are we going to zoom in and out?
+            s_mCameraMatrix = s_mProjectionMatrix * s_mModelViewMatrix;
         }
 
 
+        // TO_DO: create 3 and circle through them...
         void CreateVBO()
         {
             glGenBuffers(1, &iVBO_ID); 
@@ -103,18 +98,6 @@ namespace Neutrino {
         {
             glDeleteBuffers( 1, &iVBO_ID );
             GL_ERROR;
-        }
-
-
-        void TestRender()
-        {
-            /*
-            glBegin(GL_TRIANGLES);
-            glVertex3f(0.0f, 1.0f, 1.0f);
-            glVertex3f(-1.0f, -1.0f, 1.0f);
-            glVertex3f(1.0f, -1.0f, 1.0f);
-            glEnd();
-            */
         }
 
 
@@ -188,12 +171,6 @@ namespace Neutrino {
                 // For each sprite up to iCount
                 for(int i=0; i<iCount; i++)
                 {
-                    /*
-                    LOG_INFO("Scale: %f", *pScales);
-                    LOG_INFO("Rot: %f ", *pRots);
-                    LOG_INFO("Pos: %f,%f,%f", pPos->x, pPos->y, pPos->z);
-                    */
-
                     // Build the transform matrix for this sprite
                     glm::mat4 mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
                     glm::mat4 mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -211,31 +188,25 @@ namespace Neutrino {
                         float fScaledWidth = (*pHWidths * s_fScaledWidth);
                         float fScaledHeight = (*pHHeights * s_fScaledHeight);
 
-                        /*
-                        LOG_INFO("Scaled Width: %f", fScaledWidth);
-                        LOG_INFO("Scaled Height: %f", fScaledHeight);
-                        */
-
-
                         vQuadTL_Pos->x = 0.0f - fScaledWidth;
                         vQuadTL_Pos->y = 0.0f + fScaledHeight;
                         vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-                        vQuadTL_Pos->w = 1.0f;   // TO_DO: need to put z-layer in here
+                        vQuadTL_Pos->w = 1.0f;   
 
                         vQuadTR_Pos->x = 0.0f + fScaledWidth;
                         vQuadTR_Pos->y = 0.0f + fScaledHeight;
                         vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-                        vQuadTR_Pos->w = 1.0f;   // TO_DO: need to put z-layer in here
+                        vQuadTR_Pos->w = 1.0f;   
                                                  
                         vQuadBL_Pos->x = 0.0f - fScaledWidth;
                         vQuadBL_Pos->y = 0.0f - fScaledHeight;
                         vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-                        vQuadBL_Pos->w = 1.0f;   // TO_DO: need to put z-layer in here
+                        vQuadBL_Pos->w = 1.0f;   
 
                         vQuadBR_Pos->x = 0.0f + fScaledWidth;
                         vQuadBR_Pos->y = 0.0f - fScaledHeight;
                         vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
-                        vQuadBR_Pos->w = 1.0f;   // TO_DO: need to put z-layer in here
+                        vQuadBR_Pos->w = 1.0f;   
                     }
 
 
@@ -245,22 +216,15 @@ namespace Neutrino {
                     glm::vec4 vTransTL = mTransform * *vQuadTL_Pos;
                     glm::vec4 vTransTR = mTransform * *vQuadTR_Pos;
 
-                    /*
-                    LOG_INFO("BL: %f, %f, %f", vTransBL.x, vTransBL.y, vTransBL.z );
-                    LOG_INFO("BR: %f, %f, %f", vTransBR.x, vTransBR.y, vTransBR.z );
-                    LOG_INFO("TL: %f, %f, %f", vTransTL.x, vTransTL.y, vTransTL.z );
-                    LOG_INFO("TR: %f, %f, %f", vTransTR.x, vTransTR.y, vTransTR.z );
-                    */
-
-                    
                     // Get the packed colour
                     uint32 iColour = GetPackedColourV4(pColours);
+                    // LOG_INFO("Colour:" FOUR_BYTE_HEX, iColour);
 
-//                    LOG_INFO("Colour:" FOUR_BYTE_HEX, iColour);
-
+                    //
                     // TO_DO: Texture coords...
+                    //
                     
-                    // Populate the VBO vertex corner
+                    // Populate the VBO vertex corners
                     pVertex->_colour = iColour;
                     pVertex->_uv[0] = 0;
                     pVertex->_uv[1] = 0;
@@ -322,25 +286,31 @@ namespace Neutrino {
 
             glUnmapBuffer(GL_ARRAY_BUFFER);
 
-
             DELETEX vQuadBL_Pos;
             DELETEX vQuadBR_Pos;
             DELETEX vQuadTL_Pos;
             DELETEX vQuadTR_Pos;
+            DELETEX vPos;
         }
 
 
         void RenderVBO(const int iSpriteCount)
         {
-            ASSERT_GL_ERROR;
-
-            glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // TO_DO: 
+            //      Blend Func should be a parameter of the texture page. 
+            //      Split additive textures off into their own pool with sep VBO
+            //      Render this last for mobile. 
+            //      
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       
-            // glBindTexture( GL_TEXTURE_2D, mVBO_Map[i]->_Texture_ID );
-            // glUniform1i (uniforms[UNIFORM_TEXTURE], 0);
+            // TO_DO:
+            //      Add the texture loading...
+            //      
+            //glBindTexture( GL_TEXTURE_2D, mVBO_Map[i]->_Texture_ID );
+            //glUniform1i (uniforms[UNIFORM_TEXTURE], 0);
 
             glBindBuffer ( GL_ARRAY_BUFFER, iVBO_ID);
+            glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             ASSERT_GL_ERROR;
                 
             glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
@@ -355,11 +325,11 @@ namespace Neutrino {
             glEnableVertexAttribArray(ATTRIB_COLOR);
             ASSERT_GL_ERROR;
 
-            //glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
-            //ASSERT_GL_ERROR;
+            glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+            ASSERT_GL_ERROR;
 
-            //glEnableVertexAttribArray(ATTRIB_TEXTURE);
-            //ASSERT_GL_ERROR;
+            glEnableVertexAttribArray(ATTRIB_TEXTURE);
+            ASSERT_GL_ERROR;
 
             glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
             ASSERT_GL_ERROR;            

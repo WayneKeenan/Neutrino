@@ -23,7 +23,8 @@ namespace Neutrino
 	namespace GLUtils 
 	{
 
-		// Vertex structure defines content placed in the VBO for rendering. 
+		// Vertex structure defines content order for quad data placed in the current VBO. 
+		// Colour is a AABBGGRR packed
 		// 
 		typedef struct Vertex_t
 		{
@@ -36,10 +37,6 @@ namespace Neutrino
 		// 
 		static const uint16 s_iMaxSprites = 2048;		
 		
-
-		// Temporary
-		void TestRender();
-
 		// SetViewport
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
 		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight);
@@ -49,8 +46,8 @@ namespace Neutrino
 		void GenerateMVCMatrices();
 
 		// LogGlError
-		// 	 Wrapper to chcek glError and LOG_ERR to log file in a clean way. 
-		// 	 Use the GL_ERROR / ASSERT_GL_ERROR macros to use this in code...
+		// 	 Wrapper to chcek glError & LOG_ERR to the logfile in a clean way. 
+		// 	 Use the GL_ERROR / ASSERT_GL_ERROR for simplicity
 		bool LogGlError(const char *pFile, int iLine);
 
 		// CreateVBO

@@ -17,11 +17,9 @@ namespace Neutrino {
 	{
 	 	DEFAULT_SHADER,
 		DEFAULT_UNTEXTURED,
-		/*
 		BLOOM_SHADER,
 		BLUR_HORIZ,
 		BLUR_VERTICAL,
-		*/
 		NUM_SHADERS
 	};
 
@@ -29,15 +27,12 @@ namespace Neutrino {
 	const char* const s_pDefaultShaderVertFilename = "default-shader.vsh";
 	const char* const s_pDefaultUntexturedFragFilename = "default-untextured-shader.fsh";
 	const char* const s_pDefaultUntexturedVertFilename = "default-untextured-shader.vsh";
-
-	/*
 	const char* const s_pBloomShaderFragFilename = "bloom-shader.fsh";
 	const char* const s_pBloomShaderVertFilename = "bloom-shader.vsh";
 	const char* const s_pBlurHorizShaderFragFilename = "blur-horiz-shader.fsh";
 	const char* const s_pBlurHorizShaderVertFilename = "blur-horiz-shader.vsh";
 	const char* const s_pBlurVertShaderFragFilename = "blur-vert-shader.fsh";
 	const char* const s_pBlurVertShaderVertFilename = "blur-vert-shader.vsh";
-*/
 
 	// LoadEngineShaders()
 	//		Framework init function to load the standard shaders (predefined) and validate them. 

@@ -211,11 +211,11 @@ namespace Neutrino {
 		{
 			// TO_DO: Need these to be custom for each shader as well...
 			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
-	  		GL_ERROR;
+	  		ASSERT_GL_ERROR;
 			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
-	  		GL_ERROR;
+	  		ASSERT_GL_ERROR;
 			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
-	  		GL_ERROR;
+	  		ASSERT_GL_ERROR;
 
 			// Get uniform locations
 			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
@@ -241,23 +241,23 @@ namespace Neutrino {
 
 	bool LoadEngineShaders()
 	{
+		// This is a fixed pool of known shaders. Not going to support arbitrary shader params atm. 
+		// 
 		LoadShader(s_pDefaultShaderFragFilename, s_pDefaultShaderVertFilename);
 		LoadShader(s_pDefaultUntexturedFragFilename, s_pDefaultUntexturedVertFilename);
-
-		/*
 		LoadShader(s_pBloomShaderFragFilename, s_pBloomShaderVertFilename);
 		LoadShader(s_pBlurHorizShaderFragFilename, s_pBlurHorizShaderVertFilename);
 		LoadShader(s_pBlurVertShaderFragFilename, s_pBlurVertShaderVertFilename);
-*/
 		SetActiveShader(DEFAULT_UNTEXTURED);
-
 		return true;
 	}
+
 
 	GLint* GetActiveUniforms ()
 	{ 
 		return s_pActiveShader->_Uniforms; 
 	};
+
 
 	void SetActiveShader(eStandardShaders iIndex)
 	{

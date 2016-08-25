@@ -6,8 +6,12 @@ namespace Neutrino {
 
 	// FileExists()
 	// 		C Style stat check for existence of file in the user's filesystem. 
-	//   	This does not check for existence of a file in the resource bundle (use PHYSFS_exists() instead)
+	//   	This does not check for existence of a file in the resource bundle (use ResourceFileExists instead)
 	bool FileExists( const char * pFilename );
+
+	// ResourceFileExists()
+	// 		Check for existence of file in the resource bundle 
+	bool ResourceFileExists( const char * pFilename );
 
 	// MountResources()
 	// 		Mount the game's resource bundle from the given filepath. 

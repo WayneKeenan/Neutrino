@@ -16,6 +16,12 @@ namespace Neutrino {
 		return stat(pFilename, &fileBuf) == 0;
 	}
 
+	bool ResourceFileExists( const char* pFilename)
+	{
+		int iExists = PHYSFS_exists(pFilename);
+		return (iExists!=0);
+	}
+
 	bool MountResources( const char* pFilename )
 	{
 		PHYSFS_init(NULL);
@@ -96,8 +102,15 @@ namespace Neutrino {
 
 		LOG_INFO("Loading: %s, Bytes: %d", pFilename, iSize);
 
-		PHYSFS_read(pFileHandle, pLoadedResource, (PHYSFS_uint32)iSize, 1);
+		int i = (int)PHYSFS_read(pFileHandle, pLoadedResource, (PHYSFS_uint32)iSize, 1);
 		PHYSFS_close(pFileHandle);
+
+		if( i < 1)
+		{
+			LOG_ERROR("PHYSFS file read failed for: %s", pFilename);
+			DELETEX [] pLoadedResource;
+			pLoadedResource = NULL;
+		}
 
 		return pLoadedResource;
 	}

@@ -84,5 +84,6 @@ namespace Neutrino
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
 		void RenderVBO(const int iSpriteCount);
+
 	};
 }

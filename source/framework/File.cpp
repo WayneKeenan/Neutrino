@@ -45,6 +45,7 @@ namespace Neutrino {
 			return false;		
 		}
 
+		PHYSFS_deinit();
 		LOG_INFO("Unmounted resource bundle: %s", pFilename);
 		return true;
 	}

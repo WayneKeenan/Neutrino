@@ -1,6 +1,5 @@
 #include "sdl_wrapper.h"
 #include "../Log.h"
-
 #include "../GLUtils.h"
 
 
@@ -120,4 +119,41 @@ namespace Neutrino
 		return s_pBasePath;
 	}
 
+    bool GLTextureFromSDLSurface(GLuint* pTextureIDs, uint8 iCount, SDL_Surface* pSurf, bool bFiltered)
+    {
+        int iMode = 0;
+        if (pSurf->format->BytesPerPixel == 3) 
+        { 
+            iMode = GL_RGB;
+        } 
+        else if (pSurf->format->BytesPerPixel == 4) 
+        { 
+            iMode = GL_RGBA;
+        } 
+        else 
+        {
+            LOG_ERROR("UploadTextureFromSDLSurface: Only 24 and 32bit SDL surfaces are supported");
+            return false;
+        }
+
+        glGenTextures( 1, &pTextureIDs[iCount] );
+        
+        glBindTexture( GL_TEXTURE_2D, pTextureIDs[iCount] );
+        
+        glTexImage2D( GL_TEXTURE_2D, 0, pSurf->format->BytesPerPixel, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels );
+        
+
+        if (bFiltered)
+        {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        }
+        else
+        {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );        
+        }
+
+        return true;
+    }
 }

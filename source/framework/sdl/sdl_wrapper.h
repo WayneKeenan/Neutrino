@@ -3,7 +3,9 @@
 #include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_image.h>
 #include "../Assert.h"
+#include "../Types.h"
 
 namespace Neutrino
 {
@@ -27,6 +29,9 @@ namespace Neutrino
 	// Populate the engine's resource and preferences paths:
 	const char* SDLGetBasePath();
 	const char* SDLGetPrefPath();
+
+
+	 bool GLTextureFromSDLSurface(GLuint* pTextureIDs, uint8 iCount, SDL_Surface* pSurf, bool bFiltered);
 
 }
 

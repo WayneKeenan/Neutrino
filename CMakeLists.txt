@@ -40,6 +40,8 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/external_dependencies/inih/cpp/
 )
 
+find_package(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+
 find_package(GLEW REQUIRED)
 if (GLEW_FOUND)
     include_directories(${GLEW_INCLUDE_DIRS})
@@ -68,9 +70,10 @@ FILE( GLOB_RECURSE NEUTRINO_SOURCES source/*.cpp )
 
 add_executable(Neutrino ${NEUTRINO_SOURCES})
 target_link_libraries(
-    Neutrino ${SDL2_LIBRARY} ${GLEW_LIBRARIES}
+    Neutrino ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${GLEW_LIBRARIES}
  )
 
 # Technically don't need this as we run cmake from the build folder. Could use it to copy
 # builds to the steam content folder though
 install(TARGETS Neutrino RUNTIME DESTINATION ${BIN_DIR})
+

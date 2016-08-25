@@ -7,6 +7,7 @@ of the framework/2D engine that will be used for this and future games from Trip
 
 Neutrino requires the following code to build and run:
 
+- SDL2, SDLImage
 - The GLM math library
 - IMGUI, immediate mode GUI 
 - Libconfig, C Library to parse config files. 
@@ -23,7 +24,7 @@ The external dependencies folder can be emptied by running:
 
 `./external_dependencies/RemoveDeps.sh`
 
-Libconfig, GLEW and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
+SDL2, SDLImage, Libconfig, GLEW and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
 
 ##Building
 

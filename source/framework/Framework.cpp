@@ -12,7 +12,13 @@ namespace Neutrino
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
+
 	static Sprite_t* s_pBPtr;
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	bool CoreInit( const char* const pGameName )
 	{
@@ -112,7 +118,6 @@ namespace Neutrino
 		}
 
 
-
 		// Mount the resources pack file. Must do this prior to OGL setup as shaders will need to be loaded
 		// from it.
 		{
@@ -150,6 +155,70 @@ namespace Neutrino
 		}
 
 
+
+		// Get GameConfig.tdi for this game and
+		// 	1. Load all the textures
+		//  2. TBD :D
+		// 
+		// 	TO_DO: Shaders to load should be read from this file?
+		//
+		{
+			if( ResourceFileExists("GameConfig.txt"))
+			{
+				const char* pFileBytes = LoadResourceBytes("GameConfig.txt");
+
+				if( NULL == pFileBytes)
+				{
+					LOG_ERROR("Unable to read GameConfig.txt, exiting.");
+					return false;					
+				}
+
+				config_t cfg;
+				config_init(&cfg);
+
+				// Parse the config from memory
+				if(! config_read_string(&cfg, pFileBytes)) 
+				{
+					const char* pErr =  config_error_text(&cfg);
+					config_destroy(&cfg);
+
+					LOG_ERROR("Unable to parse game config: \'%s\' - exiting...", pErr);
+					return false;
+				}
+
+				// Iterate over the possible textures
+				{
+					int iTextureCount = 0;
+					if (config_lookup_int(&cfg, "textures.count", &iTextureCount))
+					{
+						for(int i = 0; i<iTextureCount; i++)
+						{
+							char sID[64]={'\0'};
+							const char* pFilename;
+							sprintf(sID, "textures.texture%d", i);
+							if ( config_lookup_string(&cfg, sID, &pFilename) == CONFIG_TRUE)
+							{
+								LOG_INFO("Found texture: %s", pFilename);
+								if( !LoadTexture(pFilename) )
+								{
+									LOG_ERROR("Failed to load %s, exiting...", pFilename);
+								}
+							}
+						}										
+					}
+				}
+
+				config_destroy(&cfg);
+			}
+			else
+			{
+				LOG_ERROR("Unable to find GameConfig.txt, exiting...");
+				return false;	
+			}
+		}
+
+
+
 		// Allocate Sprite Buffers and grab our pointer to the bottom
 		AllocateSpriteArrays(GLUtils::GetMaxSpriteCount());
 		s_pBPtr = GetBasePointers();
@@ -167,6 +236,9 @@ namespace Neutrino
 		return true;
 	}
 
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	bool CoreUpdate()
@@ -198,15 +270,19 @@ namespace Neutrino
 							);
 
 		// Set the active shader for this pass
-		SetActiveShader(DEFAULT_UNTEXTURED);
+		SetActiveShader(DEFAULT_SHADER);
 
 		// Bind and draw the active VBO
-		GLUtils::RenderVBO(GetSpriteCount());
+		GLUtils::RenderVBO(GetSpriteCount(), GetTextureID(0));
 
 		// Let SDL do its magic...
 		SDLPresent();
 		return true;
 	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	bool CoreKill()

@@ -137,11 +137,11 @@ namespace Neutrino
         }
 
         glGenTextures( 1, &pTextureIDs[iCount] );
-        
+		ASSERT_GL_ERROR;        
         glBindTexture( GL_TEXTURE_2D, pTextureIDs[iCount] );
-        
+		ASSERT_GL_ERROR;                
         glTexImage2D( GL_TEXTURE_2D, 0, pSurf->format->BytesPerPixel, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels );
-        
+   		ASSERT_GL_ERROR;        
 
         if (bFiltered)
         {
@@ -154,6 +154,7 @@ namespace Neutrino
             glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );        
         }
 
+        LOG_INFO("Texture bound: %d/%dpx @ %d bytes per pixel", pSurf->w, pSurf->h, pSurf->format->BytesPerPixel );
         return true;
     }
 }

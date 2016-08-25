@@ -13,6 +13,14 @@ namespace Neutrino {
 		NUM_ATTRIBUTES
 	};
 
+	enum _ShaderUniforms
+	{
+		UNIFORM_TRANSLATE,
+		UNIFORM_MATRIX,
+		UNIFORM_TEXTURE,
+		NUM_UNIFORMS
+	};
+
 	enum eStandardShaders
 	{
 	 	DEFAULT_SHADER,
@@ -23,6 +31,7 @@ namespace Neutrino {
 		NUM_SHADERS
 	};
 
+	// TO_DO: Shaders to load should be read from GameConfig.txt
 	const char* const s_pDefaultShaderFragFilename = "default-shader.fsh";
 	const char* const s_pDefaultShaderVertFilename = "default-shader.vsh";
 	const char* const s_pDefaultUntexturedFragFilename = "default-untextured-shader.fsh";

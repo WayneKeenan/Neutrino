@@ -7,14 +7,6 @@
 
 namespace Neutrino {
 
-	enum _ShaderUniforms
-	{
-		UNIFORM_TRANSLATE,
-		UNIFORM_MATRIX,
-		UNIFORM_TEXTURE,
-		NUM_UNIFORMS
-	};
-
 	struct _ShaderSettings_t
 	{
 	  GLint _Uniforms[NUM_UNIFORMS];
@@ -242,7 +234,7 @@ namespace Neutrino {
 	bool LoadEngineShaders()
 	{
 		// This is a fixed pool of known shaders. Not going to support arbitrary shader params atm. 
-		// 
+		// TO_DO: Shaders to load should be read from GameConfig.txt
 		LoadShader(s_pDefaultShaderFragFilename, s_pDefaultShaderVertFilename);
 		LoadShader(s_pDefaultUntexturedFragFilename, s_pDefaultUntexturedVertFilename);
 		LoadShader(s_pBloomShaderFragFilename, s_pBloomShaderVertFilename);

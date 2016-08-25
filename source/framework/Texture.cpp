@@ -1,6 +1,6 @@
 #include "Texture.h"
 #include "sdl/sdl_wrapper.h"
-#include "GLUtils.h"
+
 #include "File.h"
 #include "Memory.h"
 
@@ -12,7 +12,7 @@ namespace Neutrino {
 
 	bool LoadTexture( const char* pFilename )
 	{
-		if (FileExists(pFilename))
+		if (ResourceFileExists(pFilename))
 		{
 			uint32 iFileSize = GetFileSizeBytes( pFilename );
 			ASSERT(iFileSize > 0, "LoadGLTexture: %s zero bytes in size?", pFilename);
@@ -28,6 +28,9 @@ namespace Neutrino {
 
   			bool bLoadStatus = GLTextureFromSDLSurface(s_iTextureIDs, s_iLoadedTextureCount, pSurf, true);
 
+  			if( bLoadStatus )
+  				s_iLoadedTextureCount++;
+
 			SDL_FreeSurface(pSurf);
   			DELETEX [] pFileBytes;
 
@@ -35,5 +38,10 @@ namespace Neutrino {
 		}
 
 	 	return false;
+	}
+
+	GLuint GetTextureID(int iCount)
+	{
+		return s_iTextureIDs[iCount];
 	}
 }

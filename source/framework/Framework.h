@@ -14,6 +14,7 @@
 #include "ShaderUtils.h"
 #include "GameStateManager.h"
 #include "../game/global/CGameGlobals.h"
+#include "Texture.h"
 
 namespace Neutrino {
 	

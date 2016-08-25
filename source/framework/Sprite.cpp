@@ -3,6 +3,8 @@
 #include "Memory.h"
 #include "Colour.h"
 #include <string.h>
+#include <math.h>
+#include "Time.h"
 
 namespace Neutrino 
 {
@@ -21,6 +23,7 @@ namespace Neutrino
 	// Counters
 	static uint16 iActiveSpriteCount = 0;
 	static uint32 iMaxSpriteCount =0;
+
 
 
 	void AllocateSpriteArrays(uint16_t iSpriteCount)
@@ -120,21 +123,25 @@ namespace Neutrino
 		return &s_Sprites[0];
 	}
 
+	// Temp vars
+	static float fAngle=0.0f;
 
 	void TestSprite()
 	{
 		Sprite_t* mySprite = GetActiveSprite();
 		ASSERT(mySprite, "TestSprite, GetActiveSprite returned NULL");
 
-		glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+		fAngle += 1.0f * GetGameMSDelta();
+
+		glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, fabs(sin(fAngle)));
 		glm::vec3* vPos = NEWX glm::vec3(320.0f/2,180.0f/2, 1.0f);
 
 		*(mySprite->_vColour) = *vColour;
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = 16.0f;
 		*(mySprite->_fHalfHeight) = 16.0f;
-		*(mySprite->_fScale) = 1.0f;
-		*(mySprite->_fRotDegrees) = 0.0f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle)) * 2.0f;
+		*(mySprite->_fRotDegrees) = fAngle  * 2.0f;
 
 /*
 		LOG_INFO("Active sprite count: %d", iActiveSpriteCount);

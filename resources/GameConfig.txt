@@ -1,0 +1,4 @@
+textures = {
+	count: 1,
+	texture0: "default.png",
+}

@@ -193,6 +193,10 @@ namespace Neutrino {
             glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
             glm::vec4* vQuadTL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
             glm::vec4* vQuadTR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+            glm::vec4 vTransBL = glm::vec4();
+            glm::vec4 vTransBR = glm::vec4();
+            glm::vec4 vTransTL = glm::vec4();
+            glm::vec4 vTransTR = glm::vec4();
             glm::vec3* vPos = NEWX glm::vec3();
 
 
@@ -250,10 +254,10 @@ namespace Neutrino {
 
 
                     // Transform the vertex positions
-                    glm::vec4 vTransBL = mTransform * *vQuadBL_Pos;
-                    glm::vec4 vTransBR = mTransform * *vQuadBR_Pos;
-                    glm::vec4 vTransTL = mTransform * *vQuadTL_Pos;
-                    glm::vec4 vTransTR = mTransform * *vQuadTR_Pos;
+                    vTransBL = mTransform * *vQuadBL_Pos;
+                    vTransBR = mTransform * *vQuadBR_Pos;
+                    vTransTL = mTransform * *vQuadTL_Pos;
+                    vTransTR = mTransform * *vQuadTR_Pos;
 
                     // Get the packed colour
                     uint32 iColour = GetPackedColourV4(pColours);
@@ -266,15 +270,15 @@ namespace Neutrino {
                     // Populate the VBO vertex corners
                     pVertex->_colour = iColour;
                     pVertex->_uv[0] = 0;
-                    pVertex->_uv[1] = 0;
+                    pVertex->_uv[1] = 1;
                     pVertex->_position[0] = vTransBL.x;
                     pVertex->_position[1] = vTransBL.y;
                     pVertex->_position[2] = vTransBL.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 0;
-                    pVertex->_uv[1] = 0;
+                    pVertex->_uv[0] = 1;
+                    pVertex->_uv[1] = 1;
                     pVertex->_position[0] = vTransBR.x;
                     pVertex->_position[1] = vTransBR.y;
                     pVertex->_position[2] = vTransBR.z;
@@ -289,15 +293,15 @@ namespace Neutrino {
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 0;
-                    pVertex->_uv[1] = 0;
+                    pVertex->_uv[0] = 1;
+                    pVertex->_uv[1] = 1;
                     pVertex->_position[0] = vTransBR.x;
                     pVertex->_position[1] = vTransBR.y;
                     pVertex->_position[2] = vTransBR.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 0;
+                    pVertex->_uv[0] = 1;
                     pVertex->_uv[1] = 0;
                     pVertex->_position[0] = vTransTR.x;
                     pVertex->_position[1] = vTransTR.y;
@@ -333,7 +337,7 @@ namespace Neutrino {
         }
 
 
-        void RenderVBO(const int iSpriteCount)
+        void RenderVBO(const int iSpriteCount, GLuint iID)
         {
             // TO_DO: 
             //      Blend Func should be a parameter of the texture page. 
@@ -342,11 +346,9 @@ namespace Neutrino {
             //      
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       
-            // TO_DO:
-            //      Add the texture loading...
-            //      
-            //glBindTexture( GL_TEXTURE_2D, mVBO_Map[i]->_Texture_ID );
-            //glUniform1i (uniforms[UNIFORM_TEXTURE], 0);
+            GLint* pUniforms = GetActiveUniforms();
+            glBindTexture( GL_TEXTURE_2D, iID );
+            glUniform1i (pUniforms[UNIFORM_TEXTURE], 0);
 
             glBindBuffer ( GL_ARRAY_BUFFER, GetActiveVBO());
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

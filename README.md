@@ -18,7 +18,7 @@ External dependencies can be brought into the project (via git clone) by running
 
 `./external_dependencies/SetupDeps.sh`
 
-IMGUI & GLM are header only libraries so require no additional build steps.  
+IMGUI & GLM are header only libraries so require no additional build steps, however IMGUI is included in the framework from the `source/framework/imggui_copy` directory, so soft links should be provided as this folder is empty by default. The script `LinkIMGUI.sh` in the `external_dependencies` folder will do this for you on *NIX systems.    
 
 The external dependencies folder can be emptied by running:
 

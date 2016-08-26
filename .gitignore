@@ -1,5 +1,7 @@
 external_dependencies/glm/
 external_dependencies/imgui/
+source/framework/imgui_copy/*.h
+source/framework/imgui_copy/*.cpp
 build/*.exe
 build/Neutrino
 *.swp

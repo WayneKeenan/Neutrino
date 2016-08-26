@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "sdl/sdl_wrapper.h"
-
 #include "File.h"
 #include "Memory.h"
 
@@ -39,6 +38,7 @@ namespace Neutrino {
 
 	 	return false;
 	}
+
 
 	GLuint GetTextureID(int iCount)
 	{

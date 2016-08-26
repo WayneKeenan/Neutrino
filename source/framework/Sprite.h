@@ -54,7 +54,7 @@ namespace Neutrino
 	Sprite_t* GetBasePointers();
 
 	// TestSprite
-	// 		Simple functoin to draw a sprite to the centre of the screen, testing this part
-	//   	of the framework. 
+	// 		Simple functoin to draw a sprite to the centre of the screen and verify Sprite_t
+	//   	data is working correctly in the VBO
 	void TestSprite();
 }

@@ -131,7 +131,7 @@ namespace Neutrino
 		}
 	
 
-		// Create an SDL window with an OGL 3.1 Context and compile standard shaders
+		// Create an SDL window with an OGL 3 Context and compile standard shaders
 		// 
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
@@ -155,69 +155,12 @@ namespace Neutrino
 		}
 
 
-
-		// Get GameConfig.tdi for this game and
-		// 	1. Load all the textures
-		//  2. TBD :D
-		// 
-		// 	TO_DO: Shaders to load should be read from this file?
-		//
+		// Load all the textures defined in GameCofig.txt
+		if(!LoadTexturesFromConfigFile())
 		{
-			if( ResourceFileExists("GameConfig.txt"))
-			{
-				const char* pFileBytes = LoadResourceBytes("GameConfig.txt");
-
-				if( NULL == pFileBytes)
-				{
-					LOG_ERROR("Unable to read GameConfig.txt, exiting.");
-					return false;					
-				}
-
-				config_t cfg;
-				config_init(&cfg);
-
-				// Parse the config from memory
-				if(! config_read_string(&cfg, pFileBytes)) 
-				{
-					const char* pErr =  config_error_text(&cfg);
-					config_destroy(&cfg);
-
-					LOG_ERROR("Unable to parse game config: \'%s\' - exiting...", pErr);
-					return false;
-				}
-
-				// Iterate over the possible textures
-				{
-					int iTextureCount = 0;
-					if (config_lookup_int(&cfg, "textures.count", &iTextureCount))
-					{
-						for(int i = 0; i<iTextureCount; i++)
-						{
-							char sID[64]={'\0'};
-							const char* pFilename;
-							sprintf(sID, "textures.texture%d", i);
-							if ( config_lookup_string(&cfg, sID, &pFilename) == CONFIG_TRUE)
-							{
-								LOG_INFO("Found texture: %s", pFilename);
-								if( !LoadTexture(pFilename) )
-								{
-									LOG_ERROR("Failed to load %s, exiting...", pFilename);
-								}
-							}
-						}										
-					}
-				}
-
-				config_destroy(&cfg);
-			}
-			else
-			{
-				LOG_ERROR("Unable to find GameConfig.txt, exiting...");
-				return false;	
-			}
+			LOG_ERROR("Unable to load textures, exiting...");
+			return false;
 		}
-
-
 
 		// Allocate Sprite Buffers and grab our pointer to the bottom
 		AllocateSpriteArrays(GLUtils::GetMaxSpriteCount());

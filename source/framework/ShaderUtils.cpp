@@ -113,7 +113,6 @@ namespace Neutrino {
 	// LoadShaders()
 	// 		Load a fixed set of shaders from the Resource folder
 	// 		Currently shaders are predefined and loaded in a fixed order...
-	//		TO_DO: all resources need to be put in, and loaded from, a PHYSFS pack file
 	static bool LoadShader( const char* pFragFilename, const char* pVertFilename )
 	{
 		ASSERT(iNumShadersLoaded < NUM_SHADERS, "Attempting to load more shaders than currently defined");

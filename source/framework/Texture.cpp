@@ -4,10 +4,10 @@
 #include "Memory.h"
 #include "libconfig.h"
 #include "Log.h"
+#include "Types.h"
+#include "Sprite.h"
 
 namespace Neutrino {
-
-	static const int s_iMaxNumTextures = 4;
 	static uint8 s_iLoadedTextureCount = 0;
 	static TPage_t* s_aTexturePages;
 
@@ -106,7 +106,6 @@ namespace Neutrino {
 		    //
 		    // Generate the 3 VBOs assigned to this texture
 		    //
-		    
 		    (s_aTexturePages[iCount]._pVBO) = *(NEWX(GLUtils::VBO_t));
 		    GLUtils::CreateVBOs(&s_aTexturePages[iCount]._pVBO);
 		}
@@ -139,6 +138,11 @@ namespace Neutrino {
 		}
 
 
+
+		//
+		// Allocate the sprite arrays for this texture...
+		// 
+		AllocateSpriteArrays(s_aTexturePages[iCount]._iTextureID);
 		return bLoadStatus;
 	}
 
@@ -167,8 +171,8 @@ namespace Neutrino {
 		// TPageSpriteInfo_t arrays inside each of these will need to be allocated after parsing the tpage<n>.txt file
 		//  
 		{
-			s_aTexturePages = NEWX TPage_t[s_iMaxNumTextures];
-			LOG_INFO("Allocated %d bytes [%dK] for texture page parameters", sizeof(TPage_t) * s_iMaxNumTextures, (sizeof(TPage_t) * s_iMaxNumTextures) / 1024 );	
+			s_aTexturePages = NEWX TPage_t[iMAX_TEXTURES];
+			LOG_INFO("Allocated %d bytes [%dK] for texture page parameters", sizeof(TPage_t) * iMAX_TEXTURES, (sizeof(TPage_t) * iMAX_TEXTURES) / 1024 );	
 			s_iLoadedTextureCount = 0;				
 		}
 
@@ -215,16 +219,43 @@ namespace Neutrino {
 							LOG_ERROR("Failed to load %s, exiting...", pFilename);
 							return false;
 						}
-
-						s_iLoadedTextureCount++;
 					}
 				}										
 			}
 		}
 
 		config_destroy(&cfg);
-		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount-1);
+		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
 
 		return true;
+	}
+
+
+
+
+	void DrawTextures()
+	{
+		for( int i = 0; i < s_iLoadedTextureCount; i++)
+		{
+				Sprite_t* s_pBPtr = GetBasePointers();
+
+				GLUtils::PopulateVBO(
+								s_pBPtr->_fHalfWidth, 
+								s_pBPtr->_fHalfHeight, 
+								s_pBPtr->_fRotDegrees, 
+								s_pBPtr->_fScale, 
+								s_pBPtr->_vColour, 
+								s_pBPtr->_vPosition, 
+								GetSpriteCount(),
+								GetTextureVBO(i)
+							);
+
+			// Bind and draw the active VBO
+			GLUtils::RenderVBO(GetSpriteCount(), GetTextureID(i), GetTextureVBO(i));
+
+		}
+		// Populate the VBOs
+
+
 	}
 }

@@ -5,122 +5,120 @@
 #include <string.h>
 #include <math.h>
 #include "Time.h"
+#include "Types.h"
 
 namespace Neutrino 
 {
 
 	// Static allocated arrays for the sprite settings
-    static float* s_afHalfWidth;
-    static float* s_afHalfHeight;
-    static float* s_afSpriteRotDegrees;
-    static float* s_afSpriteScale;
-    static glm::vec4* s_avSprColours;
-    static glm::vec3* s_avSprPositions;
-
-    // Array of struct of pointers into the sprite details arrays
-	static Sprite_t* s_Sprites = NULL;
+	static SpriteRenderInfo_t* s_SpriteRenderInfo[iMAX_TEXTURES];
 
 	// Counters
-	static uint16 iActiveSpriteCount = 0;
-	static uint32 iMaxSpriteCount =0;
+	static uint8 s_iAllocatedTextures = 0;
 
 
-
-	void AllocateSpriteArrays(uint16_t iSpriteCount)
+	void AllocateSpriteArrays(GLuint iTextureID)
 	{
-		iActiveSpriteCount = 0;
-		iMaxSpriteCount = iSpriteCount;
+		ASSERT(s_iAllocatedTextures < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
+
+		s_SpriteRenderInfo[s_iAllocatedTextures] = NEWX(SpriteRenderInfo_t);
+
+		s_SpriteRenderInfo[s_iAllocatedTextures]->_iActiveSpriteCount = 0;
+		s_SpriteRenderInfo[s_iAllocatedTextures]->_iTextureID = iTextureID;
+
 
 		// Allocate the memory for our sprite settings arrays...
 		{
-	        s_afHalfWidth = NEWX float[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+			s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 
-	        s_afHalfHeight = NEWX float[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for Half Height", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for Half Height", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 
-	        s_afSpriteRotDegrees = NEWX float[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 
-	        s_afSpriteScale = NEWX float[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 					
-	        s_avSprColours = NEWX glm::vec4[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(glm::vec4) * iSpriteCount, (sizeof(glm::vec4) * iSpriteCount) / 1024 );		
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(glm::vec4) * iMAX_SPRITES, (sizeof(glm::vec4) * iMAX_SPRITES) / 1024 );		
 
-	        s_avSprPositions = NEWX glm::vec3[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iSpriteCount, (sizeof(glm::vec3) * iSpriteCount) / 1024);
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iMAX_SPRITES, (sizeof(glm::vec3) * iMAX_SPRITES) / 1024);
 
-	        s_Sprites = NEWX Sprite_t[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite structs", sizeof(Sprite_t) * iSpriteCount, (sizeof(Sprite_t) * iSpriteCount) / 1024);
+			s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers = NEWX Sprite_t[iMAX_SPRITES];
 		}
-
 
 		// Setup the pointers in the sprite structs to correct locations in the sprite settings arrays. 
-		for(int i = 0; i < iSpriteCount; i ++)
+		for(int i = 0; i < iMAX_SPRITES; i ++)
 		{
-	        s_Sprites[i]._fHalfWidth = &s_afHalfWidth[iActiveSpriteCount];
-	        s_Sprites[i]._fHalfHeight = &s_afHalfHeight[iActiveSpriteCount];
-	        s_Sprites[i]._fRotDegrees = &s_afSpriteRotDegrees[iActiveSpriteCount];
-	        s_Sprites[i]._fScale = &s_afSpriteScale[iActiveSpriteCount];
-	        s_Sprites[i]._vColour = &s_avSprColours[iActiveSpriteCount];
-	        s_Sprites[i]._vPosition = &s_avSprPositions[iActiveSpriteCount];
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fHalfWidth = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfWidth[i];
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fHalfHeight = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfHeight[i];
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fRotDegrees = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteRotDegrees[i];
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fScale = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteScale[i];
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._vColour = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprColours[i];
+	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._vPosition = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprPositions[i];
 		}
 	}
 
 
 
-
+	// TO_DO: Need to pass in a texture ID 
 	void DeallocateSpriteArrays()
 	{
-        DELETEX [] s_afHalfWidth;
-        DELETEX [] s_afHalfHeight;
-        DELETEX [] s_afSpriteScale;
-        DELETEX [] s_afSpriteRotDegrees;
-        DELETEX [] s_avSprColours;
-        DELETEX [] s_avSprPositions;
-		DELETEX [] s_Sprites;
+		for(int i = 0; i < s_iAllocatedTextures; i ++)
+		{
+	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._afHalfWidth;
+	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._afHalfHeight;
+	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._afSpriteScale;
+	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._afSpriteRotDegrees;
+	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._avSprColours;
+	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._avSprPositions;
+			DELETEX [] s_SpriteRenderInfo[i]->_SpriteBasePointers;			
+		}
 	}
 
 
 
-
+	// TO_DO: Need to pass in a texture ID 
 	Sprite_t* GetActiveSprite()
 	{
 		Sprite_t* pRet = NULL;
 
-		if ( iActiveSpriteCount < iMaxSpriteCount)
+		if ( s_SpriteRenderInfo[0]->_iActiveSpriteCount < iMAX_SPRITES)
 		{
-			pRet = &s_Sprites[iActiveSpriteCount]; 
-			iActiveSpriteCount++;
+			pRet = &s_SpriteRenderInfo[0]->_SpriteBasePointers[s_SpriteRenderInfo[0]->_iActiveSpriteCount]; 
+			s_SpriteRenderInfo[0]->_iActiveSpriteCount++;
 		}
 		else
 		{
-			ASSERT(iActiveSpriteCount < iMaxSpriteCount, "Sprite count limit reached! Raise maximum number of sprites");
+			ASSERT(s_SpriteRenderInfo[0]->_iActiveSpriteCount < iMAX_SPRITES, "Sprite count limit reached! Raise maximum number of sprites");
 			// Exit cleanly...
 		}
 
 		return pRet;
+		
 	}
-
-
-
 
 	void ResetSpriteCount()
 	{
-		iActiveSpriteCount = 0;
+		for(int i = 0; i < s_iAllocatedTextures; i ++)
+		{
+			s_SpriteRenderInfo[i]->_iActiveSpriteCount = 0;
+		}
 	}
 
-
+	// TO_DO: Need to pass in a texture ID 
 	uint16 GetSpriteCount()
 	{
-		return iActiveSpriteCount;
+		return s_SpriteRenderInfo[0]->_iActiveSpriteCount;
 	}
 
-
+// TO_DO: Need to pass in a texture ID 
 	Sprite_t* GetBasePointers()
 	{
-		return &s_Sprites[0];
+		return &s_SpriteRenderInfo[0]->_SpriteBasePointers[0];
 	}
 
 	// Temp vars

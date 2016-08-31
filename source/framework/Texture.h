@@ -29,11 +29,7 @@ namespace Neutrino {
 	//  	_iWidth: texture's width
 	//  	_iHeight: texture height
 	//  	_iMaxSprites: number of sprites contained in this texture page
-	//  	aSpriteInfo: array containing the relevent coords for each sprite within the tpage
-	//  
-	// TO_DO:
-	// 		The TPage_t should probably store the base pointers to the individual sprite arrays that'll be used to render any sprites
-	//   	defined here.
+	//  	aSpriteInfo: array containing the relevent coords for each sprite within the tpage.
 	//  
 	typedef struct TPage_t
 	{
@@ -42,7 +38,7 @@ namespace Neutrino {
 		uint16 _iHeight;
 		uint16 _iMaxSprites;
 		TPageSpriteInfo_t* aSprintInfo;
-		GLUtils::VBO_t _pVBO;
+		GLUtils::VBO_t _pVBO;	// TO_DO: remove this, doesn't need to be tracked by the tpage, can be indexed through a function call in GLUtils
 	} TPage_t;
 
 
@@ -50,8 +46,7 @@ namespace Neutrino {
 	// 		Returns the GLuint identifier for the loaded texture
 	//   
 	//  TO_DO:
-	//  	This should be removed from accesible scope. The framework should iterate over each texture page
-	//   	and call a DrawSprites function for it...
+	//  	This should be removed from accesible scope. The framework should call a Draw Sprites that goes over each of the SpriteRenderInfo things
 	GLuint GetTextureID(int iCount);
 	GLUtils::VBO_t* GetTextureVBO(int iCount);
 
@@ -75,5 +70,10 @@ namespace Neutrino {
 	bool LoadTexturesFromConfigFile();
 
 
+	// TO DO: remove this into Sprite...
+	void DrawTextures();
+
 	// TO_DO: we need clean up functions for all these loaded textures...
+	// 
+	// TO_DO: we need to make sure all the VBOs are deallocated...
 }

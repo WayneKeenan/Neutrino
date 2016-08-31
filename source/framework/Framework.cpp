@@ -13,8 +13,6 @@ namespace Neutrino
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
-	static Sprite_t* s_pBPtr;
-
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,14 +163,6 @@ namespace Neutrino
 		}
 
 
-		// Allocate Sprite Buffers and grab our pointer to the bottom
-		// TO_DO: this may need to change to a sprite buffer per texture...
-		// Multi thread this?
-		// 
-		AllocateSpriteArrays(GLUtils::GetMaxSpriteCount());
-		s_pBPtr = GetBasePointers();
-		ASSERT( NULL != s_pBPtr, "GetBasePointers returned null");
-
 		// Create any Singletons we need
 		//
 		CGameGlobals::Create();
@@ -204,26 +194,14 @@ namespace Neutrino
 		// Generate new Camera/World matrices for this frame
 		GLUtils::GenerateMVCMatrices();
 
+
 		// Generate some test sprites (TO BE REMOVED)
 		TestSprite();
 
-		// Populate the VBOs
-		GLUtils::PopulateVBO(
-								s_pBPtr->_fHalfWidth, 
-								s_pBPtr->_fHalfHeight, 
-								s_pBPtr->_fRotDegrees, 
-								s_pBPtr->_fScale, 
-								s_pBPtr->_vColour, 
-								s_pBPtr->_vPosition, 
-								GetSpriteCount(),
-								GetTextureVBO(0)
-							);
 
 		// Set the active shader for this pass
 		SetActiveShader(DEFAULT_SHADER);
-
-		// Bind and draw the active VBO
-		GLUtils::RenderVBO(GetSpriteCount(), GetTextureID(0), GetTextureVBO(0));
+		DrawTextures();
 
 		// Let SDL do its magic...
 		SDLPresent();

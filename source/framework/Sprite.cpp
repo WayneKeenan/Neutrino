@@ -37,7 +37,7 @@ namespace Neutrino
 			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
 	        s_afHalfHeight = NEWX float[iSpriteCount];
-			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
+			LOG_INFO("Allocated %d bytes [%dK] for Half Height", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		
 
 	        s_afSpriteRotDegrees = NEWX float[iSpriteCount];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iSpriteCount, (sizeof(float) * iSpriteCount) / 1024 );		

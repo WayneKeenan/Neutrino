@@ -12,7 +12,6 @@ namespace Neutrino {
 	static TPage_t* s_aTexturePages;
 
 
-
 	GLuint GetTextureID(int iCount)
 	{
 		return s_aTexturePages[iCount].iTextureID;
@@ -22,18 +21,8 @@ namespace Neutrino {
 
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
 	{
-		if (!ResourceFileExists(pFilename))
-		{
-			LOG_ERROR("Unable to find %s, exiting...", pFilename);
-			return false;
-		}
-
-
-		if (!ResourceFileExists(pTPageFilename))
-		{
-			LOG_ERROR("Unable to find %s, exiting...", pTPageFilename);
-			return false;
-		}
+		if (!ResourceFileExists(pFilename)) { LOG_ERROR("Unable to find %s, exiting...", pFilename); return false; }
+		if (!ResourceFileExists(pTPageFilename)) { LOG_ERROR("Unable to find %s, exiting...", pTPageFilename); return false; }
 
 
 		// 
@@ -53,6 +42,56 @@ namespace Neutrino {
 				LOG_ERROR("Unable to parse tpage config: \'%s\' - exiting...", pErr);
 				return false;
 			}
+
+			if (config_lookup_int(&cfg, "tpage.width", (int*)&s_aTexturePages[iCount].iWidth) != CONFIG_TRUE)
+			{
+				LOG_ERROR("Unable to find tpage width, exiting...");
+				return false;	
+			}
+			
+			if (config_lookup_int(&cfg, "tpage.height", (int*)&s_aTexturePages[iCount].iHeight) != CONFIG_TRUE)
+			{
+				LOG_ERROR("Unable to find tpage height, exiting...");
+				return false;	
+			}
+
+			// Get the list of sprites in the tpage info file
+			config_setting_t* pSprSetting = config_lookup(&cfg, "tpage.sprites");
+  			if(NULL == pSprSetting)
+  			{
+				LOG_ERROR("Unable to find list of sprites, exiting...");
+				return false;	
+  			}
+
+  			//
+  			// Allocate the TPageSpriteInfo array for this texture page and populate with each sprite's info
+  			// 
+    		int iSprs = config_setting_length(pSprSetting);
+    		s_aTexturePages[iCount].aSprintInfo = NEWX TPageSpriteInfo_t[iSprs]; 
+    		s_aTexturePages[iCount].iMaxSprites = iSprs-1;   		   
+    		LOG_INFO("Texture page contains %d sprites", iSprs-1); 			
+    		LOG_INFO("Allocated %d bytes [%dK] for sprite definitions", sizeof(TPageSpriteInfo_t) * iSprs, (sizeof(TPageSpriteInfo_t) * iSprs) / 1024 );
+
+			for(int i = 0; i < iSprs-1; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
+			{
+  				config_setting_t* pSprite = config_setting_get_elem(pSprSetting, i);
+  				int iWidth, iHeight;
+  				const char* sFilename;
+
+		      	if(!(config_setting_lookup_int(pSprite, "x", (int*)&s_aTexturePages[iCount].aSprintInfo[i].iX) &&
+		      		 config_setting_lookup_int(pSprite, "y", (int*)&s_aTexturePages[iCount].aSprintInfo[i].iY) &&
+		      		 config_setting_lookup_int(pSprite, "width", &iWidth) && 
+		      		 config_setting_lookup_int(pSprite, "height", &iHeight) && 
+		      		 config_setting_lookup_string(pSprite, "filename", &sFilename)))	
+		      	{
+		      		LOG_ERROR("Parsing sprite %d failed", i);
+		      		return false;
+		      	}
+
+		      	s_aTexturePages[iCount].aSprintInfo[i].fHalfWidth = (float)iWidth/2.0f;
+		      	s_aTexturePages[iCount].aSprintInfo[i].fHalfHeight = (float)iHeight/2.0f;
+		      	LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, s_aTexturePages[iCount].aSprintInfo[i].iX, s_aTexturePages[iCount].aSprintInfo[i].iY );
+		    }
 		}
 
 
@@ -85,6 +124,7 @@ namespace Neutrino {
 
 		return bLoadStatus;
 	}
+
 
 
 
@@ -123,7 +163,7 @@ namespace Neutrino {
 		//
 		// Parse the config from memory
 		// 
-		if(! config_read_string(&cfg, pFileBytes)) 
+		if(!config_read_string(&cfg, pFileBytes)) 
 		{
 			const char* pErr =  config_error_text(&cfg);
 			config_destroy(&cfg);
@@ -166,7 +206,7 @@ namespace Neutrino {
 		}
 
 		config_destroy(&cfg);
-		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
+		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount-1);
 
 		return true;
 	}

@@ -14,52 +14,55 @@ namespace Neutrino
 	static SpriteRenderInfo_t* s_SpriteRenderInfo[iMAX_TEXTURES];
 
 	// Counters
-	static uint8 s_iAllocatedTextures = 0;
+	static uint8 s_iAllocatedSets = 0;
 
 
 	void AllocateSpriteArrays(GLuint iTextureID)
 	{
-		ASSERT(s_iAllocatedTextures < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
+		ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
 
-		s_SpriteRenderInfo[s_iAllocatedTextures] = NEWX(SpriteRenderInfo_t);
+		s_SpriteRenderInfo[s_iAllocatedSets] = NEWX(SpriteRenderInfo_t);
 
-		s_SpriteRenderInfo[s_iAllocatedTextures]->_iActiveSpriteCount = 0;
-		s_SpriteRenderInfo[s_iAllocatedTextures]->_iTextureID = iTextureID;
+		s_SpriteRenderInfo[s_iAllocatedSets]->_iActiveSpriteCount = 0;
+		s_SpriteRenderInfo[s_iAllocatedSets]->_iTextureID = iTextureID;
 
 
 		// Allocate the memory for our sprite settings arrays...
 		{
-			s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
+			s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
 			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
 			LOG_INFO("Allocated %d bytes [%dK] for Half Height", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
 					
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(glm::vec4) * iMAX_SPRITES, (sizeof(glm::vec4) * iMAX_SPRITES) / 1024 );		
 
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
 			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iMAX_SPRITES, (sizeof(glm::vec3) * iMAX_SPRITES) / 1024);
 
-			s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers = NEWX Sprite_t[iMAX_SPRITES];
+			s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers = NEWX Sprite_t[iMAX_SPRITES];
+			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(Sprite_t) * iMAX_SPRITES, (sizeof(Sprite_t) * iMAX_SPRITES) / 1024);
 		}
 
 		// Setup the pointers in the sprite structs to correct locations in the sprite settings arrays. 
 		for(int i = 0; i < iMAX_SPRITES; i ++)
 		{
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fHalfWidth = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfWidth[i];
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fHalfHeight = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afHalfHeight[i];
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fRotDegrees = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteRotDegrees[i];
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._fScale = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._afSpriteScale[i];
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._vColour = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprColours[i];
-	        s_SpriteRenderInfo[s_iAllocatedTextures]->_SpriteBasePointers[i]._vPosition = &s_SpriteRenderInfo[s_iAllocatedTextures]->_SprArrayBase._avSprPositions[i];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfWidth = &s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth[i];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfHeight = &s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight[i];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fRotDegrees = &s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees[i];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fScale = &s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale[i];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._vColour = &s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours[i];
+	        s_SpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._vPosition = &s_SpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions[i];
 		}
+
+		s_iAllocatedSets++;
 	}
 
 
@@ -67,7 +70,7 @@ namespace Neutrino
 	// TO_DO: Need to pass in a texture ID 
 	void DeallocateSpriteArrays()
 	{
-		for(int i = 0; i < s_iAllocatedTextures; i ++)
+		for(int i = 0; i < s_iAllocatedSets; i ++)
 		{
 	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._afHalfWidth;
 	        DELETEX [] s_SpriteRenderInfo[i]->_SprArrayBase._afHalfHeight;
@@ -103,19 +106,19 @@ namespace Neutrino
 
 	void ResetSpriteCount()
 	{
-		for(int i = 0; i < s_iAllocatedTextures; i ++)
+		for(int i = 0; i < s_iAllocatedSets; i ++)
 		{
 			s_SpriteRenderInfo[i]->_iActiveSpriteCount = 0;
 		}
 	}
 
-	// TO_DO: Need to pass in a texture ID 
+	// TO_DO: This can be removed
 	uint16 GetSpriteCount()
 	{
 		return s_SpriteRenderInfo[0]->_iActiveSpriteCount;
 	}
 
-// TO_DO: Need to pass in a texture ID 
+	// TO_DO: This can be removed
 	Sprite_t* GetBasePointers()
 	{
 		return &s_SpriteRenderInfo[0]->_SpriteBasePointers[0];

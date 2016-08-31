@@ -1,0 +1,57 @@
+tpage: 
+{
+	width: 962;
+	height: 922;
+ 	sprites: (
+		
+		{
+			filename: "andy.jpg";
+			x: 4;
+			y: 490;
+			width: 400;
+			height: 428;
+		},
+		
+		{
+			filename: "jonhare.jpg";
+			x: 4;
+			y: 4;
+			width: 640;
+			height: 480;
+		},
+		
+		{
+			filename: "minter.jpg";
+			x: 650;
+			y: 4;
+			width: 308;
+			height: 276;
+		},
+		
+		{
+			filename: "ste.jpg";
+			x: 650;
+			y: 286;
+			width: 300;
+			height: 169;
+		},
+		
+		{
+			filename: "toms.png";
+			x: 747;
+			y: 461;
+			width: 180;
+			height: 180;
+		},
+		
+		{
+			filename: "turner.jpg";
+			x: 410;
+			y: 490;
+			width: 331;
+			height: 422;
+		},
+		
+		{} #Insert an empty group so list element is terminated correctly. Do not remove this from the exporter
+	)
+}

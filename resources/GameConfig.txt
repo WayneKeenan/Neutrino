@@ -1,5 +1,5 @@
-textures = {
+textures: {
 	count: 1,
-	texture0: "default.png",
-    tpageinfo0: "default.tpage",
+	texture0: "tpage1.png",
+  tpageinfo0: "tpage1.txt",
 }

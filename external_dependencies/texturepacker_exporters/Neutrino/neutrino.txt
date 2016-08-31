@@ -1,0 +1,17 @@
+tpage: 
+{
+	width: {{texture.size.width}};
+	height: {{texture.size.height}};
+ 	sprites: (
+		{% for sprite in allSprites %}
+		{
+			filename: "{{sprite.fullName}}";
+			x: {{sprite.frameRect.x}};
+			y: {{sprite.frameRect.y}};
+			width: {{sprite.frameRect.width}};
+			height: {{sprite.frameRect.height}};
+		},
+		{% endfor %}
+		{} #Insert an empty group so list element is terminated correctly. Do not remove this from the exporter
+	)
+}

@@ -119,7 +119,7 @@ namespace Neutrino
 		return s_pBasePath;
 	}
 
-    bool GLTextureFromSDLSurface(GLuint* pTextureIDs, uint8 iCount, SDL_Surface* pSurf, bool bFiltered)
+    bool GLTextureFromSDLSurface(GLuint* pTextureID, SDL_Surface* pSurf, bool bFiltered)
     {
         int iMode = 0;
         if (pSurf->format->BytesPerPixel == 3) 
@@ -136,9 +136,9 @@ namespace Neutrino
             return false;
         }
 
-        glGenTextures( 1, &pTextureIDs[iCount] );
+        glGenTextures( 1, pTextureID );
 		ASSERT_GL_ERROR;        
-        glBindTexture( GL_TEXTURE_2D, pTextureIDs[iCount] );
+        glBindTexture( GL_TEXTURE_2D, *pTextureID );
 		ASSERT_GL_ERROR;                
         glTexImage2D( GL_TEXTURE_2D, 0, pSurf->format->BytesPerPixel, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels );
    		ASSERT_GL_ERROR;        

@@ -156,13 +156,20 @@ namespace Neutrino
 
 
 		// Load all the textures defined in GameCofig.txt
+		// There's a current assumption that we can probably load all our textures on init 
+		// as there'll never be too many of them. Not likely to fill VRAM with these games...
+		//  
 		if(!LoadTexturesFromConfigFile())
 		{
-			LOG_ERROR("Unable to load textures, exiting...");
+			LOG_ERROR("Framework was unable to load all textures, exiting...");
 			return false;
 		}
 
+
 		// Allocate Sprite Buffers and grab our pointer to the bottom
+		// TO_DO: this may need to change to a sprite buffer per texture...
+		// Multi thread this?
+		// 
 		AllocateSpriteArrays(GLUtils::GetMaxSpriteCount());
 		s_pBPtr = GetBasePointers();
 		ASSERT( NULL != s_pBPtr, "GetBasePointers returned null");

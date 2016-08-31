@@ -31,7 +31,7 @@ namespace Neutrino
 	const char* SDLGetPrefPath();
 
 
-	 bool GLTextureFromSDLSurface(GLuint* pTextureIDs, uint8 iCount, SDL_Surface* pSurf, bool bFiltered);
+	 bool GLTextureFromSDLSurface(GLuint* pTextureID,  SDL_Surface* pSurf, bool bFiltered);
 
 }
 

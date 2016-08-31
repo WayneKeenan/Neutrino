@@ -27,9 +27,6 @@ namespace Neutrino {
         static const int s_iSizeOfSprite = 6*sizeof(Vertex_t);
         static const int s_iSizeOfVertex = sizeof(Vertex_t);
 
-        static GLuint s_iVBOs[3]; 
-        static uint8 s_iVBOCounter = 0;
-
 
         float* GetCameraMatrix()
         {
@@ -85,30 +82,30 @@ namespace Neutrino {
 
 
         
-        void CreateVBO()
+        void CreateVBOs(VBO_t* pVBO)
         {
-            glGenBuffers(1, &s_iVBOs[0]); 
+            glGenBuffers(1, &pVBO->_aVBOs[0]); 
             ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, s_iVBOs[0]); 
-            ASSERT_GL_ERROR;
-            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
-            ASSERT_GL_ERROR;
-
-            glGenBuffers(1, &s_iVBOs[1]); 
-            ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, s_iVBOs[1]); 
+            glBindBuffer(GL_ARRAY_BUFFER, pVBO->_aVBOs[0]); 
             ASSERT_GL_ERROR;
             glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
             ASSERT_GL_ERROR;
 
-            glGenBuffers(1, &s_iVBOs[2]); 
+            glGenBuffers(1, &pVBO->_aVBOs[1]); 
             ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, s_iVBOs[2]); 
+            glBindBuffer(GL_ARRAY_BUFFER, pVBO->_aVBOs[1]); 
             ASSERT_GL_ERROR;
             glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
             ASSERT_GL_ERROR;
 
-            s_iVBOCounter=0;
+            glGenBuffers(1, &pVBO->_aVBOs[2]); 
+            ASSERT_GL_ERROR;
+            glBindBuffer(GL_ARRAY_BUFFER, pVBO->_aVBOs[2]); 
+            ASSERT_GL_ERROR;
+            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
+            ASSERT_GL_ERROR;
+
+            pVBO->_iVBOCounter = 0;
         }
 
 
@@ -167,25 +164,7 @@ namespace Neutrino {
         }
 
 
-        // This VBO isn't sent until the DrawArrays() call, should be clear of the driver by then...
-        // Note: this is based on some libGDX profiling data that I've lost the URL to. YMMV
-        // 
-        // (Dynamic Draw sucked balls on iOS 5 so...)
-        GLuint GetActiveVBO()
-        {
-            return s_iVBOs[s_iVBOCounter];
-        }
-
-
-        // Next active VBO was used two frames ago. 
-        void IncVBO()
-        {
-            s_iVBOCounter++;
-            if ( s_iVBOCounter == 3 ) s_iVBOCounter = 0;
-        }
-
-
-        void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount)
+        void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, VBO_t* pVBO)
         {
             ASSERT(iCount < s_iMaxSprites, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
@@ -202,7 +181,7 @@ namespace Neutrino {
 
             // Get the position of the first vertex in the VBO
             
-            GLuint iVBO_ID = GetActiveVBO();
+            GLuint iVBO_ID = pVBO->_aVBOs[pVBO->_iVBOCounter];
 
             glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
             ASSERT_GL_ERROR;
@@ -337,7 +316,7 @@ namespace Neutrino {
         }
 
 
-        void RenderVBO(const int iSpriteCount, GLuint iID)
+        void RenderVBO(const int iSpriteCount, GLuint iID, VBO_t* pVBO)
         {
             // TO_DO: 
             //      Blend Func should be a parameter of the texture page. 
@@ -350,7 +329,7 @@ namespace Neutrino {
             glBindTexture( GL_TEXTURE_2D, iID );
             glUniform1i (pUniforms[UNIFORM_TEXTURE], 0);
 
-            glBindBuffer ( GL_ARRAY_BUFFER, GetActiveVBO());
+            glBindBuffer ( GL_ARRAY_BUFFER, pVBO->_aVBOs[pVBO->_iVBOCounter]);
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             ASSERT_GL_ERROR;
                 
@@ -375,7 +354,8 @@ namespace Neutrino {
             glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
             ASSERT_GL_ERROR;            
 
-            IncVBO();
+            pVBO->_iVBOCounter++;
+            if ( pVBO->_iVBOCounter == 3) pVBO->_iVBOCounter = 0;
         }
     }
 }

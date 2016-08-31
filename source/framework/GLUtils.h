@@ -33,6 +33,13 @@ namespace Neutrino
 			GLfloat _position[3];
 		} Vertex_t; 
 
+
+		typedef struct VBO_t
+		{
+			GLuint _aVBOs[3];
+			uint8  _iVBOCounter;
+		} VBO_t;
+
 		// Temporary, need to find a balance of the amount we're copying vs number needed.
 		// 
 		static const uint16 s_iMaxSprites = 2048;		
@@ -50,7 +57,7 @@ namespace Neutrino
 		// 	 Use the GL_ERROR / ASSERT_GL_ERROR for simplicity
 		bool LogGlError(const char *pFile, int iLine);
 
-		// CreateVBO
+		// CreateVBOs
 		//		Generates 3 VBO arrays which we iterate over each frame. 
 		//  	Bit of fluff logic here, as I'm second guessing what the driver is going to do, but
 		//   	avoiding the case where we're doing a data map&copy into a VBO the driver might still 
@@ -59,7 +66,10 @@ namespace Neutrino
 		//      
 		//      None of this is user facing, Render* functions have to get active VBO which is always
 		//      one that was used two frames ago...
-		void CreateVBO();
+		//      
+		//      Called by LoadTexturesFromConfigFile()
+		//      
+		void CreateVBOs(VBO_t* pVBO);
 
 
 		// GetCameraMatrix
@@ -78,12 +88,12 @@ namespace Neutrino
 
 		// PopulateVBO
 		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame
-		void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount);
+		void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, VBO_t* pVBO);
 
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
-		void RenderVBO(const int iSpriteCount, GLuint iID);
+		void RenderVBO(const int iSpriteCount, GLuint iID, VBO_t* pVBO);
 
 	};
 }

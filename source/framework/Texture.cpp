@@ -14,9 +14,13 @@ namespace Neutrino {
 
 	GLuint GetTextureID(int iCount)
 	{
-		return s_aTexturePages[iCount].iTextureID;
+		return s_aTexturePages[iCount]._iTextureID;
 	}
 
+	GLUtils::VBO_t* GetTextureVBO(int iCount)
+	{
+		return &s_aTexturePages[iCount]._pVBO;
+	}
 
 
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
@@ -43,15 +47,17 @@ namespace Neutrino {
 				return false;
 			}
 
-			if (config_lookup_int(&cfg, "tpage.width", (int*)&s_aTexturePages[iCount].iWidth) != CONFIG_TRUE)
+			if (config_lookup_int(&cfg, "tpage.width", (int*)&s_aTexturePages[iCount]._iWidth) != CONFIG_TRUE)
 			{
 				LOG_ERROR("Unable to find tpage width, exiting...");
+				config_destroy(&cfg);
 				return false;	
 			}
 			
-			if (config_lookup_int(&cfg, "tpage.height", (int*)&s_aTexturePages[iCount].iHeight) != CONFIG_TRUE)
+			if (config_lookup_int(&cfg, "tpage.height", (int*)&s_aTexturePages[iCount]._iHeight) != CONFIG_TRUE)
 			{
 				LOG_ERROR("Unable to find tpage height, exiting...");
+				config_destroy(&cfg);
 				return false;	
 			}
 
@@ -60,6 +66,7 @@ namespace Neutrino {
   			if(NULL == pSprSetting)
   			{
 				LOG_ERROR("Unable to find list of sprites, exiting...");
+				config_destroy(&cfg);
 				return false;	
   			}
 
@@ -68,7 +75,7 @@ namespace Neutrino {
   			// 
     		int iSprs = config_setting_length(pSprSetting);
     		s_aTexturePages[iCount].aSprintInfo = NEWX TPageSpriteInfo_t[iSprs]; 
-    		s_aTexturePages[iCount].iMaxSprites = iSprs-1;   		   
+    		s_aTexturePages[iCount]._iMaxSprites = (uint16)(iSprs-1);   		   
     		LOG_INFO("Texture page contains %d sprites", iSprs-1); 			
     		LOG_INFO("Allocated %d bytes [%dK] for sprite definitions", sizeof(TPageSpriteInfo_t) * iSprs, (sizeof(TPageSpriteInfo_t) * iSprs) / 1024 );
 
@@ -78,8 +85,8 @@ namespace Neutrino {
   				int iWidth, iHeight;
   				const char* sFilename;
 
-		      	if(!(config_setting_lookup_int(pSprite, "x", (int*)&s_aTexturePages[iCount].aSprintInfo[i].iX) &&
-		      		 config_setting_lookup_int(pSprite, "y", (int*)&s_aTexturePages[iCount].aSprintInfo[i].iY) &&
+		      	if(!(config_setting_lookup_int(pSprite, "x", (int*)&s_aTexturePages[iCount].aSprintInfo[i]._iX) &&
+		      		 config_setting_lookup_int(pSprite, "y", (int*)&s_aTexturePages[iCount].aSprintInfo[i]._iY) &&
 		      		 config_setting_lookup_int(pSprite, "width", &iWidth) && 
 		      		 config_setting_lookup_int(pSprite, "height", &iHeight) && 
 		      		 config_setting_lookup_string(pSprite, "filename", &sFilename)))	
@@ -88,10 +95,20 @@ namespace Neutrino {
 		      		return false;
 		      	}
 
-		      	s_aTexturePages[iCount].aSprintInfo[i].fHalfWidth = (float)iWidth/2.0f;
-		      	s_aTexturePages[iCount].aSprintInfo[i].fHalfHeight = (float)iHeight/2.0f;
-		      	LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, s_aTexturePages[iCount].aSprintInfo[i].iX, s_aTexturePages[iCount].aSprintInfo[i].iY );
+		      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfWidth = (float)iWidth/2.0f;
+		      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfHeight = (float)iHeight/2.0f;
+		      	LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, s_aTexturePages[iCount].aSprintInfo[i]._iX, s_aTexturePages[iCount].aSprintInfo[i]._iY );
 		    }
+
+		    config_destroy(&cfg);
+
+
+		    //
+		    // Generate the 3 VBOs assigned to this texture
+		    //
+		    
+		    (s_aTexturePages[iCount]._pVBO) = *(NEWX(GLUtils::VBO_t));
+		    GLUtils::CreateVBOs(&s_aTexturePages[iCount]._pVBO);
 		}
 
 
@@ -112,7 +129,7 @@ namespace Neutrino {
   			SDL_Surface* pSurf = IMG_Load_RW(pOps, 1);
   			ASSERT(pSurf, "LoadGLTexture: SDL Surface conversion failed");
 
-  			bLoadStatus = GLTextureFromSDLSurface(&s_aTexturePages[iCount].iTextureID, pSurf, true);
+  			bLoadStatus = GLTextureFromSDLSurface(&s_aTexturePages[iCount]._iTextureID, pSurf, true);
 
   			if( bLoadStatus )
   				s_iLoadedTextureCount++;

@@ -151,7 +151,6 @@ namespace Neutrino
 									NeutrinoPreferences->s_iInternalHeight 
 								);
 			GLUtils::GenerateMVCMatrices();
-			GLUtils::CreateVBO();
 		}
 
 
@@ -216,14 +215,15 @@ namespace Neutrino
 								s_pBPtr->_fScale, 
 								s_pBPtr->_vColour, 
 								s_pBPtr->_vPosition, 
-								GetSpriteCount()
+								GetSpriteCount(),
+								GetTextureVBO(0)
 							);
 
 		// Set the active shader for this pass
 		SetActiveShader(DEFAULT_SHADER);
 
 		// Bind and draw the active VBO
-		GLUtils::RenderVBO(GetSpriteCount(), GetTextureID(0));
+		GLUtils::RenderVBO(GetSpriteCount(), GetTextureID(0), GetTextureVBO(0));
 
 		// Let SDL do its magic...
 		SDLPresent();

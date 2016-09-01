@@ -102,8 +102,8 @@ namespace Neutrino
 					fflush(pPlayerPrefsFile);
 					fclose(pPlayerPrefsFile);
  
-					NeutrinoPreferences->s_iScreenHeight = 720;
-					NeutrinoPreferences->s_iScreenWidth = 1280;
+					NeutrinoPreferences->s_iScreenHeight = 1080;
+					NeutrinoPreferences->s_iScreenWidth = 1920;
 					NeutrinoPreferences->s_iInternalWidth = 320;
 					NeutrinoPreferences->s_iInternalHeight = 180;
 				}
@@ -201,7 +201,7 @@ namespace Neutrino
 
 		// Set the active shader for this pass
 		SetActiveShader(DEFAULT_SHADER);
-		DrawTextures();
+		DrawSprites();
 
 		// Let SDL do its magic...
 		SDLPresent();

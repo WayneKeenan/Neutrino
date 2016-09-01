@@ -74,7 +74,7 @@ namespace Neutrino
 
 	// GetActiveSprite
 	//		Get the next available Sprite_t struct in order to draw a new sprite this frame 		
-	Sprite_t* GetActiveSprite();
+	Sprite_t* GetActiveSprite(GLuint iTextureID);
 
 	// ResetSpriteCount()
 	// 		Called by the framework at the start of each tick, moves the "active sprite" to the
@@ -82,6 +82,8 @@ namespace Neutrino
 	//    	all sprites from the next VBO that will be sent to the GPU
 	void ResetSpriteCount();
 
+	
+	void DrawSprites();
 
 	// GetSpriteCount
 	// 		Return the number of active sprites this tick

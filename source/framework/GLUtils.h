@@ -19,7 +19,6 @@
 
 namespace Neutrino 
 {
-
 	namespace GLUtils 
 	{
 
@@ -39,10 +38,7 @@ namespace Neutrino
 			GLuint _aVBOs[3];
 			uint8  _iVBOCounter;
 		} VBO_t;
-
-		// Temporary, need to find a balance of the amount we're copying vs number needed.
-		// 
-		static const uint16 s_iMaxSprites = 2048;		
+	
 		
 		// SetViewport
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
@@ -69,7 +65,7 @@ namespace Neutrino
 		//      
 		//      Called by LoadTexturesFromConfigFile()
 		//      
-		void CreateVBOs(VBO_t* pVBO);
+		void CreateVBOs();
 
 
 		// GetCameraMatrix
@@ -79,7 +75,7 @@ namespace Neutrino
 
 		// DeleteVBO
 		// 		Safely cleans up any created VBOs, with error checking.
-		void DeleteVBO( GLuint iVBO_ID  );
+		void DeleteVBO();
 
 
 		// GetMaxSpriteCount
@@ -88,12 +84,12 @@ namespace Neutrino
 
 		// PopulateVBO
 		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame
-		void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, VBO_t* pVBO);
+		void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, const int iVBOSet);
 
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
-		void RenderVBO(const int iSpriteCount, GLuint iID, VBO_t* pVBO);
+		void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet);
 
 	};
 }

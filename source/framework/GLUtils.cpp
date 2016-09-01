@@ -21,11 +21,18 @@ namespace Neutrino {
         static float s_fViewportWidth;
         static float s_fViewportHeight;
 
+        // Internal coords
         static float s_fScaledWidth;
         static float s_fScaledHeight;
 
         static const int s_iSizeOfSprite = 6*sizeof(Vertex_t);
         static const int s_iSizeOfVertex = sizeof(Vertex_t);
+
+        // Static allocated arrays for the buffered VBOs
+        static VBO_t* s_pVBOArrays[iMAX_TEXTURES];
+    
+        // Counters
+        static uint8 s_iAllocatedSets = 0;
 
 
         float* GetCameraMatrix()
@@ -62,7 +69,7 @@ namespace Neutrino {
             }
 
             // Set the projection matrix for this viewport. 0,0 at bottom left.
-            s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO, 0.0f, s_fOGL_Y_RATIO, 1.0f, -1.0f );
+            s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO,  0.0f, s_fOGL_Y_RATIO, 1.0f, -1.0f );
 
         }
 
@@ -82,37 +89,49 @@ namespace Neutrino {
 
 
         
-        void CreateVBOs(VBO_t* pVBO)
+        void CreateVBOs()
         {
-            glGenBuffers(1, &pVBO->_aVBOs[0]); 
+            ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to CreateVBOs made when max textures has been reached.");
+
+            s_pVBOArrays[s_iAllocatedSets] = NEWX(VBO_t);
+            s_pVBOArrays[s_iAllocatedSets]->_iVBOCounter = 0;
+
+            glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[0]); 
             ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, pVBO->_aVBOs[0]); 
+            glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[0]); 
             ASSERT_GL_ERROR;
-            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
+            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW  );
             ASSERT_GL_ERROR;
 
-            glGenBuffers(1, &pVBO->_aVBOs[1]); 
+            glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[1]); 
             ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, pVBO->_aVBOs[1]); 
+            glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[1]); 
             ASSERT_GL_ERROR;
-            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
-            ASSERT_GL_ERROR;
-
-            glGenBuffers(1, &pVBO->_aVBOs[2]); 
-            ASSERT_GL_ERROR;
-            glBindBuffer(GL_ARRAY_BUFFER, pVBO->_aVBOs[2]); 
-            ASSERT_GL_ERROR;
-            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * s_iMaxSprites, NULL, GL_DYNAMIC_DRAW  );
+            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL,  GL_DYNAMIC_DRAW  );
             ASSERT_GL_ERROR;
 
-            pVBO->_iVBOCounter = 0;
+            glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[2]); 
+            ASSERT_GL_ERROR;
+            glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[2]); 
+            ASSERT_GL_ERROR;
+            glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW  );
+            ASSERT_GL_ERROR;
+
+            s_iAllocatedSets++;
         }
 
 
-        void DeleteVBO( GLuint iVBO_ID )
+        void DeleteVBOs()
         {
-            glDeleteBuffers( 1, &iVBO_ID );
-            GL_ERROR;
+            for ( int i=0; i<s_iAllocatedSets; i++)
+            {
+                glDeleteBuffers( 1, &s_pVBOArrays[i]->_aVBOs[0] );
+                GL_ERROR;                
+                glDeleteBuffers( 1, &s_pVBOArrays[i]->_aVBOs[1] );
+                GL_ERROR;                
+                glDeleteBuffers( 1, &s_pVBOArrays[i]->_aVBOs[2] );
+                GL_ERROR;                
+            }
         }
 
 
@@ -158,15 +177,9 @@ namespace Neutrino {
         }
 
 
-        uint16 GetMaxSpriteCount()
+        void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, const int iVBOSet)
         {
-            return s_iMaxSprites;
-        }
-
-
-        void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, VBO_t* pVBO)
-        {
-            ASSERT(iCount < s_iMaxSprites, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
+            ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
             glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
             glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -181,7 +194,7 @@ namespace Neutrino {
 
             // Get the position of the first vertex in the VBO
             
-            GLuint iVBO_ID = pVBO->_aVBOs[pVBO->_iVBOCounter];
+            GLuint iVBO_ID = s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter];
 
             glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
             ASSERT_GL_ERROR;
@@ -316,7 +329,7 @@ namespace Neutrino {
         }
 
 
-        void RenderVBO(const int iSpriteCount, GLuint iID, VBO_t* pVBO)
+        void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet)
         {
             // TO_DO: 
             //      Blend Func should be a parameter of the texture page. 
@@ -329,7 +342,7 @@ namespace Neutrino {
             glBindTexture( GL_TEXTURE_2D, iID );
             glUniform1i (pUniforms[UNIFORM_TEXTURE], 0);
 
-            glBindBuffer ( GL_ARRAY_BUFFER, pVBO->_aVBOs[pVBO->_iVBOCounter]);
+            glBindBuffer ( GL_ARRAY_BUFFER, s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter]);
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             ASSERT_GL_ERROR;
                 
@@ -354,8 +367,8 @@ namespace Neutrino {
             glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
             ASSERT_GL_ERROR;            
 
-            pVBO->_iVBOCounter++;
-            if ( pVBO->_iVBOCounter == 3) pVBO->_iVBOCounter = 0;
+            s_pVBOArrays[iVBOSet]->_iVBOCounter++;
+            if ( s_pVBOArrays[iVBOSet]->_iVBOCounter == 3) s_pVBOArrays[iVBOSet]->_iVBOCounter = 0;
         }
     }
 }

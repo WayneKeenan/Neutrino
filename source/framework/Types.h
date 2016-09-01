@@ -19,7 +19,7 @@ static const float fHALF_PI = fPI / 2.0f;
 static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
 static const int iMAX_TEXTURES = 4;
-static const int iMAX_SPRITES = 4096;
+static const int iMAX_SPRITES = 2048;
 
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)

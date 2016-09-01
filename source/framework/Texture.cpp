@@ -101,13 +101,6 @@ namespace Neutrino {
 		    }
 
 		    config_destroy(&cfg);
-
-
-		    //
-		    // Generate the 3 VBOs assigned to this texture
-		    //
-		    (s_aTexturePages[iCount]._pVBO) = *(NEWX(GLUtils::VBO_t));
-		    GLUtils::CreateVBOs(&s_aTexturePages[iCount]._pVBO);
 		}
 
 
@@ -138,11 +131,12 @@ namespace Neutrino {
 		}
 
 
+		// Allocate sprite arrays and VBOs for this texture...
+		{
+			AllocateSpriteArrays(s_aTexturePages[iCount]._iTextureID);
+			GLUtils::CreateVBOs();
+		}
 
-		//
-		// Allocate the sprite arrays for this texture...
-		// 
-		AllocateSpriteArrays(s_aTexturePages[iCount]._iTextureID);
 		return bLoadStatus;
 	}
 
@@ -228,34 +222,5 @@ namespace Neutrino {
 		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
 
 		return true;
-	}
-
-
-
-
-	void DrawTextures()
-	{
-		for( int i = 0; i < s_iLoadedTextureCount; i++)
-		{
-				Sprite_t* s_pBPtr = GetBasePointers();
-
-				GLUtils::PopulateVBO(
-								s_pBPtr->_fHalfWidth, 
-								s_pBPtr->_fHalfHeight, 
-								s_pBPtr->_fRotDegrees, 
-								s_pBPtr->_fScale, 
-								s_pBPtr->_vColour, 
-								s_pBPtr->_vPosition, 
-								GetSpriteCount(),
-								GetTextureVBO(i)
-							);
-
-			// Bind and draw the active VBO
-			GLUtils::RenderVBO(GetSpriteCount(), GetTextureID(i), GetTextureVBO(i));
-
-		}
-		// Populate the VBOs
-
-
 	}
 }

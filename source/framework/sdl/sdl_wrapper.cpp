@@ -91,7 +91,7 @@ namespace Neutrino
 		}
 
 		SDL_StartTextInput();
-
+		//SDL_SetWindowFullscreen(pSDL_WindowHandle,SDL_WINDOW_FULLSCREEN);
 		return true;
 	}
 

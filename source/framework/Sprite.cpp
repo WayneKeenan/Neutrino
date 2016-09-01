@@ -6,6 +6,7 @@
 #include <math.h>
 #include "Time.h"
 #include "Types.h"
+#include "Texture.h"
 
 namespace Neutrino 
 {
@@ -28,26 +29,17 @@ namespace Neutrino
 
 		// Allocate the memory for our sprite settings arrays...
 		{
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_S = NEWX float[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T = NEWX float[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_SnS = NEWX float[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_TnT = NEWX float[iMAX_SPRITES];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for Half Width", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
-
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for Half Height", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
-
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite rotations", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
-
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite scale", sizeof(float) * iMAX_SPRITES, (sizeof(float) * iMAX_SPRITES) / 1024 );		
-					
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite colours", sizeof(glm::vec4) * iMAX_SPRITES, (sizeof(glm::vec4) * iMAX_SPRITES) / 1024 );		
-
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(glm::vec3) * iMAX_SPRITES, (sizeof(glm::vec3) * iMAX_SPRITES) / 1024);
-
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers = NEWX Sprite_t[iMAX_SPRITES];
-			LOG_INFO("Allocated %d bytes [%dK] for sprite positions", sizeof(Sprite_t) * iMAX_SPRITES, (sizeof(Sprite_t) * iMAX_SPRITES) / 1024);
 		}
 
 		// Setup the pointers in the sprite_t to the correct locations in the arrays. 
@@ -55,6 +47,10 @@ namespace Neutrino
 		// 
 		for(int i = 0; i < iMAX_SPRITES; i ++)
 		{
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fX_S = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_S[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fY_T = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fX_SnS = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_SnS[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fY_TnT = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_TnT[i];
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfWidth = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth[i];
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfHeight = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight[i];
 	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fRotDegrees = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees[i];
@@ -121,6 +117,10 @@ namespace Neutrino
 			{
 
 				GLUtils::PopulateVBO(
+								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fX_S,
+								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fY_T,
+								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fX_SnS,
+								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fY_TnT,
 								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fHalfWidth, 
 								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fHalfHeight, 
 								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fRotDegrees, 
@@ -144,31 +144,115 @@ namespace Neutrino
 
 	void TestSprite()
 	{
+
 		Sprite_t* mySprite = NULL;
-		glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		glm::vec3* vPos = NEWX glm::vec3(320.0f,180.0f, 1.0f);
+		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
+		ASSERT(mySprite, "TestSprite, GetActiveSprite returned NULL");
+
+		const TPageSpriteInfo_t* pSpriteInfo = GetSpriteInfo(0, 0);
 
 
 		fAngle += 1.0f * GetGameMSDelta();
 
-		for( int x = 0; x < 320; x+=32)
-		{
-			for( int y = 0; y < 180; y+=32)
-			{
-				mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
-				ASSERT(mySprite, "TestSprite, GetActiveSprite returned NULL");
+// Andy
+		glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*0.75)));
+		glm::vec3* vPos = NEWX glm::vec3(20,160, 1.0f);
 
-				vPos->x = (float)x+16;
-				vPos->y = (float)y+16;
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fRotDegrees) = fAngle;		
+		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
+		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
+		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
 
-				*(mySprite->_vColour) = *vColour;
-				*(mySprite->_vPosition) = *vPos;
-				*(mySprite->_fHalfWidth) = 8.0f;
-				*(mySprite->_fHalfHeight) = 8.0f;
-				*(mySprite->_fScale) = (float)fabs(sin(fAngle))*2;
-				*(mySprite->_fRotDegrees) = fAngle;		
-			}
-		}
+
+		pSpriteInfo = GetSpriteInfo(0, 1);
+		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle)));
+		vPos = NEWX glm::vec3(50, 50, 1.0f);
+		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
+
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fRotDegrees) = fAngle * 0.5;		
+		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
+		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
+		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
+		pSpriteInfo = GetSpriteInfo(0, 2);
+		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*2)));
+		vPos = NEWX glm::vec3(250, 80, 1.0f);
+		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
+
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fRotDegrees) = fAngle * 1.5;		
+		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
+		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
+		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
+
+		pSpriteInfo = GetSpriteInfo(0, 3);
+		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		vPos = NEWX glm::vec3(100, 100, 1.0f);
+		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
+
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fRotDegrees) = fAngle;		
+		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
+		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
+		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
+
+		pSpriteInfo = GetSpriteInfo(0, 4);
+		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle)));
+		vPos = NEWX glm::vec3(200, 100, 1.0f);
+		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
+
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.5;
+		*(mySprite->_fRotDegrees) = fAngle  * 0.2;		
+		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
+		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
+		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
+
+		pSpriteInfo = GetSpriteInfo(0, 5);
+		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*0.5)));
+		vPos = NEWX glm::vec3(280, 150, 1.0f);
+		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
+
+		*(mySprite->_vColour) = *vColour;
+		*(mySprite->_vPosition) = *vPos;
+		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fRotDegrees) = fAngle;		
+		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
+		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
+		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
 
 /*
 		LOG_INFO("Active sprite count: %d", iActiveSpriteCount);

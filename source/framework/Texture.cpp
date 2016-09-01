@@ -12,15 +12,17 @@ namespace Neutrino {
 	static TPage_t* s_aTexturePages;
 
 
-	GLuint GetTextureID(int iCount)
+	const TPageSpriteInfo_t* GetSpriteInfo(const int iTextureSet, const int iSpriteCount)
 	{
-		return s_aTexturePages[iCount]._iTextureID;
+		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetSpriteInfo number of textures loaded: %d, iTextureSet asked for: %d", s_iLoadedTextureCount, iTextureSet);
+
+		TPage_t* pTpage = &s_aTexturePages[iTextureSet];
+
+		ASSERT(iSpriteCount < pTpage->_iMaxSprites, "GetSpriteInfo called for a Sprite that doesn't exist. Max: %d, iSpriteCount: %d", pTpage->_iMaxSprites, iSpriteCount );
+
+		return &pTpage->aSprintInfo[iSpriteCount];
 	}
 
-	GLUtils::VBO_t* GetTextureVBO(int iCount)
-	{
-		return &s_aTexturePages[iCount]._pVBO;
-	}
 
 
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
@@ -95,8 +97,27 @@ namespace Neutrino {
 		      		return false;
 		      	}
 
-		      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfWidth = (float)iWidth/2.0f;
-		      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfHeight = (float)iHeight/2.0f;
+		      	// Calculate this sprite's UV coords and dimensions
+		      	{
+		      		// Assume non power of 2 textures
+    				float fTexelW = 1.0f / (float)s_aTexturePages[iCount]._iWidth;
+    				float fTexelH = 1.0f / (float)s_aTexturePages[iCount]._iHeight;
+
+    				// OpenGL samples from the middle of a texel, so we'll need to add an offset
+    				float fTexelMovementW = (fTexelW / 2.0f);
+    				float fTexelMovementH = (fTexelH / 2.0f);
+
+    				// Store the UV coords
+    				s_aTexturePages[iCount].aSprintInfo[i]._fX_S = (s_aTexturePages[iCount].aSprintInfo[i]._iX * fTexelW) + fTexelMovementW;
+    				s_aTexturePages[iCount].aSprintInfo[i]._fY_T = (s_aTexturePages[iCount].aSprintInfo[i]._iY * fTexelH) + fTexelMovementH;
+    				s_aTexturePages[iCount].aSprintInfo[i]._fX_SnS = (s_aTexturePages[iCount].aSprintInfo[i]._fX_S + ((float)iWidth * fTexelW)) - fTexelMovementW;
+    				s_aTexturePages[iCount].aSprintInfo[i]._fY_TnT = (s_aTexturePages[iCount].aSprintInfo[i]._fY_T + ((float)iHeight * fTexelH)) - fTexelMovementH;
+
+    				// And half dimensions (Quad's origin is always at the centre)
+			      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfWidth = (float)iWidth/2.0f;
+			      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfHeight = (float)iHeight/2.0f;
+		      	}
+
 		      	LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, s_aTexturePages[iCount].aSprintInfo[i]._iX, s_aTexturePages[iCount].aSprintInfo[i]._iY );
 		    }
 

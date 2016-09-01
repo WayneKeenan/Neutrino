@@ -177,7 +177,18 @@ namespace Neutrino {
         }
 
 
-        void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, const int iVBOSet)
+        void PopulateVBO(   float* pX_S,
+                            float* pY_T,
+                            float* pX_SnS,
+                            float* pY_TnT,
+                            float* pHWidths, 
+                            float* pHHeights, 
+                            float* pRots, 
+                            float* pScales, 
+                            glm::vec4* pColours, 
+                            glm::vec3* pPos, 
+                            const int iCount, 
+                            const int iVBOSet   )
         {
             ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
@@ -253,56 +264,51 @@ namespace Neutrino {
 
                     // Get the packed colour
                     uint32 iColour = GetPackedColourV4(pColours);
-                    // LOG_INFO("Colour:" FOUR_BYTE_HEX, iColour);
 
-                    //
-                    // TO_DO: Texture coords...
-                    //
-                    
                     // Populate the VBO vertex corners
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 0;
-                    pVertex->_uv[1] = 1;
+                    pVertex->_uv[0] = *pX_S;
+                    pVertex->_uv[1] = *pY_TnT;
                     pVertex->_position[0] = vTransBL.x;
                     pVertex->_position[1] = vTransBL.y;
                     pVertex->_position[2] = vTransBL.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 1;
-                    pVertex->_uv[1] = 1;
+                    pVertex->_uv[0] = *pX_SnS;
+                    pVertex->_uv[1] = *pY_TnT;
                     pVertex->_position[0] = vTransBR.x;
                     pVertex->_position[1] = vTransBR.y;
                     pVertex->_position[2] = vTransBR.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 0;
-                    pVertex->_uv[1] = 0;
+                    pVertex->_uv[0] = *pX_S;
+                    pVertex->_uv[1] = *pY_T;
                     pVertex->_position[0] = vTransTL.x;
                     pVertex->_position[1] = vTransTL.y;
                     pVertex->_position[2] = vTransTL.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 1;
-                    pVertex->_uv[1] = 1;
+                    pVertex->_uv[0] = *pX_SnS;
+                    pVertex->_uv[1] = *pY_TnT;
                     pVertex->_position[0] = vTransBR.x;
                     pVertex->_position[1] = vTransBR.y;
                     pVertex->_position[2] = vTransBR.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 1;
-                    pVertex->_uv[1] = 0;
+                    pVertex->_uv[0] = *pX_SnS;
+                    pVertex->_uv[1] = *pY_T;
                     pVertex->_position[0] = vTransTR.x;
                     pVertex->_position[1] = vTransTR.y;
                     pVertex->_position[2] = vTransTR.z;
                     pVertex++;
 
                     pVertex->_colour = iColour;
-                    pVertex->_uv[0] = 0;
-                    pVertex->_uv[1] = 0;
+                    pVertex->_uv[0] = *pX_S;
+                    pVertex->_uv[1] = *pY_T;
                     pVertex->_position[0] = vTransTL.x;
                     pVertex->_position[1] = vTransTL.y;
                     pVertex->_position[2] = vTransTL.z;
@@ -310,6 +316,10 @@ namespace Neutrino {
 
                     // VBO Vertex pointer is now pointing at the next sprite, so increment through the 
                     // sprite settings arrays to get the data for the next iteration
+                    pX_S++;
+                    pY_T++;
+                    pX_SnS++;
+                    pY_TnT++;
                     pHWidths++;
                     pHHeights++;
                     pRots++;

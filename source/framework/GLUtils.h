@@ -84,11 +84,23 @@ namespace Neutrino
 
 		// PopulateVBO
 		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame
-		void PopulateVBO(float* pHWidths, float* pHHeights, float* pRots, float* pScales, glm::vec4* pColours, glm::vec3* pPos, const int iCount, const int iVBOSet);
+		void PopulateVBO(	float* pX_S,
+                            float* pY_T,
+                            float* pX_SnS,
+                            float* pY_TnT,
+                            float* pHWidths, 
+                            float* pHHeights, 
+                            float* pRots, 
+                            float* pScales, 
+                            glm::vec4* pColours, 
+                            glm::vec3* pPos, 
+                            const int iCount, 
+                            const int iVBOSet	);
 
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
+		//   	TO_DO: If there's not a lot of shader changes, merge this and Populate VBO above...
 		void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet);
 
 	};

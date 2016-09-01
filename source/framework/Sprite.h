@@ -24,6 +24,10 @@ namespace Neutrino
 	// 
 	typedef struct SpriteArraySet_t
 	{
+		float* 		_afX_S;
+		float* 		_afY_T;
+		float* 		_afX_SnS;
+		float* 		_afY_TnT;
 		float* 		_afHalfWidth;
     	float* 		_afHalfHeight;
     	float* 		_afSpriteRotDegrees;
@@ -39,8 +43,10 @@ namespace Neutrino
 	// 
 	typedef struct Sprite_t			
 	{ 
-		// Texture ID
-		// Sprite Index
+		float* 		_fX_S;
+		float* 		_fY_T;
+		float* 		_fX_SnS;
+		float* 		_fY_TnT;
 		float*		_fHalfWidth;	// The pixel dimensions, as mapped to the internal coord system, not the GL pixel output
 		float* 		_fHalfHeight;
 		float*		_fRotDegrees;	// Sprite rotation

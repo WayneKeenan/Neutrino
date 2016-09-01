@@ -84,11 +84,11 @@ namespace Neutrino {
 			for(int i = 0; i < iSprs-1; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
 			{
   				config_setting_t* pSprite = config_setting_get_elem(pSprSetting, i);
-  				int iWidth, iHeight;
+  				int iWidth, iHeight, iX, iY;
   				const char* sFilename;
 
-		      	if(!(config_setting_lookup_int(pSprite, "x", (int*)&s_aTexturePages[iCount].aSprintInfo[i]._iX) &&
-		      		 config_setting_lookup_int(pSprite, "y", (int*)&s_aTexturePages[iCount].aSprintInfo[i]._iY) &&
+		      	if(!(config_setting_lookup_int(pSprite, "x", &iX) &&
+		      		 config_setting_lookup_int(pSprite, "y", &iY) &&
 		      		 config_setting_lookup_int(pSprite, "width", &iWidth) && 
 		      		 config_setting_lookup_int(pSprite, "height", &iHeight) && 
 		      		 config_setting_lookup_string(pSprite, "filename", &sFilename)))	
@@ -108,8 +108,8 @@ namespace Neutrino {
     				float fTexelMovementH = (fTexelH / 2.0f);
 
     				// Store the UV coords
-    				s_aTexturePages[iCount].aSprintInfo[i]._fX_S = (s_aTexturePages[iCount].aSprintInfo[i]._iX * fTexelW) + fTexelMovementW;
-    				s_aTexturePages[iCount].aSprintInfo[i]._fY_T = (s_aTexturePages[iCount].aSprintInfo[i]._iY * fTexelH) + fTexelMovementH;
+    				s_aTexturePages[iCount].aSprintInfo[i]._fX_S = ((float)iX * fTexelW) + fTexelMovementW;
+    				s_aTexturePages[iCount].aSprintInfo[i]._fY_T = ((float)iY * fTexelH) + fTexelMovementH;
     				s_aTexturePages[iCount].aSprintInfo[i]._fX_SnS = (s_aTexturePages[iCount].aSprintInfo[i]._fX_S + ((float)iWidth * fTexelW)) - fTexelMovementW;
     				s_aTexturePages[iCount].aSprintInfo[i]._fY_TnT = (s_aTexturePages[iCount].aSprintInfo[i]._fY_T + ((float)iHeight * fTexelH)) - fTexelMovementH;
 
@@ -118,7 +118,7 @@ namespace Neutrino {
 			      	s_aTexturePages[iCount].aSprintInfo[i]._fHalfHeight = (float)iHeight/2.0f;
 		      	}
 
-		      	LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, s_aTexturePages[iCount].aSprintInfo[i]._iX, s_aTexturePages[iCount].aSprintInfo[i]._iY );
+		      	LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, iX, iY );
 		    }
 
 		    config_destroy(&cfg);

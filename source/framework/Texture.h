@@ -9,7 +9,7 @@ namespace Neutrino {
 	// 
 	// Params:
 	// 		x & y: P_iXel coordinates within the texture
-	// 		_fHalfWidth & _fHalfHeight: P_iXel Dimensions of the sprite / 2.0 - used as-is by the Sprite functions to generate rendered quad   
+	// 		_fHalfWidth & _fHalfHeight: Pixel Dimensions of the sprite / 2.0 - used as-is by the Sprite functions to generate rendered quad   
 	// 
 	// TO_DO:
 	// 		Pre-calc the UV settings we'll need to copy into the sprite when rendering...
@@ -20,8 +20,8 @@ namespace Neutrino {
 		float	_fY_T;
 		float 	_fX_SnS;	// Top Right UV
 		float 	_fY_TnT;
-		uint16	_iX;		
-		uint16	_iY;
+//		uint16	_iX;		
+//		uint16	_iY;
 		float	_fHalfWidth;
 		float 	_fHalfHeight;
 	} TPageSpriteInfo_t;
@@ -63,6 +63,8 @@ namespace Neutrino {
 	//      
 	bool LoadTexturesFromConfigFile();
 
-
+	// GetSpriteInfo
+	// 		Returns pointer to the correct TPageSpriteInfo_t structure for a given sprite index in the packed texture page
+	//   	Sprite will call this to grab UV and Dimension info 
 	const TPageSpriteInfo_t* GetSpriteInfo(const int iTextureSet, const int iSpriteCount);
 }

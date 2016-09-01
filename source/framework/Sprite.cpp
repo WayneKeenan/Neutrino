@@ -154,7 +154,6 @@ namespace Neutrino
 
 		fAngle += 1.0f * GetGameMSDelta();
 
-// Andy
 		glm::vec4* vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*0.75)));
 		glm::vec3* vPos = NEWX glm::vec3(20,160, 1.0f);
 
@@ -162,7 +161,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
 		*(mySprite->_fRotDegrees) = fAngle;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -179,8 +178,8 @@ namespace Neutrino
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
-		*(mySprite->_fRotDegrees) = fAngle * 0.5;		
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fRotDegrees) = fAngle * 0.5f;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
@@ -195,8 +194,8 @@ namespace Neutrino
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
-		*(mySprite->_fRotDegrees) = fAngle * 1.5;		
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fRotDegrees) = fAngle * 1.5f;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
@@ -212,7 +211,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
 		*(mySprite->_fRotDegrees) = fAngle;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -229,8 +228,8 @@ namespace Neutrino
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.5;
-		*(mySprite->_fRotDegrees) = fAngle  * 0.2;		
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.5f;
+		*(mySprite->_fRotDegrees) = fAngle  * 0.2f;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
@@ -238,7 +237,7 @@ namespace Neutrino
 
 
 		pSpriteInfo = GetSpriteInfo(0, 5);
-		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*0.5)));
+		vColour = NEWX glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*0.5f)));
 		vPos = NEWX glm::vec3(280, 150, 1.0f);
 		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
 
@@ -246,23 +245,13 @@ namespace Neutrino
 		*(mySprite->_vPosition) = *vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
 		*(mySprite->_fRotDegrees) = fAngle;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
 		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
 
-
-/*
-		LOG_INFO("Active sprite count: %d", iActiveSpriteCount);
-		LOG_INFO("x %f", (mySprite->_vColour->x));
-		LOG_INFO("y %f", (mySprite->_vColour->y));
-		LOG_INFO("z %f", (mySprite->_vColour->z));
-		LOG_INFO("w %f", (mySprite->_vColour->w));
-
-		LOG_INFO("Pos: %f, %f, %f", (mySprite->_vPosition->x),(mySprite->_vPosition->y),(mySprite->_vPosition->z));
-*/
 
 		DELETEX vColour;
 		DELETEX vPos;

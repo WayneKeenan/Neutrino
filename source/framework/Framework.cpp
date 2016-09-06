@@ -139,7 +139,7 @@ namespace Neutrino
 			if( !SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight) )
 				return false;
 			
-			if( !LoadEngineShaders() )
+			if( !AttachShaders() )
 				return false;
 
 			GLUtils::SetViewport(	
@@ -182,6 +182,9 @@ namespace Neutrino
 
 	bool CoreUpdate()
 	{
+		// Pump SDL Events
+		//
+		
 		// Update clocks 
 		TimeUpdate();
 
@@ -227,9 +230,9 @@ namespace Neutrino
 			CGameGlobals::Destroy();
 			DELETEX(NeutrinoPreferences);
 
-			// Delete shaders 
-			// Delete VOBs
 			DeallocateSpriteArrays();
+			DeallocateAllTextures();		// Also deletes all VBOs
+			DetachShaders();
 		}
 
 

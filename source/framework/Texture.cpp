@@ -79,7 +79,7 @@ namespace Neutrino {
     		s_aTexturePages[iCount].aSprintInfo = NEWX TPageSpriteInfo_t[iSprs]; 
     		s_aTexturePages[iCount]._iMaxSprites = (uint16)(iSprs-1);   		   
     		LOG_INFO("Texture page contains %d sprites", iSprs-1); 			
-    		LOG_INFO("Allocated %d bytes [%dK] for sprite definitions", sizeof(TPageSpriteInfo_t) * iSprs, (sizeof(TPageSpriteInfo_t) * iSprs) / 1024 );
+//    		LOG_INFO("Allocated %d bytes [%dK] for sprite definitions", sizeof(TPageSpriteInfo_t) * iSprs, (sizeof(TPageSpriteInfo_t) * iSprs) / 1024 );
 
 			for(int i = 0; i < iSprs-1; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
 			{
@@ -148,7 +148,7 @@ namespace Neutrino {
   				s_iLoadedTextureCount++;
 
 			SDL_FreeSurface(pSurf);
-  			DELETEX [] pFileBytes;
+  			DELETEX [] pFileBytes;		// NEWX in LoadResourceBytes()
 		}
 
 
@@ -187,7 +187,7 @@ namespace Neutrino {
 		//  
 		{
 			s_aTexturePages = NEWX TPage_t[iMAX_TEXTURES];
-			LOG_INFO("Allocated %d bytes [%dK] for texture page parameters", sizeof(TPage_t) * iMAX_TEXTURES, (sizeof(TPage_t) * iMAX_TEXTURES) / 1024 );	
+//			LOG_INFO("Allocated %d bytes [%dK] for texture page parameters", sizeof(TPage_t) * iMAX_TEXTURES, (sizeof(TPage_t) * iMAX_TEXTURES) / 1024 );	
 			s_iLoadedTextureCount = 0;				
 		}
 
@@ -243,5 +243,19 @@ namespace Neutrino {
 		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
 
 		return true;
+	}
+
+
+	void DeallocateAllTextures()
+	{
+		for (int i =0; i < s_iLoadedTextureCount; i++)
+		{
+			glDeleteTextures(1, &s_aTexturePages[i]._iTextureID);
+			DELETEX [] s_aTexturePages[i].aSprintInfo;
+		}
+
+		DELETEX [] s_aTexturePages;
+		GLUtils::DeallocateVBOs();
+		LOG_INFO("Textures deallocated.");
 	}
 }

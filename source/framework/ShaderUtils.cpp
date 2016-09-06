@@ -16,7 +16,7 @@ namespace Neutrino {
 
 	static _ShaderSettings_t* s_pActiveShader = NULL;
 	static _ShaderSettings_t* s_aLoadedShaders = NEWX _ShaderSettings_t[NUM_SHADERS];
-	static uint8 iNumShadersLoaded = 0;
+	static uint8 s_iNumShadersLoaded = 0;
 
 
 	// LogShader()
@@ -115,7 +115,7 @@ namespace Neutrino {
 	// 		Currently shaders are predefined and loaded in a fixed order...
 	static bool LoadShader( const char* pFragFilename, const char* pVertFilename )
 	{
-		ASSERT(iNumShadersLoaded < NUM_SHADERS, "Attempting to load more shaders than currently defined");
+		ASSERT(s_iNumShadersLoaded < NUM_SHADERS, "Attempting to load more shaders than currently defined");
 
 		GLuint iVertShader = 0;
 		GLuint iFragShader = 0;
@@ -142,10 +142,10 @@ namespace Neutrino {
 
 		// Generate the program and shader objects we need
 		{
-			s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
-			s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID = glCreateProgram();
+			s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID = 0;
+			s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID = glCreateProgram();
 
-			if( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID == 0 )
+			if( s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID == 0 )
 			{
 				LOG_ERROR("LoadShader: %s -- glCreateProgram failed...");
 				return false;
@@ -176,20 +176,20 @@ namespace Neutrino {
 			ASSERT( CompileShader (iVertShader, VertSource, iVertSourceSize ), "Failed to compile vertex shader! %s", pVertFilename);  
 
 			// Attach shaders to program ID
-			glAttachShader(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iFragShader);
+			glAttachShader(s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, iFragShader);
 	  		ASSERT_GL_ERROR;
-			glAttachShader(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, iVertShader);  
+			glAttachShader(s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, iVertShader);  
   			ASSERT_GL_ERROR;
 
 			// Link program
-			if ( !LinkShader( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID ) )
+			if ( !LinkShader( s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID ) )
 			{    
 					glDeleteShader(iVertShader);
 					iVertShader = 0;
 					glDeleteShader(iFragShader);
 			  		iFragShader = 0;
-				 	glDeleteProgram(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID);
-			  		s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID = 0;
+				 	glDeleteProgram(s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID);
+			  		s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID = 0;
 
 			  		DELETEX FragSource;
 			  		DELETEX VertSource;
@@ -201,17 +201,17 @@ namespace Neutrino {
 		// Setup the uniforms so we can access them later
 		{
 			// TO_DO: Need these to be custom for each shader as well...
-			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
+			glBindAttribLocation(s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, ATTRIB_VERTEX, "position");
 	  		ASSERT_GL_ERROR;
-			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
+			glBindAttribLocation(s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, ATTRIB_COLOR, "color");
 	  		ASSERT_GL_ERROR;
-			glBindAttribLocation(s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
+			glBindAttribLocation(s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, ATTRIB_TEXTURE, "textureCoordinates");
 	  		ASSERT_GL_ERROR;
 
 			// Get uniform locations
-			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "translate");
-			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "texture" );
-			s_aLoadedShaders[ iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( s_aLoadedShaders[ iNumShadersLoaded ]._ProgramID, "matrix" );
+			s_aLoadedShaders[ s_iNumShadersLoaded ]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation( s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, "translate");
+			s_aLoadedShaders[ s_iNumShadersLoaded ]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation( s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, "texture" );
+			s_aLoadedShaders[ s_iNumShadersLoaded ]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation( s_aLoadedShaders[ s_iNumShadersLoaded ]._ProgramID, "matrix" );
 		}
 
 
@@ -225,12 +225,28 @@ namespace Neutrino {
 
 
 		// We've loaded a shader
-		++iNumShadersLoaded;
+		++s_iNumShadersLoaded;
 		return true;
 	}
 
+	void DetachShaders()
+	{
+ 		GLsizei iCount=0;
+ 		GLuint* aShaders = NEWX GLuint[2];
+		for(int i = 0; i < s_iNumShadersLoaded; i++)
+		{
+			iCount = 0;
+			glGetAttachedShaders( s_aLoadedShaders[i]._ProgramID, 2, &iCount, aShaders);
+			for(int j=0; j<iCount; j++)
+			{
+				glDetachShader(s_aLoadedShaders[i]._ProgramID, aShaders[j]);
+			}
+		}
+		DELETEX [] aShaders;
+		LOG_INFO("Shaders detached");
+	}
 
-	bool LoadEngineShaders()
+	bool AttachShaders()
 	{
 		// This is a fixed pool of known shaders. Not going to support arbitrary shader params atm. 
 		// TO_DO: Shaders to load should be read from GameConfig.txt

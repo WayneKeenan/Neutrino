@@ -46,7 +46,11 @@ namespace Neutrino {
 	// LoadEngineShaders()
 	//		Framework init function to load the standard shaders (predefined) and validate them. 
 	//		Startup will fail if this function doesn't complete. 
-	bool LoadEngineShaders();
+	bool AttachShaders();
+
+	// UnloadEngineShaders()
+	//		Framework kill function to remove the loaded shaders
+	void DetachShaders();
 
 
 	// SetActiveShader

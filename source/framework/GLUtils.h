@@ -75,7 +75,7 @@ namespace Neutrino
 
 		// DeleteVBO
 		// 		Safely cleans up any created VBOs, with error checking.
-		void DeleteVBO();
+		void DeallocateVBOs();
 
 
 		// GetMaxSpriteCount

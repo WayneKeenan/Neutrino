@@ -121,7 +121,7 @@ namespace Neutrino {
         }
 
 
-        void DeleteVBOs()
+        void DeallocateVBOs()
         {
             for ( int i=0; i<s_iAllocatedSets; i++)
             {
@@ -131,7 +131,11 @@ namespace Neutrino {
                 GL_ERROR;                
                 glDeleteBuffers( 1, &s_pVBOArrays[i]->_aVBOs[2] );
                 GL_ERROR;                
+
+                DELETEX s_pVBOArrays[i];
             }
+
+            LOG_INFO("VBOs Deallocated.");
         }
 
 

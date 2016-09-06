@@ -10,10 +10,8 @@ namespace Neutrino {
 	// Params:
 	// 		x & y: P_iXel coordinates within the texture
 	// 		_fHalfWidth & _fHalfHeight: Pixel Dimensions of the sprite / 2.0 - used as-is by the Sprite functions to generate rendered quad   
-	// 
-	// TO_DO:
-	// 		Pre-calc the UV settings we'll need to copy into the sprite when rendering...
-	//   
+	//   	X_S* X_T*: pre-cacled UV coords for the sprite within the tpage
+	//    
 	typedef struct TPageSpriteInfo_t
 	{
 		float	_fX_S;		// Bot Left UV
@@ -61,10 +59,17 @@ namespace Neutrino {
 	//      The framework assumes that there won't be many textures and that it will be safe to load them all into memory during 
 	//      CoreInit(). This may or may not be wise, so go easy on the 4096*4096*32 textures ;P
 	//      
+	//      This function will trigger GLUtils to create a set of VBOs for the texture. 
+	//      
 	bool LoadTexturesFromConfigFile();
 
 	// GetSpriteInfo
 	// 		Returns pointer to the correct TPageSpriteInfo_t structure for a given sprite index in the packed texture page
 	//   	Sprite will call this to grab UV and Dimension info 
 	const TPageSpriteInfo_t* GetSpriteInfo(const int iTextureSet, const int iSpriteCount);
+
+	// ClearAllTextures()
+	// 		Free memory allocated for TPage_t arrays created during LoadTexturesFromConfigFile(), delete the texture
+	//   	and call the GLUtils framework to delete the associated VBOS
+	void DeallocateAllTextures();
 }

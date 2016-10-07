@@ -14,17 +14,7 @@ int main(int, char**)
 	bool bRunning = true;
 	while(bRunning)
 	{
-		Neutrino::CoreUpdate();
-
-		SDL_Event e;
-		while( SDL_PollEvent( &e ) != 0 )
-		{
-			//User requests quit
-			if( e.type == SDL_QUIT )
-			{
-				bRunning = false;
-			}	
-		}
+		bRunning = Neutrino::CoreUpdate();
 	}
 
 	Neutrino::CoreKill();

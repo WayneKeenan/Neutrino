@@ -1,7 +1,8 @@
 #include "sdl_wrapper.h"
 #include "../Log.h"
 #include "../GLUtils.h"
-
+#include "../imgui/imgui.h"
+#include "imgui_impl_sdl_gl3.h"
 
 namespace Neutrino
 {
@@ -25,6 +26,7 @@ namespace Neutrino
 		s_pBasePath = SDL_GetBasePath();
 		return true;
 	}
+
 
 
 	bool SDLCreateWindowAndContext(int iScreenWidth, int iScreenHeight)
@@ -91,33 +93,54 @@ namespace Neutrino
 		}
 
 		SDL_StartTextInput();
+
+
+    	ImGui_ImplSdlGL3_Init(pSDL_WindowHandle);
+    	ImGui_ImplSdlGL3_CreateDeviceObjects();
+
 		//SDL_SetWindowFullscreen(pSDL_WindowHandle,SDL_WINDOW_FULLSCREEN);
 		return true;
 	}
 
 
+
+
 	void SDLPresent()
 	{
+		ImGui::Render();
 		SDL_GL_SwapWindow( pSDL_WindowHandle );
 	}
 
 
+
+
 	bool SDLKill()
 	{
+		ImGui_ImplSdlGL3_Shutdown();
+		SDL_GL_DeleteContext( SDL_GLContext );
 		SDL_DestroyWindow( pSDL_WindowHandle );
 		SDL_Quit();
 		return true;
 	}
+
+
+
 
 	const char* SDLGetPrefPath()
 	{
 		return s_pPrefsPath;
 	}
 
+
+
+
 	const char* SDLGetBasePath()
 	{
 		return s_pBasePath;
 	}
+
+
+
 
     bool GLTextureFromSDLSurface(GLuint* pTextureID, SDL_Surface* pSurf, bool bFiltered)
     {
@@ -156,5 +179,65 @@ namespace Neutrino
 
         LOG_INFO("Texture bound: %d/%dpx @ %d bytes per pixel", pSurf->w, pSurf->h, pSurf->format->BytesPerPixel );
         return true;
+    }
+
+
+
+
+
+    bool SDLProcessInput()
+    {
+    	ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
+
+    	SDL_Event event;
+    	bool bRet = true;
+		while( SDL_PollEvent( &event ) != 0 )
+		{
+			ImGui_ImplSdlGL3_ProcessEvent(&event);
+			if( event.type == SDL_QUIT )
+			{
+				bRet = false;
+			}	
+		}
+
+		return bRet;
+    }
+
+    	bool show_test_window = true;
+    	bool show_another_window = false;
+
+    void TestIMGUI()
+    {
+    	ImVec4 clear_color = ImColor(114, 144, 154);
+
+
+        // 1. Show a simple window
+        // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+        {
+            static float f = 0.0f;
+            ImGui::Text("Hello, world!");
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&clear_color);
+            if (ImGui::Button("Test Window")) show_test_window ^= 1;
+            if (ImGui::Button("Another Window")) show_another_window ^= 1;
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        }
+
+        // 2. Show another simple window, this time using an explicit Begin/End pair
+        if (show_another_window)
+        {
+            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
+            ImGui::Begin("Another Window", &show_another_window);
+            ImGui::Text("Hello");
+            ImGui::End();
+        }
+
+        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
+        if (show_test_window)
+        {
+            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
+            ImGui::ShowTestWindow(&show_test_window);
+        }
+        
     }
 }

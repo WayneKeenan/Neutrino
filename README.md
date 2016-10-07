@@ -18,9 +18,13 @@ External dependencies can be brought into the project (via git clone) by running
 
 `./external_dependencies/SetupDeps.sh`
 
-IMGUI & GLM are header only libraries so require no additional build steps. The latest version of GLEW will be cloned from git, so will require building and installing. Ţhe script will echo the build steps after cloning. 
+GLM is a header only library so requires no additional build steps. 
 
-Also, on linux systems ensure you're running the latest version of Mesa. For Intel chipsets you can download the Ubuntu upgrade kit from: https://01.org/linuxgraphics/downloads   
+Although the above script clones the latest IMGUI, it's already been manually copied into the Neutrino source folder. You probably don't need to update this to the newly downloaded version unless you have build errors. 
+
+The latest version of GLEW will be cloned from git, so will require building and installing. Ţhe script will echo the build steps after cloning. Or checkout the Readme in the repro.  
+
+On linux systems ensure you're running the latest version of Mesa. Neutrino only requires an OpenGL3.0 context but old Mesa is old. For Intel chipsets you can download the Ubuntu upgrade kit from: https://01.org/linuxgraphics/downloads   
 
 The external dependencies folder can be emptied by running:
 

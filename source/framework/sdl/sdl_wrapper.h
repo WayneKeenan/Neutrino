@@ -31,8 +31,20 @@ namespace Neutrino
 	const char* SDLGetPrefPath();
 
 
-	 bool GLTextureFromSDLSurface(GLuint* pTextureID,  SDL_Surface* pSurf, bool bFiltered);
+	// GLTextureFromSDLSurface()
+	// 		uses SDL image to load a texture to an SDL surface and bind that to an OGL texture. 
+	//   	bFiltered will set the GL filter hint to GL_LINEAR or default to GL_NEAREST
+	bool GLTextureFromSDLSurface(GLuint* pTextureID,  SDL_Surface* pSurf, bool bFiltered);
 
+
+	// SDLProcessInput()
+	// 		Polls all SDL input events. Passes events on to IMGUI ad should - eventually - set our input mappings
+	bool SDLProcessInput();
+
+
+	// TestIMGUI()
+	// 		Output the IMGUI test window
+	void TestIMGUI();
 }
 
 #endif

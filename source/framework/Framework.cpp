@@ -1,6 +1,5 @@
 #include "Framework.h"
 #include "libconfig.h"
-
 #include <stdio.h>
 
 namespace Neutrino 
@@ -12,6 +11,7 @@ namespace Neutrino
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
+	static bool s_bRunningStatus = true;
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ namespace Neutrino
 		// Enter Initial Gamestate
 		GameStateInit();
 
-		return true;
+		return s_bRunningStatus;
 	}
 
 
@@ -182,33 +182,38 @@ namespace Neutrino
 
 	bool CoreUpdate()
 	{
-		// Pump SDL Events
-		//
 		
 		// Update clocks 
 		TimeUpdate();
 
+		// Poll input events, pass controls to IMGUI and capture Quit state
+		s_bRunningStatus = SDLProcessInput();
+
 		// Reset active sprite count to zero
 		ResetSpriteCount();
 
-		// Process the active game state (this will process the game objects)
+		// Process the active game state
 		GameStateUpdate();
 
 		// Generate new Camera/World matrices for this frame
 		GLUtils::GenerateMVCMatrices();
 
-
 		// Generate some test sprites (TO BE REMOVED)
 		TestSprite();
 
-
 		// Set the active shader for this pass
 		SetActiveShader(DEFAULT_SHADER);
+
+		// Draw everything
 		DrawSprites();
+
+		//
+		TestIMGUI();
 
 		// Let SDL do its magic...
 		SDLPresent();
-		return true;
+
+		return s_bRunningStatus;
 	}
 
 

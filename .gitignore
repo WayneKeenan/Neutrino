@@ -22,3 +22,4 @@ Find Results
 .tags_sorted_by_file
 .sublime-build
 build/bin/
+external_dependencies/glew/

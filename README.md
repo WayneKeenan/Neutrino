@@ -18,13 +18,15 @@ External dependencies can be brought into the project (via git clone) by running
 
 `./external_dependencies/SetupDeps.sh`
 
-IMGUI & GLM are header only libraries so require no additional build steps, however IMGUI is included in the framework from the `source/framework/imggui_copy` directory, so soft links should be provided as this folder is empty by default. The script `LinkIMGUI.sh` in the `external_dependencies` folder will do this for you on *NIX systems.    
+IMGUI & GLM are header only libraries so require no additional build steps. The latest version of GLEW will be cloned from git, so will require building and installing. Ţhe script will echo the build steps after cloning. 
+
+Also, on linux systems ensure you're running the latest version of Mesa. For Intel chipsets you can download the Ubuntu upgrade kit from: https://01.org/linuxgraphics/downloads   
 
 The external dependencies folder can be emptied by running:
 
 `./external_dependencies/RemoveDeps.sh`
 
-SDL2, SDLImage, Libconfig, GLEW and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
+SDL2, SDLImage, Libconfig and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
 
 ##Building
 

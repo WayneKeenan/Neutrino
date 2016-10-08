@@ -13,7 +13,7 @@ namespace Neutrino {
 		NUM_ATTRIBUTES
 	};
 
-	enum _ShaderUniforms
+	enum eShaderUniforms
 	{
 		UNIFORM_TRANSLATE,
 		UNIFORM_MATRIX,
@@ -32,6 +32,7 @@ namespace Neutrino {
 	};
 
 	// TO_DO: Shaders to load should be read from GameConfig.txt
+	// TO_DO: imgui implementation should have it's shaders loaded in this batch as well...
 	const char* const s_pDefaultShaderFragFilename = "default-shader.fsh";
 	const char* const s_pDefaultShaderVertFilename = "default-shader.vsh";
 	const char* const s_pDefaultUntexturedFragFilename = "default-untextured-shader.fsh";

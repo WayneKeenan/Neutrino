@@ -7,21 +7,18 @@
 
 namespace Neutrino {
 
-	struct _ShaderSettings_t
+	struct ShaderSettings_t
 	{
 	  GLint _Uniforms[NUM_UNIFORMS];
 	  GLint _ProgramID; 
 	};
 
 
-	static _ShaderSettings_t* s_pActiveShader = NULL;
-	static _ShaderSettings_t* s_aLoadedShaders = NEWX _ShaderSettings_t[NUM_SHADERS];
+	static ShaderSettings_t* s_pActiveShader = NULL;
+	static ShaderSettings_t* s_aLoadedShaders = NEWX ShaderSettings_t[NUM_SHADERS];
 	static uint8 s_iNumShadersLoaded = 0;
 
 
-	// LogShader()
-	//		Output the GL log info for shader compile
-	//
 	void LogShader(GLuint iID)
 	{
 		GLint iLogLength;
@@ -38,9 +35,6 @@ namespace Neutrino {
 	}
 	 
 
-	// LogProgram()
-	//		Output the GL log for the program compile
-	//
 	void LogProgram ( GLuint iProg )
 	{
 		GLint iLogLength;
@@ -56,9 +50,7 @@ namespace Neutrino {
 		}
 	}
 
-	//	LinkShader()
-	//		Link and optionally validate. 
-	//
+
 	static bool LinkShader ( GLuint iProg )
 	{
 		GLint iStatus;
@@ -81,9 +73,6 @@ namespace Neutrino {
 
 
 
-	// CompileShader()
-	//		Take C-String shader source and compile it. With optional debug validation and logging
-	//
 	static bool CompileShader ( GLuint iShader, const char* pShaderSource, const int iBytes )
 	{
  		GLint iStatus;
@@ -110,9 +99,7 @@ namespace Neutrino {
 	}
 
 
-	// LoadShaders()
-	// 		Load a fixed set of shaders from the Resource folder
-	// 		Currently shaders are predefined and loaded in a fixed order...
+
 	static bool LoadShader( const char* pFragFilename, const char* pVertFilename )
 	{
 		ASSERT(s_iNumShadersLoaded < NUM_SHADERS, "Attempting to load more shaders than currently defined");
@@ -245,6 +232,7 @@ namespace Neutrino {
 		DELETEX [] aShaders;
 		LOG_INFO("Shaders detached");
 	}
+
 
 	bool AttachShaders()
 	{

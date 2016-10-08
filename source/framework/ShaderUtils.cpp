@@ -22,7 +22,7 @@ namespace Neutrino {
 	// LogShader()
 	//		Output the GL log info for shader compile
 	//
-	static void LogShader(GLuint iID)
+	void LogShader(GLuint iID)
 	{
 		GLint iLogLength;
   		glGetShaderiv(iID, GL_INFO_LOG_LENGTH, &iLogLength);
@@ -41,7 +41,7 @@ namespace Neutrino {
 	// LogProgram()
 	//		Output the GL log for the program compile
 	//
-	static void LogProgram ( GLuint iProg )
+	void LogProgram ( GLuint iProg )
 	{
 		GLint iLogLength;
 		glGetProgramiv(iProg, GL_INFO_LOG_LENGTH, &iLogLength);

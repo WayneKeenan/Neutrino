@@ -19,7 +19,7 @@ namespace Neutrino
 
 	// SDLCreateWindowAndContext():
 	// 		Attempts to open an SDL window of given dimensions with an OGL3.1 context
-	bool SDLCreateWindowAndContext(int iScreenWidth, int iScreenHeight); 	
+	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight); 	
 
 
 	// SDLPresent()
@@ -34,7 +34,7 @@ namespace Neutrino
 	// GLTextureFromSDLSurface()
 	// 		uses SDL image to load a texture to an SDL surface and bind that to an OGL texture. 
 	//   	bFiltered will set the GL filter hint to GL_LINEAR or default to GL_NEAREST
-	bool GLTextureFromSDLSurface(GLuint* pTextureID,  SDL_Surface* pSurf, bool bFiltered);
+	bool GLTextureFromSDLSurface(GLuint* pTextureID, const SDL_Surface* pSurf, const bool bFiltered);
 
 
 	// SDLProcessInput()

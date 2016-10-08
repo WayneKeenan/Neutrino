@@ -60,4 +60,8 @@ namespace Neutrino {
 	// GetActiveUniforms
 	// 		Returns the address of the current shader uniforms (see: struct _ShaderSettings_t in cpp file)
 	GLint* GetActiveUniforms ();
+
+	void LogShader(GLuint iID);
+
+	void LogProgram ( GLuint iProg );
 }

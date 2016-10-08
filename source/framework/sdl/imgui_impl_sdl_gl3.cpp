@@ -14,8 +14,8 @@
 
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
-#include "../GLUtils.h"
 #include "../Log.h"
+#include "../ShaderUtils.h"
 
 // SDL,GL3W
 #include <SDL.h>
@@ -32,39 +32,6 @@ static int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
 static int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
 static unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
 
-void LogShader(GLuint iID)
-{
-    GLint iLogLength;
-    glGetShaderiv(iID, GL_INFO_LOG_LENGTH, &iLogLength);
-
-    if (iLogLength > 1)
-    {
-        GLchar *pLog = (GLchar *)malloc(iLogLength);
-        glGetShaderInfoLog(iID, iLogLength, &iLogLength, pLog);
-
-        LOG_INFO("Shader compile log: %s", pLog);
-        free(pLog);
-    }   
-}
- 
-
-// LogProgram()
-//      Output the GL log for the program compile
-//
-void LogProgram ( GLuint iProg )
-{
-    GLint iLogLength;
-    glGetProgramiv(iProg, GL_INFO_LOG_LENGTH, &iLogLength);
-
-    if (iLogLength > 1)
-    {
-        GLchar *pLog = (GLchar *)malloc(iLogLength);
-        glGetProgramInfoLog(iProg, iLogLength, &iLogLength, pLog);
-
-        LOG_INFO("Program compile log: %s", pLog);
-        free(pLog);
-    }
-}
 
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 // If text or lines are blurry when integrating ImGui in your engine:
@@ -276,61 +243,81 @@ bool ImGui_ImplSdlGL3_CreateDeviceObjects()
         "   col.b = texture2D( Texture, vec2( Frag_UV.s, Frag_UV.t ) ).z;\n"
         "   col.a = texture2D( Texture, vec2( Frag_UV.s, Frag_UV.t ) ).w;\n"
         "   gl_FragColor = Frag_Color *col;\n"
-
 //        "	gl_FragColor = Frag_Color * texture( Texture, Frag_UV.st);\n"
         "}\n";
 
     g_ShaderHandle = glCreateProgram();
     IMGUI_GL_ERROR;
+
     g_VertHandle = glCreateShader(GL_VERTEX_SHADER);
     IMGUI_GL_ERROR;
+
     g_FragHandle = glCreateShader(GL_FRAGMENT_SHADER);
     IMGUI_GL_ERROR;
+
     glShaderSource(g_VertHandle, 1, &vertex_shader, 0);
     IMGUI_GL_ERROR;
+
     glShaderSource(g_FragHandle, 1, &fragment_shader, 0);
     IMGUI_GL_ERROR;
+
     glCompileShader(g_VertHandle);
-    LogShader(g_VertHandle);
+    Neutrino::LogShader(g_VertHandle);
     IMGUI_GL_ERROR;
+
     glCompileShader(g_FragHandle);
-    LogShader(g_FragHandle);
+    Neutrino::LogShader(g_FragHandle);
     IMGUI_GL_ERROR;
+
     glAttachShader(g_ShaderHandle, g_VertHandle);
     IMGUI_GL_ERROR;
+
     glAttachShader(g_ShaderHandle, g_FragHandle);
     IMGUI_GL_ERROR;
+
     glLinkProgram(g_ShaderHandle);
-    LogProgram(g_ShaderHandle);
+    Neutrino::LogProgram(g_ShaderHandle);
 
 
     g_AttribLocationTex = glGetUniformLocation(g_ShaderHandle, "Texture");
     IMGUI_GL_ERROR;
+
     g_AttribLocationProjMtx = glGetUniformLocation(g_ShaderHandle, "ProjMtx");
     IMGUI_GL_ERROR;
+
     g_AttribLocationPosition = glGetAttribLocation(g_ShaderHandle, "Position");
     IMGUI_GL_ERROR;
+
     g_AttribLocationUV = glGetAttribLocation(g_ShaderHandle, "UV");
     IMGUI_GL_ERROR;
+
     g_AttribLocationColor = glGetAttribLocation(g_ShaderHandle, "Color");
     IMGUI_GL_ERROR;
 
     glGenBuffers(1, &g_VboHandle);
     IMGUI_GL_ERROR;
+
     glGenBuffers(1, &g_ElementsHandle);
     IMGUI_GL_ERROR;
+
     glGenVertexArrays(1, &g_VaoHandle);
     IMGUI_GL_ERROR;
+
     glBindVertexArray(g_VaoHandle);
     IMGUI_GL_ERROR;
+
     glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
     IMGUI_GL_ERROR;
+
     glEnableVertexAttribArray(g_AttribLocationPosition);
     IMGUI_GL_ERROR;
+
     glEnableVertexAttribArray(g_AttribLocationUV);
     IMGUI_GL_ERROR;
+
     glEnableVertexAttribArray(g_AttribLocationColor);
     IMGUI_GL_ERROR;
+
 
 #define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
     glVertexAttribPointer(g_AttribLocationPosition, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)OFFSETOF(ImDrawVert, pos));
@@ -346,8 +333,10 @@ bool ImGui_ImplSdlGL3_CreateDeviceObjects()
     // Restore modified GL state
     glBindTexture(GL_TEXTURE_2D, last_texture);
     IMGUI_GL_ERROR;
+
     glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
     IMGUI_GL_ERROR;
+    
     glBindVertexArray(last_vertex_array);
     IMGUI_GL_ERROR;
     return true;

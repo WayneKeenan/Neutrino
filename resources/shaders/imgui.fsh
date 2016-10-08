@@ -1,9 +1,13 @@
-uniform sampler2D Texture
-in vec2 Frag_UV
-in vec4 Frag_Color
-out vec4 Out_Color
+uniform sampler2D Texture;
+varying vec2 Frag_UV;
+varying vec4 Frag_Color;
 
 void main()
 {
-	Out_Color = Frag_Color * texture( Texture, Frag_UV.st);
+  vec4 col;
+   col.r = texture2D( Texture, vec2( Frag_UV.s, Frag_UV.t ) ).x;
+   col.g = texture2D( Texture, vec2( Frag_UV.s, Frag_UV.t ) ).y;
+   col.b = texture2D( Texture, vec2( Frag_UV.s, Frag_UV.t ) ).z;
+   col.a = texture2D( Texture, vec2( Frag_UV.s, Frag_UV.t ) ).w;
+   gl_FragColor = Frag_Color *col;
 }

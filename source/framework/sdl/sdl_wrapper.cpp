@@ -29,7 +29,7 @@ namespace Neutrino
 
 
 
-	bool SDLCreateWindowAndContext(int iScreenWidth, int iScreenHeight)
+	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
 	{
 		// Define OpenGL 3.1 core
 
@@ -76,7 +76,7 @@ namespace Neutrino
 			
 
 		// Initialize GLEW
-		//glewExperimental = GL_TRUE; 
+		glewExperimental = GL_TRUE; 
 		GLenum glewError = glewInit();
 		if( glewError != GLEW_OK )
 		{
@@ -142,7 +142,7 @@ namespace Neutrino
 
 
 
-    bool GLTextureFromSDLSurface(GLuint* pTextureID, SDL_Surface* pSurf, bool bFiltered)
+    bool GLTextureFromSDLSurface(GLuint* pTextureID, const SDL_Surface* pSurf, const bool bFiltered)
     {
         int iMode = 0;
         if (pSurf->format->BytesPerPixel == 3) 
@@ -203,8 +203,8 @@ namespace Neutrino
 		return bRet;
     }
 
-    	bool show_test_window = true;
-    	bool show_another_window = false;
+    static bool bTestWindow = true;
+    static bool bAnotherTestWindow = false;
 
     void TestIMGUI()
     {
@@ -218,25 +218,25 @@ namespace Neutrino
             ImGui::Text("Hello, world!");
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
             ImGui::ColorEdit3("clear color", (float*)&clear_color);
-            if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
+            if (ImGui::Button("Test Window")) bTestWindow ^= 1;
+            if (ImGui::Button("Another Window")) bAnotherTestWindow ^= 1;
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         }
 
         // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
+        if (bAnotherTestWindow)
         {
             ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
+            ImGui::Begin("Another Window", &bAnotherTestWindow);
             ImGui::Text("Hello");
             ImGui::End();
         }
 
         // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
+        if (bTestWindow)
         {
             ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
+            ImGui::ShowTestWindow(&bTestWindow);
         }
         
     }

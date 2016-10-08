@@ -14,7 +14,6 @@
 
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
-#include "../Log.h"
 #include "../ShaderUtils.h"
 
 // SDL,GL3W

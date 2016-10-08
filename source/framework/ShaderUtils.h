@@ -61,7 +61,13 @@ namespace Neutrino {
 	// 		Returns the address of the current shader uniforms (see: struct _ShaderSettings_t in cpp file)
 	GLint* GetActiveUniforms ();
 
+
+	// LogShader()
+	// 		Simple function to output compilation errors from shader source. IMGUI implementation will use this
 	void LogShader(GLuint iID);
 
+
+	// LogProgram()
+	// 		Simple function to output linking errors for a shader programm. IMGUI implementation will use this
 	void LogProgram ( GLuint iProg );
 }

@@ -28,6 +28,7 @@ namespace Neutrino {
 		
 	} NeutrinioPreferences_t;
 
+
 	extern NeutrinioPreferences_t* NeutrinoPreferences;
 	extern CGameGlobals* pGameGlobals;
 	

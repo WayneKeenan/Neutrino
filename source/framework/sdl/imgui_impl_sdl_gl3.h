@@ -8,12 +8,11 @@
 
 
 #if defined(DEBUG)
-#include "../GLUtils.h"
-#define IMGUI_GL_ERROR do{Neutrino::GLUtils::LogGlError(__FILE__,__LINE__);}while(0)
-#define IMGUI_ASSERT_GL_ERROR do{ASSERT(!Neutrino::GLUtils::LogGlError(__FILE__,__LINE__));}while(0)
+	#include "../GLUtils.h"
+	#define IMGUI_GL_ERROR do{Neutrino::GLUtils::LogGlError(__FILE__,__LINE__);}while(0)
 #else
-#define GL_ERROR
-#define ASSERT_GL_ERROR
+	#define GL_ERROR
+	#define ASSERT_GL_ERROR
 #endif
 
 struct SDL_Window;

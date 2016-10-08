@@ -8,6 +8,7 @@ class CGameGlobals : public CSingleton<CGameGlobals>
 		bool m_bShowDebug = false;
 
 
+
 		CGameGlobals() {LOG_INFO("Game Globals created");};
 		~CGameGlobals() {LOG_INFO("Game Globals destroyed");};
 };

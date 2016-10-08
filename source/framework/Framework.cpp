@@ -52,6 +52,12 @@ namespace Neutrino
 				config_t cfg;
 				config_init(&cfg);
 
+
+				//
+				// Parse the dimensions for the game window and internal render buffer
+				// (This is for pixel games, so assumption is we'll always render to a smaller
+				// backbuffer and then present that scaled up in the final displayport)
+				//     
 				if(! config_read_file(&cfg, pPlayerPrefsFilename)) 
 				{
 					config_destroy(&cfg);
@@ -87,25 +93,45 @@ namespace Neutrino
 					return false;
 				}
 
+
+				//
+				//	Now parse the player's input preferences
+				if( !InputInit(&cfg) )
+				{
+					config_destroy(&cfg);	
+					return false;
+				}
+				LOG_INFO("Input bindings parsed and set to the following:\n%s", GetInputMappingsString());				
+
 				// Think we've got what we need from the config file for now
 				config_destroy(&cfg);
 			}
 			else
 			{
-				// write out a default player prefs file since this is likely the first run
-				//
 				LOG_WARNING("No player prefs file found, creating defaults...");
+
+				// This will create a default keyboard input mapping set (Mapped to SDL Keycodes)
+				InputInitWithDefaults();
+
+				// write out a default player prefs file since this is looks like the first run
+				//
 				if( (pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")) )
 				{
-					const char* _pPrefsText = "screenheight: 720\nscreenwidth: 1280\ninternalwidth: 320\ninternalheight: 180\n";
-					fwrite(_pPrefsText, strlen(_pPrefsText), 1, pPlayerPrefsFile);
-					fflush(pPlayerPrefsFile);
-					fclose(pPlayerPrefsFile);
- 
+
 					NeutrinoPreferences->s_iScreenHeight = 1080;
 					NeutrinoPreferences->s_iScreenWidth = 1920;
 					NeutrinoPreferences->s_iInternalWidth = 320;
 					NeutrinoPreferences->s_iInternalHeight = 180;
+
+					const char* pInputMappingsText = GetInputMappingsString();
+					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 320\ninternalheight: 180\n";
+				
+					fprintf(pPlayerPrefsFile, "%s", pPrefsText);
+					fprintf(pPlayerPrefsFile, "%s", pInputMappingsText);
+
+					fflush(pPlayerPrefsFile);
+					fclose(pPlayerPrefsFile);
+
 				}
 				else
 				{
@@ -240,7 +266,7 @@ namespace Neutrino
 			DetachShaders();
 		}
 
-
+		InputKill();
 		GameStateKill();
 		SDLKill();
 		

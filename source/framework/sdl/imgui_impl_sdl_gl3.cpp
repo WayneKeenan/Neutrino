@@ -15,6 +15,7 @@
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
 #include "../ShaderUtils.h"
+#include "../Log.h"
 
 // SDL,GL3W
 #include <SDL.h>
@@ -201,6 +202,7 @@ void ImGui_ImplSdlGL3_CreateFontsTexture()
 
     // Restore state
     glBindTexture(GL_TEXTURE_2D, last_texture);
+    LOG_INFO("ImGui font texture created");
 }
 
 bool ImGui_ImplSdlGL3_CreateDeviceObjects()
@@ -338,6 +340,8 @@ bool ImGui_ImplSdlGL3_CreateDeviceObjects()
     
     glBindVertexArray(last_vertex_array);
     IMGUI_GL_ERROR;
+
+    LOG_INFO("ImGui shaders compiled");
     return true;
 }
 

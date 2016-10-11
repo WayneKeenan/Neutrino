@@ -177,7 +177,6 @@ namespace Neutrino
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
 		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
 
-/*
 		pSpriteInfo = GetSpriteInfo(0, 1);
 		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
 
@@ -250,7 +249,5 @@ namespace Neutrino
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
 		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
-
-		*/
 	}
 }

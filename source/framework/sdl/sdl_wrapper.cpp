@@ -4,6 +4,8 @@
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
 #include "../Input.h"
+#include "../Debug.h"
+
 
 namespace Neutrino
 {
@@ -208,6 +210,8 @@ namespace Neutrino
 				break;
 
 				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_F1)
+						ToggleDebugOverlay();
 				case SDL_KEYUP:
 		        {
 		            int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;

@@ -8,6 +8,7 @@ namespace Neutrino
 {
 	static InputMappings_t* s_pKeyInput;
 	static char* s_pKeyboardMappingsString;
+	
 
 	static void Init()
 	{

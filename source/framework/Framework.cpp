@@ -1,5 +1,6 @@
 #include "Framework.h"
 #include "libconfig.h"
+#include "Debug.h"
 #include <stdio.h>
 
 namespace Neutrino 
@@ -215,6 +216,10 @@ namespace Neutrino
 		// Poll input events, pass controls to IMGUI and capture Quit state
 		s_bRunningStatus = SDLProcessInput();
 
+#if defined DEBUG
+		DrawDebugOverlay();
+#endif
+
 		// Reset active sprite count to zero
 		ResetSpriteCount();
 
@@ -232,9 +237,6 @@ namespace Neutrino
 
 		// Draw everything
 		DrawSprites();
-
-		//
-		TestIMGUI();
 
 		// Let SDL do its magic...
 		SDLPresent();

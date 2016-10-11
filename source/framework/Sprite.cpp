@@ -8,6 +8,11 @@
 #include "Types.h"
 #include "Texture.h"
 
+
+// TODO: Remove this, just for testing the INPUT axis...
+#include "Input.h"
+
+
 namespace Neutrino 
 {
 	//
@@ -146,9 +151,11 @@ namespace Neutrino
 
 	// Temp vars
 	static float fAngle=0.0f;
+	static glm::vec3 vPos = glm::vec3(20,160, 1.0f);
 
 	void TestSprite()
 	{
+		vPos += *GetInputAxisGameDeltaScaled() * 100.0f;
 
 		Sprite_t* mySprite = NULL;
 		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
@@ -160,7 +167,7 @@ namespace Neutrino
 		fAngle += 1.0f * GetGameMSDelta();
 
 		*(mySprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, (float)fabs(sin(fAngle*0.75)));
-		*(mySprite->_vPosition) = glm::vec3(20,160, 1.0f);;
+		*(mySprite->_vPosition) = vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
 		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
@@ -170,6 +177,7 @@ namespace Neutrino
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
 		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
 
+/*
 		pSpriteInfo = GetSpriteInfo(0, 1);
 		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
 
@@ -242,5 +250,7 @@ namespace Neutrino
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
 		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
+		*/
 	}
 }

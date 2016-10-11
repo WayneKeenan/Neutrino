@@ -1,5 +1,6 @@
 #pragma once
 #include "libconfig.h"
+#include <glm/glm.hpp> 
 
 namespace Neutrino
 {
@@ -51,4 +52,13 @@ namespace Neutrino
 	//	GetInputMappingsString()
 	// 		Return a human readable string of current input mappings that we can save to the PlayerPrefs file...
 	char* GetInputMappingsString();
+
+	void SetKeys(int* pKeys);
+
+	
+	void BuildInputAxis(const bool bKeyPressed);
+
+	glm::vec3* GetInputAxis();
+
+	glm::vec3* GetInputAxisGameDeltaScaled();
 }

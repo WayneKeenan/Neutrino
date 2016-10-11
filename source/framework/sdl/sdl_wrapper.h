@@ -45,6 +45,8 @@ namespace Neutrino
 	// TestIMGUI()
 	// 		Output the IMGUI test window
 	void TestIMGUI();
+
+	int** GetKeysArray();
 }
 
 #endif

@@ -3,6 +3,7 @@
 #include "../GLUtils.h"
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
+#include "../Input.h"
 
 namespace Neutrino
 {
@@ -12,6 +13,7 @@ namespace Neutrino
 	static const char* s_pBasePath;
 	static const char* s_pPrefsPath;
 	static const char* s_pGameName;
+	static int s_iKeyDown[512];
 
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
@@ -24,9 +26,11 @@ namespace Neutrino
 		s_pGameName = pGameName;
 		s_pPrefsPath = SDL_GetPrefPath(pOrgName, pGameName);
 		s_pBasePath = SDL_GetBasePath();
+
+		// Tell the Input functions where to find our key state array.
+		SetKeys(&s_iKeyDown[0]);
 		return true;
 	}
-
 
 
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
@@ -94,7 +98,7 @@ namespace Neutrino
 
 		SDL_StartTextInput();
 
-
+		// Setup ImGUI
     	ImGui_ImplSdlGL3_Init(pSDL_WindowHandle);
     	ImGui_ImplSdlGL3_CreateDeviceObjects();
 
@@ -191,18 +195,38 @@ namespace Neutrino
 
     	SDL_Event event;
     	bool bRet = true;
+    	bool bKeyPressed = false;
+
 		while( SDL_PollEvent( &event ) != 0 )
 		{
 			ImGui_ImplSdlGL3_ProcessEvent(&event);
-			if( event.type == SDL_QUIT )
+		
+			switch(event.type)
 			{
-				bRet = false;
-			}	
+				case SDL_QUIT:
+					bRet = false;
+				break;
+
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+		        {
+		            int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;
+		            s_iKeyDown[key] = (event.type == SDL_KEYDOWN);
+		            bKeyPressed = true;
+		        }
+		        break;
+
+		        // TODO: Add in joypad...
+			}   
 		}
 
+		// Let the Input functions build the input axis for this frame
+		BuildInputAxis(bKeyPressed);
 		return bRet;
     }
 
+
+/*
     static bool bTestWindow = true;
     static bool bAnotherTestWindow = false;
 
@@ -240,4 +264,6 @@ namespace Neutrino
         }
         
     }
+
+    */
 }

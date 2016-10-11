@@ -21,6 +21,7 @@ namespace Neutrino
 	static bool s_bInitialized = false;
 	static bool s_bGameTimerPaused = false;
 	static bool s_bUITimerPaused = false;
+
 	
 	// 13.4.16 [GN]
 	// 		Assume SDL will always be present, don't put an interface class in as middle man
@@ -60,12 +61,19 @@ namespace Neutrino
 			else
 				s_fUIMS_Delta = s_fSystemMS_Delta;
 		}
+
+		++s_iFrameCount;
 	}
 
 
 	uint32 GetMSSinceStartup()
 	{
 		return s_iSystemMS_Elapsed;
+	}
+
+	uint32 GetCurrentMS()
+	{
+		return SDL_GetTicks();
 	}
 
 	float GetMSDelta()

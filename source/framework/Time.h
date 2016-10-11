@@ -3,11 +3,16 @@
 #include "Types.h"
 #include "sdl/sdl_wrapper.h"
 
+
 namespace Neutrino
 {
 	// GetMSSinceStartup() 
 	// 		returns the milliseconds passed since Framework init
 	uint32 GetMSSinceStartup();
+
+	// GetCurrentMSSinceStartup()
+	// 		returns SDL_GetTicks
+	uint32	GetCurrentMS();
 
 	// GetMSDelta() 
 	// 		returns milliseconds passed since last Framework tick
@@ -53,6 +58,8 @@ namespace Neutrino
 	// SetUITimerIsPaused()
 	// 		Will pause or unpause the UIMS timers so GetUIMSDelta can be locked to simulate pausing the UI 
 	void SetUITimerIsPaused( const bool bState );
+
+
 
 }
 

@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <string.h>
 #include "Time.h"
+#include "Assert.h"
 
 
 namespace Neutrino
@@ -164,8 +165,6 @@ namespace Neutrino
 				fHoriz = 1.0f;
 		}
 
-
-
 		s_vInputAxis.x = fHoriz;
 		s_vInputAxis.y = fVert;
 		s_vInputAxis.z = 0.0f;
@@ -181,5 +180,11 @@ namespace Neutrino
 	glm::vec3* GetInputAxisGameDeltaScaled()
 	{
 		return &s_vInputAxisScaled;
+	}
+
+	bool GetRawKeyState(const int iRawKey)
+	{
+		ASSERT(iRawKey<512, "Raw Key called with index out of bounds of keymap");
+		return (bool)s_pKeyState[iRawKey];
 	}
 }

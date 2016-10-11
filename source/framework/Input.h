@@ -53,12 +53,26 @@ namespace Neutrino
 	// 		Return a human readable string of current input mappings that we can save to the PlayerPrefs file...
 	char* GetInputMappingsString();
 
+
+	// SetKeys()
+	// 		SDL creates the array of key states that we want to use in these files. This function will set up the static pointer
+	//   	in this compilation unit to point to the correct location
 	void SetKeys(int* pKeys);
 
-	
+	// BuildInputAxis()
+	// 		Should be called once per tick. Will create a glm::vec3 for the current input direction. Keyboard only atm
 	void BuildInputAxis(const bool bKeyPressed);
 
+	// 	GetInputAxis()
+	//  	Return the raw input axis, created above
 	glm::vec3* GetInputAxis();
 
+	// GetInputAxisGameDeltaScaled()
+	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h)
 	glm::vec3* GetInputAxisGameDeltaScaled();
+
+	// GetRawKeyState()
+	//		Shouldn't really use this, but if you want to peek into the keyboard input state directly, this will give you access.
+	//  	iRawKey is: (SDLK_<key> & ~SDLK_SCANCODE_MASK) 
+	bool GetRawKeyState(const int iRawKey);
 }

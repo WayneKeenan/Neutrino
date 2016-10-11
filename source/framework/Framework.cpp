@@ -1,6 +1,8 @@
 #include "Framework.h"
 #include "libconfig.h"
+#if defined DEBUG
 #include "Debug.h"
+#endif
 #include <stdio.h>
 
 namespace Neutrino 
@@ -13,7 +15,6 @@ namespace Neutrino
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 	static bool s_bRunningStatus = true;
-
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,16 +210,11 @@ namespace Neutrino
 
 	bool CoreUpdate()
 	{
-		
 		// Update clocks 
 		TimeUpdate();
 
 		// Poll input events, pass controls to IMGUI and capture Quit state
 		s_bRunningStatus = SDLProcessInput();
-
-#if defined DEBUG
-		DrawDebugOverlay();
-#endif
 
 		// Reset active sprite count to zero
 		ResetSpriteCount();
@@ -238,8 +234,14 @@ namespace Neutrino
 		// Draw everything
 		DrawSprites();
 
+
+#if defined DEBUG
+		DrawDebugOverlay();
+#endif
+
 		// Let SDL do its magic...
 		SDLPresent();
+
 
 		return s_bRunningStatus;
 	}

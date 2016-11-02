@@ -14,7 +14,11 @@ namespace Neutrino
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
+
+	// TODO: Need to get Game Camera Position and add it to this for MCV generation
+	static glm::vec3 s_pvDebugCameraOffset = glm::vec3(0.0f, 0.0f, 0.0f);
 	static bool s_bRunningStatus = true;
+	static bool s_bDebugFlyCamera = false;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +180,7 @@ namespace Neutrino
 									NeutrinoPreferences->s_iInternalWidth, 
 									NeutrinoPreferences->s_iInternalHeight 
 								);
-			GLUtils::GenerateMVCMatrices();
+			GLUtils::GenerateMVCMatrices(&s_pvDebugCameraOffset);
 		}
 
 
@@ -223,7 +227,8 @@ namespace Neutrino
 		GameStateUpdate();
 
 		// Generate new Camera/World matrices for this frame
-		GLUtils::GenerateMVCMatrices();
+		// TODO: Need to get Game Camera Position and add it to this for MCV generation
+		GLUtils::GenerateMVCMatrices(&s_pvDebugCameraOffset);
 
 		// Generate some test sprites (TO BE REMOVED)
 		TestSprite();
@@ -236,7 +241,12 @@ namespace Neutrino
 
 
 #if defined DEBUG
-		DrawDebugOverlay();
+		if (s_bDebugFlyCamera)
+		{
+
+		}
+
+		DrawDebugOverlay(&s_pvDebugCameraOffset, s_bDebugFlyCamera);
 #endif
 
 		// Let SDL do its magic...

@@ -46,7 +46,7 @@ namespace Neutrino
 
 		// GenerateMatrices
 		// 		Create the new ModelView and Camera Matrices for this tick
-		void GenerateMVCMatrices();
+		void GenerateMVCMatrices(glm::vec3* vPos);
 
 		// LogGlError
 		// 	 Wrapper to chcek glError & LOG_ERR to the logfile in a clean way. 

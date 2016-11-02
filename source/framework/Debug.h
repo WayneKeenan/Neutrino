@@ -2,6 +2,7 @@
 #include "Types.h"
 #include <array>
 #include "Assert.h"
+#include <glm/glm.hpp> 
 
 
 namespace Neutrino
@@ -12,7 +13,7 @@ namespace Neutrino
 
 	//	DrawDebugOverlay()
 	// 		Creates and new ImGUI window and does all the processing necessary for our debug output. 
-	void DrawDebugOverlay();
+	void DrawDebugOverlay(glm::vec3* pCamOffset, bool bDebugCameraMode);
 
 
 	// ------------------------------------------------------------------------------------------------------

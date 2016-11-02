@@ -25,6 +25,67 @@ namespace Neutrino
 	static JoypadInput_t* s_pJoypad_4_Input;
 
 	static int s_iNumPads = 0;
+	static const int s_iMaxJoypads = 4;
+	static SDL_GameController* s_pControllers[s_iMaxJoypads];
+
+	// TODO: Integrate the community SDL mappings from here:
+	//       https://github.com/gabomdq/SDL_GameControllerDB
+
+	// Detect the number of game controllers attached and setup our mappings...
+	static void AssignGameControllers()
+	{
+		s_iNumPads = SDL_NumJoysticks();
+		int iControllersFound = 0;
+
+		if ( s_iNumPads > 1)
+			LOG_INFO("Found %d possible game controllers", s_iNumPads);
+		else
+			LOG_INFO("Found %d possible game controller", s_iNumPads);
+
+		// Loop over all potential controllers and check them. There may be more
+		// attached than we actually want...
+		for(int i=0; i < s_iNumPads; ++i)
+		{
+		    if (!SDL_IsGameController(i))
+		    	continue;
+
+		    s_pControllers[iControllersFound] = SDL_GameControllerOpen(i);
+
+		    // Output some debug log info about this pad
+		    {
+	            SDL_Joystick *pJoy = SDL_GameControllerGetJoystick( s_pControllers[iControllersFound] );
+	            SDL_JoystickGUID guid = SDL_JoystickGetGUID(pJoy);
+  				char guid_str[1024];
+  				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
+  				LOG_INFO("Info for game controller %d:", i);
+				LOG_INFO("Joystick Name: '%s'", SDL_JoystickName(pJoy));
+				LOG_INFO("Controller Name: '%s'", SDL_GameControllerName(s_pControllers[iControllersFound]));
+				LOG_INFO("GUID: %s", guid_str);
+				LOG_INFO("Number of Axes: %2d", SDL_JoystickNumAxes(pJoy));
+				LOG_INFO("Number of Buttons: %2d", SDL_JoystickNumButtons(pJoy));
+				LOG_INFO("Mapping: '%s'", SDL_GameControllerMappingForGUID(guid));
+		    }
+
+		    ++iControllersFound;
+
+		    if (iControllersFound >= s_iMaxJoypads)
+		  		break;
+		}
+	}
+
+	static void UnassignGameControllers()
+	{
+		for(int i = 0; i < s_iMaxJoypads; ++i)
+		{
+			if (s_pControllers[i])
+			{
+				SDL_GameControllerClose(s_pControllers[i]);
+			}
+		}
+	}
+
+	void 
+
 
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
@@ -119,6 +180,9 @@ namespace Neutrino
     	ImGui_ImplSdlGL3_CreateDeviceObjects();
 
 		//SDL_SetWindowFullscreen(pSDL_WindowHandle,SDL_WINDOW_FULLSCREEN);
+		
+		// If we've got this far, check the attached controllers and assign them.
+		AssignGameControllers();
 		return true;
 	}
 
@@ -139,6 +203,7 @@ namespace Neutrino
 		ImGui_ImplSdlGL3_Shutdown();
 		SDL_GL_DeleteContext( SDL_GLContext );
 		SDL_DestroyWindow( pSDL_WindowHandle );
+		UnassignGameControllers();
 		SDL_Quit();
 
 		DELETEX(s_pJoypad_1_Input);

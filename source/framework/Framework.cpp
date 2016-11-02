@@ -120,10 +120,10 @@ namespace Neutrino
 				if( (pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")) )
 				{
 
-					NeutrinoPreferences->s_iScreenHeight = 1080;
-					NeutrinoPreferences->s_iScreenWidth = 1920;
-					NeutrinoPreferences->s_iInternalWidth = 320;
-					NeutrinoPreferences->s_iInternalHeight = 180;
+					NeutrinoPreferences->s_iScreenWidth = iDEFAULT_VIEWPORT_WIDTH;
+					NeutrinoPreferences->s_iScreenHeight = iDEFAULT_VIEWPORT_HEIGHT;
+					NeutrinoPreferences->s_iInternalWidth = iDEFAULT_INTERNAL_WIDTH;
+					NeutrinoPreferences->s_iInternalHeight = iDEFAULT_INTERNAL_HEIGHT;
 
 					const char* pInputMappingsText = GetInputMappingsString();
 					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 320\ninternalheight: 180\n";

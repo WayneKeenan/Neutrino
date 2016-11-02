@@ -5,6 +5,7 @@
 #include "imgui_impl_sdl_gl3.h"
 #include "../Input.h"
 #include "../Debug.h"
+#include "../Memory.h"
 
 
 namespace Neutrino
@@ -15,7 +16,15 @@ namespace Neutrino
 	static const char* s_pBasePath;
 	static const char* s_pPrefsPath;
 	static const char* s_pGameName;
+	
 	static int s_iKeyDown[512];
+
+	static JoypadInput_t* s_pJoypad_1_Input;
+	static JoypadInput_t* s_pJoypad_2_Input;
+	static JoypadInput_t* s_pJoypad_3_Input;
+	static JoypadInput_t* s_pJoypad_4_Input;
+
+	static int s_iNumPads = 0;
 
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
@@ -29,8 +38,13 @@ namespace Neutrino
 		s_pPrefsPath = SDL_GetPrefPath(pOrgName, pGameName);
 		s_pBasePath = SDL_GetBasePath();
 
-		// Tell the Input functions where to find our key state array.
-		SetKeys(&s_iKeyDown[0]);
+		s_pJoypad_1_Input = NEWX(JoypadInput_t);
+		s_pJoypad_2_Input = NEWX(JoypadInput_t);
+		s_pJoypad_3_Input = NEWX(JoypadInput_t);
+		s_pJoypad_4_Input = NEWX(JoypadInput_t);
+
+		// Tell the Input functions where to find our key state array and joypad states
+		SetControls(&s_iKeyDown[0], s_pJoypad_1_Input, s_pJoypad_2_Input, s_pJoypad_3_Input, s_pJoypad_4_Input);
 		return true;
 	}
 
@@ -126,6 +140,11 @@ namespace Neutrino
 		SDL_GL_DeleteContext( SDL_GLContext );
 		SDL_DestroyWindow( pSDL_WindowHandle );
 		SDL_Quit();
+
+		DELETEX(s_pJoypad_1_Input);
+		DELETEX(s_pJoypad_2_Input);
+		DELETEX(s_pJoypad_3_Input);
+		DELETEX(s_pJoypad_4_Input);
 		return true;
 	}
 

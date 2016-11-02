@@ -5,10 +5,10 @@ namespace Neutrino {
 
 	// Defines the coordinates of an individual sprite within a packed texture page.
 	// Texture pages should be generated with TexturePacker (https://www.codeandweb.com/texturepacker)
-	// See the pre-defined exporter formates for this app in external_dependencies/texturepacker_exporters/Neutrino
+	// See the pre-defined exporter format for this framework in ./external_dependencies/texturepacker_exporters/Neutrino
 	// 
 	// Params:
-	// 		x & y: P_iXel coordinates within the texture
+	// 		x & y: Pixel coordinates within the texture
 	// 		_fHalfWidth & _fHalfHeight: Pixel Dimensions of the sprite / 2.0 - used as-is by the Sprite functions to generate rendered quad   
 	//   	X_S* X_T*: pre-cacled UV coords for the sprite within the tpage
 	//    
@@ -48,7 +48,7 @@ namespace Neutrino {
 	//  	file that lists all the sprites that have been packed into the image. 
 	//   
 	//		* The binary for the texture can be any format that SDL image supports, but PNG is probably best
-	//   	* The tpage info file contains sprite dimensions and p_iXel offsets, see the top of this file for formatting information
+	//   	* The tpage info file contains sprite dimensions and pixel offsets, see the top of this file for formatting information
 	//    
 	//    	This function looks for GameConfig.txt in the mounted resources bundle, and checks for texture definitions contained within.
 	//     	When it finds one, it'll attempt to load the paired files, building the relevant TPage_t info (and TPageSpriteInfo_t array)

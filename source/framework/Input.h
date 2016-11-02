@@ -37,6 +37,27 @@ namespace Neutrino
 	} InputMappings_t;
 
 
+	// Container struct for possible joypad inputs on a regular next gen joypad. 
+	// 
+	typedef struct JoypadInput_t
+	{
+		glm::vec3 _LEFT_STICK;		// Sticks
+		glm::vec3 _RIGHT_STICK;
+		float _ACTION_TRIGGER_1;	// Triggers
+		float _ACTION_TRIGGER_2;
+		bool _ACTION_1;				// Face buttons and shoulder buttons
+		bool _ACTION_2;
+		bool _ACTION_3;
+		bool _ACTION_4;
+		bool _ACTION_5;
+		bool _ACTION_6;
+		bool _META_1;				// Home / Start / Options / Back...?
+		bool _META_2;
+		bool _META_3;
+		bool _META_4;
+	} JoypadInput_t;
+
+
 	// InputInit()
 	// 		Allocates memory for the input mappings array and parses the Player's Prefs file for the current input mappings
 	bool InputInit(config_t* cfg);
@@ -57,7 +78,7 @@ namespace Neutrino
 	// SetKeys()
 	// 		SDL creates the array of key states that we want to use in these files. This function will set up the static pointer
 	//   	in this compilation unit to point to the correct location
-	void SetKeys(int* pKeys);
+	void SetControls(int* pKeys, JoypadInput_t* pPad1, JoypadInput_t* pPad2, JoypadInput_t* pPad3, JoypadInput_t* pPad4);
 
 	// BuildInputAxis()
 	// 		Should be called once per tick. Will create a glm::vec3 for the current input direction. Keyboard only atm
@@ -65,11 +86,11 @@ namespace Neutrino
 
 	// 	GetInputAxis()
 	//  	Return the raw input axis, created above
-	glm::vec3* GetInputAxis();
+	glm::vec3* GetInputAxis(int iPlayer);
 
 	// GetInputAxisGameDeltaScaled()
 	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h)
-	glm::vec3* GetInputAxisGameDeltaScaled();
+	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer);
 
 	// GetRawKeyState()
 	//		Shouldn't really use this, but if you want to peek into the keyboard input state directly, this will give you access.

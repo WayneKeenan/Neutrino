@@ -21,5 +21,10 @@ static const float fTWO_PI = fPI * 2.0f;
 static const int iMAX_TEXTURES = 4;
 static const int iMAX_SPRITES = 2048;
 
+static const int iDEFAULT_VIEWPORT_WIDTH = 1920;
+static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;
+static const int iDEFAULT_INTERNAL_WIDTH = 320;
+static const int iDEFAULT_INTERNAL_HEIGHT = 180;
+
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)

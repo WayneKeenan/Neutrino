@@ -12,8 +12,23 @@ namespace Neutrino
 	static InputMappings_t* s_pInputMappings;
 	static char* s_pKeyboardMappingsString;
 	static int* s_pKeyState;
-	static glm::vec3 s_vInputAxis;
-	static glm::vec3 s_vInputAxisScaled;
+	
+	static JoypadInput_t* s_pPad1State;
+	static JoypadInput_t* s_pPad2State;
+	static JoypadInput_t* s_pPad3State;
+	static JoypadInput_t* s_pPad4State;
+
+	static glm::vec3 s_vInputAxis_Player1;
+	static glm::vec3 s_vInputAxisScaled_Player1;
+
+	static glm::vec3 s_vInputAxis_Player2;
+	static glm::vec3 s_vInputAxisScaled_Player2;
+
+	static glm::vec3 s_vInputAxis_Player3;
+	static glm::vec3 s_vInputAxisScaled_Player3;
+
+	static glm::vec3 s_vInputAxis_Player4;
+	static glm::vec3 s_vInputAxisScaled_Player4;
 
 	static void Init()
 	{
@@ -31,6 +46,8 @@ namespace Neutrino
 
 	static void GenerateMappingsString()
 	{
+		// TODO: This is only tracking 2 players on the keyboard atm...
+		//       Needs to go up to 4...
 		snprintf(s_pKeyboardMappingsString, 25*16, 
 				"player1_up: %d\nplayer1_down: %d\nplayer1_left: %d\nplayer1_right: %d\nplayer1_action1: %d\nplayer1_action2: %d\nplayer1_action3: %d\nplayer1_action4: %d\nplayer2_up: %d\nplayer2_down: %d\nplayer2_left: %d\nplayer2_right: %d\nplayer2_action1: %d\nplayer2_action2: %d\nplayer2_action3: %d\nplayer2_action4: %d\n",
 				s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP],
@@ -129,9 +146,13 @@ namespace Neutrino
 		return s_pKeyboardMappingsString;
 	}
 
-	void SetKeys(int* pKeys)
+	void SetControls(int* pKeys, JoypadInput_t* pPad1, JoypadInput_t* pPad2, JoypadInput_t* pPad3, JoypadInput_t* pPad4)
 	{
 		s_pKeyState = pKeys;
+		s_pPad1State = pPad1;
+		s_pPad2State = pPad2;
+		s_pPad3State = pPad3;
+		s_pPad4State = pPad4;
 	}
 
 	void BuildInputAxis(const bool bState)
@@ -145,41 +166,74 @@ namespace Neutrino
 		s_pInputMappings->_bKeyWasPressed = bState;
 
 
-		// Build the input axis for this frame based around keyboard input
-		if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN ]])
+		// Build Player 1 input axis from keyboard
 		{
-			if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] )
-				fVert = 1.0f;
+			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]])
+			{
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] )
+					fVert = 1.0f;
 
-			if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]] )
-				fVert = -1.0f;
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]] )
+					fVert = -1.0f;
+			}
+
+
+			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]])
+			{
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] )
+					fHoriz = -1.0f;
+
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]] )
+					fHoriz = 1.0f;
+			}
+
+			s_vInputAxis_Player1.x = fHoriz;
+			s_vInputAxis_Player1.y = fVert;
+			s_vInputAxis_Player1.z = 0.0f;
+
+			s_vInputAxisScaled_Player1 = s_vInputAxis_Player1 * GetGameMSDelta();
 		}
-
-
-		if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]])
-		{
-			if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] )
-				fHoriz = -1.0f;
-
-			if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]] )
-				fHoriz = 1.0f;
-		}
-
-		s_vInputAxis.x = fHoriz;
-		s_vInputAxis.y = fVert;
-		s_vInputAxis.z = 0.0f;
-
-		s_vInputAxisScaled = s_vInputAxis * GetGameMSDelta();
+		
 	}
 
-	glm::vec3* GetInputAxis()
+	glm::vec3* GetInputAxis(int iPlayer)
 	{
-		return &s_vInputAxis;
+		switch(iPlayer)
+		{
+			default:
+			case 0:
+				return &s_vInputAxis_Player1;
+				break;
+			case 1:
+				return &s_vInputAxis_Player2;
+				break;
+			case 2:
+				return &s_vInputAxis_Player3;
+				break;
+			case 3:
+				return &s_vInputAxis_Player4;
+				break;
+		}
 	}
 
-	glm::vec3* GetInputAxisGameDeltaScaled()
+	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer)
 	{
-		return &s_vInputAxisScaled;
+		switch(iPlayer)
+		{
+			default:
+			case 0:
+				return &s_vInputAxisScaled_Player1;
+				break;
+			case 1:
+				return &s_vInputAxisScaled_Player2;
+				break;
+			case 2:
+				return &s_vInputAxisScaled_Player3;
+				break;
+			case 3:
+				return &s_vInputAxisScaled_Player4;
+				break;
+		}
 	}
 
 	bool GetRawKeyState(const int iRawKey)

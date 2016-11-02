@@ -151,11 +151,11 @@ namespace Neutrino
 
 	// Temp vars
 	static float fAngle=0.0f;
-	static glm::vec3 vPos = glm::vec3(20,160, 1.0f);
+	static glm::vec3 vPos = glm::vec3(0.0f,140.0f,0.0f);
 
 	void TestSprite()
 	{
-		vPos += *GetInputAxisGameDeltaScaled() * 100.0f;
+		vPos += *GetInputAxisGameDeltaScaled(0) * 100.0f;
 
 		Sprite_t* mySprite = NULL;
 		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);

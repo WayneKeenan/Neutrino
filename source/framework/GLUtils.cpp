@@ -75,9 +75,7 @@ namespace Neutrino {
 
         void GenerateMVCMatrices(glm::vec3* vPos)
         {
-            // TO_DO: pass in the vec3 offset for camera movement...
             // We're not going to rotate the camera: 
-            // 
             // glm::mat4 mRotationMatrix = glm::mat4();
             // 
             // We are going to move the camera:

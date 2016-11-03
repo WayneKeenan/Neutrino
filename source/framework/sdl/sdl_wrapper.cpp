@@ -6,7 +6,8 @@
 #include "../Input.h"
 #include "../Debug.h"
 #include "../Memory.h"
-
+#include <vector>
+#include "../Time.h"
 
 namespace Neutrino
 {
@@ -24,22 +25,31 @@ namespace Neutrino
 	static JoypadInput_t* s_pJoypad_3_Input;
 	static JoypadInput_t* s_pJoypad_4_Input;
 
-	static int s_iNumConnectedControllers = 0;
-	static int s_iNumRealControllers = 0;
 	static const int s_iMaxJoypads = 4;
 
 	typedef struct GameController_t
 	{
-		int 				_INSTANCE_ID;
+		int 				_INSTANCE;
 		SDL_GameController* _GAMEPAD;
-		bool 				_ATTACHED = false;
 	} GameController_t;
+	
+	typedef std::vector<GameController_t*> ControllerList;
 
-	// TODO: This needs to be converted to a linked list rather than an array
-	//       Add and remove events need to remove the element from the list
-	//       This'll give some auto remapping of the controllers when devices
-	//       are removed...
-	static GameController_t* s_pControllers;
+
+	// The Controller list is a vector of MaxJoypads that we will poll for input each frame. 
+	// 
+	// The default mapping between controller and player is based on the position in this vector, 
+	// so 0 == Player 1, etc. 
+	// 
+	// Note: If device 0 were to be removed, this would mean the shuffling down of any other 
+	// attached devices! This might not be what you want mid-game! 
+	// 
+	// (The framework biases always having an active controller for player one over 
+	// explicitly handling this. You may want to provide an alternate mapping above this vector
+	// for game logic...)
+	// 
+	static ControllerList s_aControllers;
+
 
 	// TODO: Integrate the community SDL mappings from here:
 	//       https://github.com/gabomdq/SDL_GameControllerDB
@@ -48,9 +58,98 @@ namespace Neutrino
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
 	 
-	
-	// Detect the number of game controllers attached and setup our mappings...
-	// Note, this doesn't handle devices being added at runtime...
+
+	// Handler for the SDL event...
+	static void RemoveGameController(int iID)
+	{
+		LOG_INFO("Looking to remove controller matching istance ID: %d.", iID);
+
+		ControllerList::iterator it;
+		GameController_t* pElem;
+		bool bFound = false;
+
+		for(it = s_aControllers.begin(); it != s_aControllers.end(); ++it )
+		{
+			pElem = *it;
+			if ( pElem->_INSTANCE == iID)
+			{
+				LOG_INFO("GameController %d [Instance ID: %d] has been removed from the list of attached controllers.", it - s_aControllers.begin(), iID);
+				SDL_GameControllerClose( pElem->_GAMEPAD );
+				bFound = true;
+				break;
+			}				
+		}
+
+		if(bFound)
+		{
+			DELETEX pElem;
+			s_aControllers.erase(it);		
+			LOG_INFO("There are now %d game controllers attached.", s_aControllers.size());					
+		}
+		else
+		{
+			LOG_ERROR("Unable to find a game controller matching ID %d in the list of attached controllers! You may have a player assigned to a disconnected controller!", iID);
+		}
+	}
+
+
+	// Takes a controller ID and checks it for being a valid controller to add to our list
+	static void AddGameController(int iID, bool bLog=true)
+	{
+		// If we're already tracking Max Controllers ignore whatever this is...
+		if ( s_aControllers.size() >= s_iMaxJoypads)
+		{
+			LOG_WARNING("A new controller has been attached, but Neutrino is already tracking %d. Ignoring thie device.", s_iMaxJoypads);
+			return;
+		}
+
+		// If this isn't even a valid controller, ignore it
+		if( !SDL_IsGameController( iID ) ) 
+			return;
+
+		// Get the pad associated with this ID
+        SDL_GameController *pPad = SDL_GameControllerOpen( iID );
+
+        // Have we been able to open the controller for reading?
+        if( !pPad ) 
+        {
+        	LOG_WARNING("Unable to open GameController [InstanceID %d], ignoring...");
+        	return;
+        }
+
+        SDL_Joystick *pJoy = SDL_GameControllerGetJoystick( pPad );
+        int iInstance = SDL_JoystickInstanceID( pJoy );
+
+        GameController_t* pElem = NEWX(GameController_t);
+        pElem->_GAMEPAD = pPad;
+        pElem->_INSTANCE = iInstance;
+
+        // Add this to our controller list. 
+        s_aControllers.push_back(pElem);
+
+        if ( bLog )
+        {
+        	// Output some debug log info about this pad
+		    {
+	            
+	            SDL_JoystickGUID guid = SDL_JoystickGetGUID(pJoy);
+  				char guid_str[1024];
+  				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
+  				LOG_INFO("Info for game controller %d:", s_aControllers.size()-1);
+				LOG_INFO("Joystick Name: '%s'", SDL_JoystickName(pJoy));
+				LOG_INFO("Controller Name: '%s'", SDL_GameControllerName(pElem->_GAMEPAD));
+				LOG_INFO("GUID: %s", guid_str);
+				LOG_INFO("SDL Instance ID: %d", SDL_JoystickInstanceID(pJoy));
+				LOG_INFO("Number of Axes: %2d", SDL_JoystickNumAxes(pJoy));
+				LOG_INFO("Number of Buttons: %2d", SDL_JoystickNumButtons(pJoy));
+				LOG_INFO("Mapping: '%s'", SDL_GameControllerMappingForGUID(guid));
+		    }
+        }
+	}
+
+
+	/*
+	// Detect the number of game controllers attached during boot and track them. 
 	static void AssignGameControllers()
 	{
 		s_iNumConnectedControllers = SDL_NumJoysticks();
@@ -67,65 +166,21 @@ namespace Neutrino
 		    if (!SDL_IsGameController(i))
 		    	continue;
 
-		    s_pControllers[s_iNumRealControllers]._GAMEPAD = SDL_GameControllerOpen(i);
-		    SDL_Joystick *pJoy = SDL_GameControllerGetJoystick( s_pControllers[s_iNumRealControllers]._GAMEPAD );
-		   	s_pControllers[s_iNumRealControllers]._INSTANCE_ID = SDL_JoystickInstanceID(pJoy);
-		   	s_pControllers[s_iNumRealControllers]._ATTACHED = true;
-
-		    // Output some debug log info about this pad
-		    {
-	            
-	            SDL_JoystickGUID guid = SDL_JoystickGetGUID(pJoy);
-  				char guid_str[1024];
-  				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
-  				LOG_INFO("Info for game controller %d:", i);
-				LOG_INFO("Joystick Name: '%s'", SDL_JoystickName(pJoy));
-				LOG_INFO("Controller Name: '%s'", SDL_GameControllerName(s_pControllers[s_iNumRealControllers]._GAMEPAD));
-				LOG_INFO("GUID: %s", guid_str);
-				LOG_INFO("SDL Instance ID: %d", SDL_JoystickInstanceID(pJoy));
-				LOG_INFO("Number of Axes: %2d", SDL_JoystickNumAxes(pJoy));
-				LOG_INFO("Number of Buttons: %2d", SDL_JoystickNumButtons(pJoy));
-				LOG_INFO("Mapping: '%s'", SDL_GameControllerMappingForGUID(guid));
-		    }
-
-		    ++s_iNumRealControllers;
-
-		    if (s_iNumRealControllers >= s_iMaxJoypads)
-		  		break;
+		    AddGameController(i);
 		}
 	}
+	*/
 
 	// Basic cleanup for the SDLKill() function... May get called on return to menu state?
 	static void UnassignGameControllers()
 	{
-		for(int i = 0; i < s_iMaxJoypads; ++i)
+		for(ControllerList::iterator it = s_aControllers.begin(); it != s_aControllers.end(); ++it )
 		{
-			if (s_pControllers[i]._ATTACHED)
-			{
-				SDL_GameControllerClose(s_pControllers[i]._GAMEPAD);
-			}
+			GameController_t* pElem = *it;
+			SDL_GameControllerClose( pElem->_GAMEPAD );
+			DELETEX pElem;
 		}
-	}
-
-	// Handler for the SDL event...
-	static void RemoveGameController(int iID)
-	{
-		LOG_INFO("HERE");
-		// Find the device that's been removed and 'clear' it from the controllers array...
-		for( int i = 0; i < s_iMaxJoypads; ++i)
-		{
-			if (s_pControllers[i]._ATTACHED && iID == s_pControllers[i]._INSTANCE_ID)
-			{
-				LOG_WARNING("Game controller %d has been disconnected!", i);
-				LOG_WARNING("SDL Instance for this controller was: %d", iID);
-
-				SDL_GameControllerClose(s_pControllers[i]._GAMEPAD);
-				s_pControllers[i]._GAMEPAD = NULL;
-				s_pControllers[i]._ATTACHED = false;
-
-				break;
-			}
-		}
+		s_aControllers.clear();
 	}
 
 
@@ -148,7 +203,6 @@ namespace Neutrino
 		s_pJoypad_2_Input = NEWX(JoypadInput_t);
 		s_pJoypad_3_Input = NEWX(JoypadInput_t);
 		s_pJoypad_4_Input = NEWX(JoypadInput_t);
-		s_pControllers = NEWX GameController_t[s_iMaxJoypads];
 
 		// Tell the Input functions where to find our key state array and joypad states
 		SetControls(&s_iKeyDown[0], s_pJoypad_1_Input, s_pJoypad_2_Input, s_pJoypad_3_Input, s_pJoypad_4_Input);
@@ -226,9 +280,7 @@ namespace Neutrino
     	ImGui_ImplSdlGL3_CreateDeviceObjects();
 
 		//SDL_SetWindowFullscreen(pSDL_WindowHandle,SDL_WINDOW_FULLSCREEN);
-		
-		// If we've got this far, check the attached controllers and assign them.
-		AssignGameControllers();
+
 		return true;
 	}
 
@@ -350,9 +402,18 @@ namespace Neutrino
 		        }
 		        break;
 
+            	case SDL_CONTROLLERDEVICEADDED:
+            	{
+            		LOG_WARNING("Frame %d - A controller device has been added!", GetFrameCount());
+            		AddGameController( (int)event.cdevice.which );            		
+            	}
+            	break;
+
 		        case SDL_CONTROLLERDEVICEREMOVED:
-		        		LOG_INFO("HERE");
+		        {		        	
+		        	LOG_WARNING("Frame %d - A controller device has been removed!", GetFrameCount());
             		RemoveGameController( (int)event.cdevice.which );
+		        }
             	break;
 
 		        // TODO: Add in joypad Polling

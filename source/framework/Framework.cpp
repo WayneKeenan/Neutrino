@@ -208,9 +208,11 @@ namespace Neutrino
 		// Enter Initial Gamestate
 		GameStateInit();
 
+#if defined DEBUG
 		// Init params needed for debug overlay
 		DebugOverlayInit();
-
+#endif
+		
 		return s_bRunningStatus;
 	}
 
@@ -248,14 +250,13 @@ namespace Neutrino
 		// Draw everything
 		DrawSprites();
 
-
 #if defined DEBUG
+		// Output the debug mode overlay
 		DebugOverlayUpdate();
 #endif
 
 		// Let SDL do its magic...
 		SDLPresent();
-
 
 		return s_bRunningStatus;
 	}

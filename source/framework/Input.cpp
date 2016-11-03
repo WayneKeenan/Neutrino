@@ -120,11 +120,11 @@ namespace Neutrino
 		s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION3] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
 		s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION4] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
 
-		s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
-		s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
-		s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
-		s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
-		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION1] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
+		s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP] = SDLK_UP & ~SDLK_SCANCODE_MASK;
+		s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN] = SDLK_DOWN & ~SDLK_SCANCODE_MASK;
+		s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT] = SDLK_LEFT & ~SDLK_SCANCODE_MASK;
+		s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT] = SDLK_RIGHT & ~SDLK_SCANCODE_MASK;
+		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION1] = SDLK_RCTRL & ~SDLK_SCANCODE_MASK;
 		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION2] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
 		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION3] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
 		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION4] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
@@ -193,7 +193,38 @@ namespace Neutrino
 
 			s_vInputAxisScaled_Player1 = s_vInputAxis_Player1 * GetGameMSDelta();
 		}
-		
+
+		fVert = fHoriz = 0.0f;
+
+		// Build Player 2 input axis from keyboard
+		{
+			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]])
+			{
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] )
+					fVert = 1.0f;
+
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]] )
+					fVert = -1.0f;
+			}
+
+
+			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]])
+			{
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] )
+					fHoriz = -1.0f;
+
+				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]] )
+					fHoriz = 1.0f;
+			}
+
+			s_vInputAxis_Player2.x = fHoriz;
+			s_vInputAxis_Player2.y = fVert;
+			s_vInputAxis_Player2.z = 0.0f;
+
+			s_vInputAxisScaled_Player2 = s_vInputAxis_Player2 * GetGameMSDelta();
+		}
+
+		// TODO: Take the keyboard scaling from Lumo to emulate the stick throw speed
 	}
 
 	glm::vec3* GetInputAxis(int iPlayer)

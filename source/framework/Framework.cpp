@@ -15,10 +15,14 @@ namespace Neutrino
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
-	// TODO: Need to get Game Camera Position and add it to this for MCV generation
-	static glm::vec3 s_pvDebugCameraOffset = glm::vec3(0.0f, 0.0f, 0.0f);
 	static bool s_bRunningStatus = true;
-	static bool s_bDebugFlyCamera = false;
+
+
+
+	// TODO: This is temporary, should be retrieved from the active game state.
+	//       Should framework have a set of camera functionality?
+	static glm::vec3 s_pvCameraPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +184,7 @@ namespace Neutrino
 									NeutrinoPreferences->s_iInternalWidth, 
 									NeutrinoPreferences->s_iInternalHeight 
 								);
-			GLUtils::GenerateMVCMatrices(&s_pvDebugCameraOffset);
+			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 		}
 
 
@@ -204,6 +208,9 @@ namespace Neutrino
 		// Enter Initial Gamestate
 		GameStateInit();
 
+		// Init params needed for debug overlay
+		DebugOverlayInit();
+
 		return s_bRunningStatus;
 	}
 
@@ -211,9 +218,11 @@ namespace Neutrino
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 	bool CoreUpdate()
 	{
+		// TODO: Remove this, temporary calc of the camera position to support the flycam
+		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;
+
 		// Update clocks 
 		TimeUpdate();
 
@@ -228,7 +237,7 @@ namespace Neutrino
 
 		// Generate new Camera/World matrices for this frame
 		// TODO: Need to get Game Camera Position and add it to this for MCV generation
-		GLUtils::GenerateMVCMatrices(&s_pvDebugCameraOffset);
+		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 
 		// Generate some test sprites (TO BE REMOVED)
 		TestSprite();
@@ -241,12 +250,7 @@ namespace Neutrino
 
 
 #if defined DEBUG
-		if (s_bDebugFlyCamera)
-		{
-
-		}
-
-		DrawDebugOverlay(&s_pvDebugCameraOffset, s_bDebugFlyCamera);
+		DebugOverlayUpdate();
 #endif
 
 		// Let SDL do its magic...
@@ -281,9 +285,10 @@ namespace Neutrino
 		}
 
 		InputKill();
+		DebugOverlayKill();
 		GameStateKill();
 		SDLKill();
-		
+
 		LOG_INFO("Framework terminated (CoreKill) cleanly. Have a nice day!");
 		return true;
 	}

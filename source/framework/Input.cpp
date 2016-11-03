@@ -6,7 +6,6 @@
 #include "Time.h"
 #include "Assert.h"
 
-
 namespace Neutrino
 {
 	static InputMappings_t* s_pInputMappings;
@@ -29,6 +28,7 @@ namespace Neutrino
 
 	static glm::vec3 s_vInputAxis_Player4;
 	static glm::vec3 s_vInputAxisScaled_Player4;
+
 
 	static void Init()
 	{

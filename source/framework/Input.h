@@ -74,7 +74,6 @@ namespace Neutrino
 	// 		Return a human readable string of current input mappings that we can save to the PlayerPrefs file...
 	char* GetInputMappingsString();
 
-
 	// SetKeys()
 	// 		SDL creates the array of key states that we want to use in these files. This function will set up the static pointer
 	//   	in this compilation unit to point to the correct location

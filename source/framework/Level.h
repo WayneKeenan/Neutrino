@@ -11,7 +11,7 @@ namespace Neutrino {
 	//
 	typedef struct LevelFileDetails_t
 	{
-		const char* pBackgroundMap;
+		char* _pBackgroundMap;
 	} LevelFileDetails_t;
 
 
@@ -22,7 +22,7 @@ namespace Neutrino {
 	// 	  How do we handle parallax? 
 	// 	  What about levels with no background?
 	// 	  See notes in your pad...
-	bool ParseBackgroundMapFile(const char* pFilename);
+	bool GenerateTileMapFromFile(const int iLvlCount);
 
 
 	// LoadLeveldetailsFromConfigFile()
@@ -31,4 +31,5 @@ namespace Neutrino {
 	// 		in an array of LevelFileDetails_t so we can quickly build a level during gamestate transition.
 	bool LoadLevelDetailsFromConfigFile();
 
+	void DeallocateLevels();
 }

@@ -1,5 +1,4 @@
 #include "ConfigFile.h"
-#include "libconfig.h"
 #include "Log.h"
 #include "File.h"
 #include "Assert.h"
@@ -50,12 +49,12 @@ namespace Neutrino
 		ASSERT(s_bConfigLoaded, "Attempting to parse details out of game config file before it is loaded");
 		if ( config_lookup_int(&s_Config, pParam, iValueStore) == CONFIG_TRUE )
 		{
-			LOG_INFO("Found: %s - %d", pParam, *iValueStore);
+			//LOG_INFO("Found: %s - %d", pParam, *iValueStore);
 			return true;
 		}
 		else
 		{
-			LOG_ERROR("GameConfigGetInt failed: %s");
+			LOG_ERROR("GameConfigGetInt failed for param: %s");
 			return false;
 		}
 	}
@@ -68,11 +67,54 @@ namespace Neutrino
 
 		if ( config_lookup_string(&s_Config, pParam, &pValueStore) == CONFIG_TRUE )
 		{
-			LOG_INFO("Found: %s - %s", pParam, pValueStore);
+			//LOG_INFO("Found: %s - %s", pParam, pValueStore);
 		}
 		else
 		{
-			LOG_ERROR("GameConfigGetString failed: %s");
+			LOG_ERROR("GameConfigGetString failed for param: %s");
+			pValueStore = NULL;
+		}
+	
+		return pValueStore;
+	}
+
+	const config_setting_t* GameConfigGetList(const char* pParam)
+	{
+		ASSERT(s_bConfigLoaded, "Attempting to parse details out of game config file before it is loaded");
+		config_setting_t* pSetting = config_lookup(&s_Config, pParam);
+		if( NULL != pSetting)
+		{
+			//LOG_INFO("Found: %s", pParam);
+			return pSetting;
+		}
+		else
+		{
+			LOG_ERROR("GameConfigGetList failed for param: %s", pParam);
+			return NULL;
+		}
+	}
+
+	const config_setting_t* GameConfigGetListElement(const config_setting_t* pList, int iCount)
+	{
+		config_setting_t* pElem = config_setting_get_elem(pList, iCount);
+		if( NULL != pElem )
+		{
+			return pElem;
+		}
+		else
+		{
+			LOG_ERROR("GameConfigGetListElement: failed to get element index %d",iCount);
+			return NULL;
+		}
+	}
+
+	const char* GameConfigGetStringFromSetting(const config_setting_t* pSetting, const char* pParam )
+	{
+		const char* pValueStore;
+
+		if ( config_setting_lookup_string(pSetting, pParam, &pValueStore) != CONFIG_TRUE )
+		{
+			LOG_ERROR("GameConfigGetStringFromSetting failed for param: %s");
 			pValueStore = NULL;
 		}
 	

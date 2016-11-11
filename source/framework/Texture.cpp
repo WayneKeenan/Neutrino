@@ -198,7 +198,7 @@ namespace Neutrino {
 
 				  if ( NULL != pFilename && NULL != pTPageFilename )
 					{
-						LOG_INFO("Found texture: %s\nINF: Found info: %s", pFilename, pTPageFilename);
+						LOG_INFO("Found texture: %s\nINF: Found texture info: %s", pFilename, pTPageFilename);
 						if( !LoadTexture(pFilename, pTPageFilename, s_iLoadedTextureCount) )
 						{
 							LOG_ERROR("Failed to load %s, exiting...", pFilename);

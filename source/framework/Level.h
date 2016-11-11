@@ -17,6 +17,4 @@ namespace Neutrino {
 	// 		Part of the CoreInit phase. Grab each of the level's various params/meta-data and store them 
 	// 		in an array of LevelFileDetails_t so we can quickly build a level during gamestate transition.
 	bool LoadLevelDetailsFromConfigFile();
-
-	void DeallocateLevels();
 }

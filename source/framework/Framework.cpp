@@ -299,7 +299,6 @@ namespace Neutrino
 			DeallocateSpriteArrays();
 			DeallocateAllTextures();		// Also deletes all VBOs
 			DetachShaders();
-			DeallocateLevels();
 		}
 
 		InputKill();

@@ -44,10 +44,5 @@ namespace Neutrino {
 		return true;
 	}
 
-	void DeallocateLevels()
-	{
-		DELETEX [] s_aLevelFileDetails;
-		LOG_INFO("Levels deallocated.");
-	}
 
 }

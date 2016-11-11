@@ -16,6 +16,8 @@
 #include "../game/global/CGameGlobals.h"
 #include "Texture.h"
 #include "Input.h"
+#include "Level.h"
+#include "ConfigFile.h"
 
 namespace Neutrino {
 	

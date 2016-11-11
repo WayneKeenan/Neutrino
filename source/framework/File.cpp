@@ -7,9 +7,6 @@
 
 namespace Neutrino {
 
-
-
-
 	bool FileExists( const char * pFilename )
 	{
 		struct stat fileBuf;

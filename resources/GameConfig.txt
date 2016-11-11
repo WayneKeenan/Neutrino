@@ -4,3 +4,9 @@ textures: {
 	texture0: "tpage1.png",
   tpageinfo0: "tpage1.txt",
 }
+
+levels: (
+  {
+		background_map: "test_map.txt",
+  }
+)

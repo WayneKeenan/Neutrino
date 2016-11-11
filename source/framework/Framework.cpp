@@ -111,7 +111,7 @@ namespace Neutrino
 					config_destroy(&cfg);	
 					return false;
 				}
-				LOG_INFO("Input bindings parsed and set to the following:\n%s", GetInputMappingsString());				
+				LOG_INFO("Input bindings parsed and set to the following:\n\n%s", GetInputMappingsString());				
 
 				// Think we've got what we need from the config file for now
 				config_destroy(&cfg);
@@ -163,6 +163,15 @@ namespace Neutrino
 				return false;
 			} 
 		}
+
+
+		// Now the resources file is mounted, load the Game Config file and keep it open for other 
+		// parts of the game to quickly grab whatever it is they need. 
+		if(!LoadConfigFile())
+		{
+			LOG_ERROR("Unable to load Game Config file, exiting.");
+			return false;
+		}
 	
 
 		// Create an SDL window with an OGL 3 Context and compile standard shaders
@@ -198,6 +207,13 @@ namespace Neutrino
 			return false;
 		}
 
+		// Parse through the list of levels and store the meta-data so we can transition 
+		// to new levels during game state transition. 
+		//
+		if(!LoadLevelDetailsFromConfigFile())
+		{
+			LOG_ERROR("Framework was unable to load level meta-data, exiting...");
+		}
 
 		// Create any Singletons we need
 		//

@@ -2,19 +2,6 @@
 
 namespace Neutrino {
 
-
-	// Container for Level meta-data. Contents will be parsed to create a level during OnLevelEnter gamestate. 
-	//
-	// Params:
-	// 	 pBackgroundMap: The tilemap for the level background. This should be created in TileD, and run through 
-	// 	 tiled_preprocess.py, which can be found in the Neutrino_Assets repo. 
-	//
-	typedef struct LevelFileDetails_t
-	{
-		char* _pBackgroundMap;
-	} LevelFileDetails_t;
-
-
 	// ParseBackgroundMapFile()
 	// 		Loads a .txt background map file and generates a static VBO holding the tilemap for the level. 
 	// TODO:
@@ -22,7 +9,7 @@ namespace Neutrino {
 	// 	  How do we handle parallax? 
 	// 	  What about levels with no background?
 	// 	  See notes in your pad...
-	bool GenerateTileMapFromFile(const int iLvlCount);
+	bool GenerateTileMapFromFile(const char* pFilename);
 
 
 	// LoadLeveldetailsFromConfigFile()

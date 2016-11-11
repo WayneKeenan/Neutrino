@@ -30,10 +30,16 @@ namespace Neutrino
 	// 		Utility function, get a string value from the game config file. 
 	const char* GameConfigGetString( const char* pParam); 
 
+	// GameConfigGetStringFromSetting()
+	// 		Get a string element from a config_setting_t (list element) structure
 	const char* GameConfigGetStringFromSetting(const config_setting_t* pSetting, const char* pParam );
 
+	// GameConfigGetList()
+	// 		Search for the list of elements identified by pParam. Returns the config_setting_t structure.
 	const config_setting_t* GameConfigGetList(const char* pParam);
 
+	// GameConfigGetListElement()
+	// 		Get the iCount element from a list.
 	const config_setting_t* GameConfigGetListElement(const config_setting_t* pList, int iCount);
 
 }

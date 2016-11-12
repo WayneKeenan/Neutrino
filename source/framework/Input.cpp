@@ -5,6 +5,7 @@
 #include <string.h>
 #include "Time.h"
 #include "Assert.h"
+#include <string.h>
 
 namespace Neutrino
 {
@@ -40,7 +41,10 @@ namespace Neutrino
 			s_pInputMappings->_aKeyboardMappings[i] = 0;		// Maps to SDLK_UNKNOWN
 		}
 
+		// TODO: This will have to handle joypad mappings as well. Too small! 
 		s_pKeyboardMappingsString = NEWX char[25*16];
+		memset(s_pKeyboardMappingsString, '\0', sizeof(char) * (25*16));
+
 	}
 
 

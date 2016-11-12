@@ -4,6 +4,7 @@
 #include "Memory.h"
 #include "Assert.h"
 #include "physfs.h"
+#include <string.h>
 
 namespace Neutrino {
 
@@ -80,11 +81,12 @@ namespace Neutrino {
 		fseek(pFile, 0, SEEK_SET);
 
 		char *pResource = NEWX char[fSize + 1];
+		memset(pResource, '\0', sizeof(char) * (fSize+1));
 		ASSERT( fSize == (long)fread(pResource, fSize, 1, pFile), "Possible read error or unexpected EOF hit during fread of: ", pFilename);
 
 		fclose(pFile);
 
-		pResource[fSize] = 0;
+		//pResource[fSize] = 0;
 
 		return pResource;
 	}
@@ -96,6 +98,7 @@ namespace Neutrino {
 		PHYSFS_file *pFileHandle = PHYSFS_openRead( pFilename );
 		PHYSFS_sint64 iSize = PHYSFS_fileLength( pFileHandle );
 		char* pLoadedResource = NEWX char[ iSize ];
+		memset(pLoadedResource, '\0', sizeof(char) * iSize);
 
 		LOG_INFO("Loading: %s, Bytes: %d", pFilename, iSize);
 

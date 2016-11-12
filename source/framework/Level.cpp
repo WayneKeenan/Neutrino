@@ -8,10 +8,63 @@
 
 namespace Neutrino {
 
-	static LevelFileDetails_t* s_aLevelFileDetails;
 
 	bool GenerateTileMapFromFile(const char* pFilename)
 	{
+		if (!ResourceFileExists(pFilename)) { LOG_ERROR("GenerateTileMapFromFile: Unable to find %s, exiting...", pFilename); return false; }
+
+		//
+		// Parse the tilemap data
+		//
+		{
+			config_t cfg;
+			config_init(&cfg);
+
+			const char* pFileBytes = LoadResourceBytes(pFilename);
+			ASSERT(NULL != pFileBytes, "Unable to load tilemap data file");
+
+
+			if(!config_read_string(&cfg, pFileBytes))
+			{
+				const char* pErr = config_error_text(&cfg);
+				config_destroy(&cfg);
+
+				LOG_ERROR("Unable to parse tilemap data: \'%s\' - exiting...", pErr);
+				return false;
+			}
+
+			int iMapWidth = 0;
+			int iMapHeight = 0;
+			int iTileW = 0;
+			int iTileH = 0;
+
+			if(!ConfigGetInt(&cfg, "map.width", &iMapWidth))
+			{
+				LOG_ERROR("Unable to find tilemap width");
+				return false;
+			}
+
+			if(!ConfigGetInt(&cfg, "map.height", &iMapHeight))
+			{
+				LOG_ERROR("Unable to find tilemap height");
+				return false;
+			}
+
+			if(!ConfigGetInt(&cfg, "map.tilewidth", &iTileW))
+			{
+				LOG_ERROR("Unable to find tilewidth");
+				return false;
+			}
+
+			if(!ConfigGetInt(&cfg, "map.tileheight", &iTileH))
+			{
+				LOG_ERROR("Unable to find tileheight");
+				return false;
+			}
+
+			LOG_INFO("Generating static tilemap from \'%s\'. Map is %d by %d, tiles are %d by %d pixels.", pFilename, iMapWidth, iMapHeight, iTileW, iTileH);
+		}
+
 		return true;
 	}
 
@@ -38,7 +91,8 @@ namespace Neutrino {
 			const char* pFilename = GameConfigGetStringFromSetting(pElem, "background_map");
 			ASSERT(pFilename, "LoadLevelDetailsFromConfigFile: failure to parse background_map filename");
 
-			GenerateTileMapFromFile(pFilename);
+			if(!GenerateTileMapFromFile(pFilename))
+				return false;
 		}
 
 		return true;

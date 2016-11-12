@@ -31,9 +31,11 @@ namespace Neutrino
 		if(!config_read_string(&s_Config, pFileBytes))
 		{
 			const char* pErr =  config_error_text(&s_Config);
+			int iErrLn = config_error_line(&s_Config);
+
 			config_destroy(&s_Config);
 
-			LOG_ERROR("Unable to parse game config: \'%s\' - exiting...", pErr);
+			LOG_ERROR("Unable to parse game config: \'%s\' line: %d - exiting...", pErr, iErrLn);
 			return false;
 		}
 
@@ -58,6 +60,21 @@ namespace Neutrino
 			return false;
 		}
 	}
+	
+	bool ConfigGetInt( config_t* pCfg, const char* pParam, int* iValueStore )
+	{
+		if ( config_lookup_int(pCfg, pParam, iValueStore) == CONFIG_TRUE )
+		{
+			//LOG_INFO("Found: %s - %d", pParam, *iValueStore);
+			return true;
+		}
+		else
+		{
+			LOG_ERROR("ConfigGetInt failed for param: %s");
+			return false;
+		}
+	}
+
 
 
 	const char* GameConfigGetString(const char* pParam)
@@ -77,6 +94,25 @@ namespace Neutrino
 	
 		return pValueStore;
 	}
+
+
+	const char* ConfigGetString(config_t* pCfg, const char* pParam)
+	{
+		const char* pValueStore;
+
+		if ( config_lookup_string(pCfg, pParam, &pValueStore) == CONFIG_TRUE )
+		{
+			//LOG_INFO("Found: %s - %s", pParam, pValueStore);
+		}
+		else
+		{
+			LOG_ERROR("ConfigGetString failed for param: %s");
+			pValueStore = NULL;
+		}
+	
+		return pValueStore;
+	}
+
 
 	const config_setting_t* GameConfigGetList(const char* pParam)
 	{

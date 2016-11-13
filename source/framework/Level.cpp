@@ -8,7 +8,11 @@
 
 namespace Neutrino {
 
-
+	// This assumes the tilemap has been built in TileD, which has the several limitations, chief of which is the 
+	// square tiles. 
+	//
+	// TODO: Find a better solution for this, or just write the tile editor in engine...
+	//
 	bool GenerateTileMapFromFile(const char* pFilename)
 	{
 		if (!ResourceFileExists(pFilename)) { LOG_ERROR("GenerateTileMapFromFile: Unable to find %s, exiting...", pFilename); return false; }
@@ -62,7 +66,14 @@ namespace Neutrino {
 				return false;
 			}
 
-			LOG_INFO("Generating static tilemap from \'%s\'. Map is %d by %d, tiles are %d by %d pixels.", pFilename, iMapWidth, iMapHeight, iTileW, iTileH);
+			const config_setting_t* pList = ConfigGetList(&cfg, "map.data");
+			if(NULL == pList)
+			{
+				LOG_ERROR("Unable to get map data");
+				return false;
+			}
+			int iLength = config_setting_length(pList);
+			LOG_INFO("Generating static tilemap from \'%s\'. Map is %d by %d, tiles are %d by %d pixels, mapdata length is %d.", pFilename, iMapWidth, iMapHeight, iTileW, iTileH, iLength);
 		}
 
 		return true;

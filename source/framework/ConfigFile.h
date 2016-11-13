@@ -14,6 +14,7 @@
 // GameConfig.txt should be loaded as part of CoreInit, once the resource bundle has been mounted. It
 // stays resident until the framework terminates. 
 //
+// 
 namespace Neutrino
 {
 
@@ -23,27 +24,37 @@ namespace Neutrino
 	bool LoadConfigFile();
 
 	// GameConfigGetInt()
-	// 		Utility function, get an int value from the game config file.
+	// 		Utility function, get an int value from the game config file, and store in iValueStore. Calling 
+	// 		function should check the return status for success/fail
 	bool GameConfigGetInt( const char* pParam, int* iValueStore );
 
-	// GameConfigGetString()
-	// 		Utility function, get a string value from the game config file. 
-	const char* GameConfigGetString( const char* pParam); 
-
-	const char* ConfigGetString( config_t* pCfg, const char* pParam );
-
+	// ConfigGetInt()
+	// 		As above, but wrapper to get an int safely from an externally loaded config file
 	bool ConfigGetInt( config_t* pCfg, const char* pParam, int* iValueStore );
 
+	// GameConfigGetString()
+	// 		Utility function, get a string value from the game config file.  Returns NULL pointer on failure
+	const char* GameConfigGetString( const char* pParam); 
+
+	// ConfigGetString()
+	// 		Wrapper to get a string from an externally loaded libconfig file. Returns NULL pointer on failure
+	const char* ConfigGetString( config_t* pCfg, const char* pParam );
+
 	// GameConfigGetStringFromSetting()
-	// 		Get a string element from a config_setting_t (list element) structure
+	// 		Get a string element from a config_setting_t (list element) structure. Returns NULL pointer on failure. Returns NULL pointer on failure
 	const char* GameConfigGetStringFromSetting(const config_setting_t* pSetting, const char* pParam );
 
 	// GameConfigGetList()
 	// 		Search for the list of elements identified by pParam. Returns the config_setting_t structure.
+	// 		Returns NULL on failure. 
 	const config_setting_t* GameConfigGetList(const char* pParam);
+	
+	// ConfigGetList()
+	// 		Wrapper, get the root element of a list from an externally loaded config file. Returns NULL on failure
+	const config_setting_t* ConfigGetList(const config_t* pCfg, const char* pParam);
 
 	// GameConfigGetListElement()
-	// 		Get the iCount element from a list.
+	// 		Get the iCount element from a list. Will return NULL on failure. 
 	const config_setting_t* GameConfigGetListElement(const config_setting_t* pList, int iCount);
 
 }

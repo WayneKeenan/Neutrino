@@ -130,6 +130,24 @@ namespace Neutrino
 		}
 	}
 
+	const config_setting_t* ConfigGetList(const config_t* pCfg, const char* pParam)
+	{
+		ASSERT(s_bConfigLoaded, "Attempting to parse details out of game config file before it is loaded");
+		config_setting_t* pSetting = config_lookup(pCfg, pParam);
+		if( NULL != pSetting)
+		{
+			//LOG_INFO("Found: %s", pParam);
+			return pSetting;
+		}
+		else
+		{
+			LOG_ERROR("ConfigGetList failed for param: %s", pParam);
+			return NULL;
+		}
+	
+	}
+
+
 	const config_setting_t* GameConfigGetListElement(const config_setting_t* pList, int iCount)
 	{
 		config_setting_t* pElem = config_setting_get_elem(pList, iCount);

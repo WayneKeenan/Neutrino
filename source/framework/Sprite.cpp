@@ -39,11 +39,11 @@ namespace Neutrino
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_SnS = NEWX float[iMAX_SPRITES];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_TnT = NEWX float[iMAX_SPRITES];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers = NEWX Sprite_t[iMAX_SPRITES];
 		}
 
@@ -56,12 +56,12 @@ namespace Neutrino
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fY_T = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T[i];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fX_SnS = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_SnS[i];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fY_TnT = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_TnT[i];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfWidth = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth[i];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfHeight = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight[i];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fRotDegrees = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees[i];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fScale = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale[i];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._vColour = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours[i];
-	        s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._vPosition = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfWidth = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fHalfHeight = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fRotDegrees = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fScale = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._vColour = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours[i];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._vPosition = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions[i];
 		}
 
 		// One set has been created...
@@ -77,12 +77,12 @@ namespace Neutrino
 			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afY_T;
 			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afX_SnS;
 			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afY_TnT;
-	        DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afHalfWidth;
-	        DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afHalfHeight;
-	        DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afSpriteScale;
-	        DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afSpriteRotDegrees;
-	        DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._avSprColours;
-	        DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._avSprPositions;
+			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afHalfWidth;
+			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afHalfHeight;
+			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afSpriteScale;
+			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._afSpriteRotDegrees;
+			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._avSprColours;
+			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._avSprPositions;
 			DELETEX [] s_aSpriteRenderInfo[i]->_SpriteBasePointers;			
 		}
 		LOG_INFO("Sprite Arrays deallocated.");
@@ -127,24 +127,24 @@ namespace Neutrino
 			{
 
 				GLUtils::PopulateVBO(
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fX_S,
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fY_T,
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fX_SnS,
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fY_TnT,
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fHalfWidth, 
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fHalfHeight, 
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fRotDegrees, 
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fScale, 
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vColour, 
-								s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vPosition, 
-								s_aSpriteRenderInfo[i]->_iActiveSpriteCount,
-								i );
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fX_S,
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fY_T,
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fX_SnS,
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fY_TnT,
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fHalfWidth, 
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fHalfHeight, 
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fRotDegrees, 
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._fScale, 
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vColour, 
+						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vPosition, 
+						s_aSpriteRenderInfo[i]->_iActiveSpriteCount,
+						i );
 
 				// TO_DO: If we don't end up doing shader swaps in here, then merge these functions...
 				GLUtils::RenderVBO(
-								s_aSpriteRenderInfo[i]->_iActiveSpriteCount, 
-								s_aSpriteRenderInfo[i]->_iTextureID,
-								i );
+						s_aSpriteRenderInfo[i]->_iActiveSpriteCount, 
+						s_aSpriteRenderInfo[i]->_iTextureID,
+						i );
 			}
 		}
 	}

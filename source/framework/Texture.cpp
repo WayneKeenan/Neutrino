@@ -44,9 +44,10 @@ namespace Neutrino {
 			if(!config_read_string(&cfg, pFileBytes)) 
 			{
 				const char* pErr =  config_error_text(&cfg);
+				int iErrLn = config_error_line(&cfg);
 				config_destroy(&cfg);
 
-				LOG_ERROR("Unable to parse tpage config: \'%s\' - exiting...", pErr);
+				LOG_ERROR("Unable to parse tpage config: \'%s\' line: %d - exiting...", pErr, iErrLn);
 				return false;
 			}
 

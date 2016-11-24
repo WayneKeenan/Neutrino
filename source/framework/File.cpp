@@ -97,8 +97,8 @@ namespace Neutrino {
 
 		PHYSFS_file *pFileHandle = PHYSFS_openRead( pFilename );
 		PHYSFS_sint64 iSize = PHYSFS_fileLength( pFileHandle );
-		char* pLoadedResource = NEWX char[ iSize ];
-		memset(pLoadedResource, '\0', sizeof(char) * iSize);
+		char* pLoadedResource = NEWX char[ iSize + 1 ];
+		memset(pLoadedResource, '\0', sizeof(char)*(iSize+1));
 
 		LOG_INFO("Loading: %s, Bytes: %d", pFilename, iSize);
 

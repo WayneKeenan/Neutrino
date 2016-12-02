@@ -400,17 +400,10 @@ namespace Neutrino
 						{
 							if(event.key.keysym.sym == SDLK_F2)
 								*iEditorFlags |= _SPLINE_ED;
-							
 							if(event.key.keysym.sym == SDLK_F3)
-							{
-								LOG_INFO("F3 pressed");
 								*iEditorFlags |= _MAP_ED;
-							}
 							if(event.key.keysym.sym == SDLK_F4)
-							{
-								LOG_INFO("F4 pressed");
 								*iEditorFlags |= _PARTICLE_ED;
-							}
 						}
 					}
 				case SDL_KEYUP:

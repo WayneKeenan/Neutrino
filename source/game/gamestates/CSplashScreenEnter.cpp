@@ -1,6 +1,6 @@
 #include "CSplashScreenEnter.h"
-
-
+#include "CSplashScreenIn.h"
+#include "../../framework/GameStateManager.h"
 
 CSplashScreenEnter::CSplashScreenEnter()
 {
@@ -23,10 +23,13 @@ void CSplashScreenEnter::Init()
 
 void CSplashScreenEnter::Update()
 {
-	// Immediate change of state to splash screen in (animation for company logo)
+	CGameState* pNextGameState = NEWX CSplashScreenIn();
+	Neutrino::GameStateChange(pNextGameState);
 }
 
 void CSplashScreenEnter::Kill()
 {
 	// Nothing to do...
 }
+
+

@@ -1,10 +1,11 @@
 #include "CSplashScreenExit.h"
-
+#include "CMainMenuEnter.h"
+#include "../../framework/GameStateManager.h"
 
 
 CSplashScreenExit::CSplashScreenExit()
 {
-	m_pStateName = "Splash Screen Enter";
+	m_pStateName = "Splash Screen Exit ";
 	LOG_INFO(">>>> %s", this->m_pStateName);
 }
 
@@ -23,7 +24,8 @@ void CSplashScreenExit::Init()
 
 void CSplashScreenExit::Update()
 {
-	// Immediate change of state to splash screen in (animation for company logo)
+	CGameState* pNextGameState = NEWX CMainMenuEnter();
+	Neutrino::GameStateChange(pNextGameState);
 }
 
 void CSplashScreenExit::Kill()

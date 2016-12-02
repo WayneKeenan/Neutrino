@@ -24,12 +24,12 @@ namespace Neutrino
 	void GameStateChange( CGameState* pNextState )
 	{
 		ASSERT( pNextState != pActiveGameState, "GameStateChange called with identical state" );
-	    ASSERT( pNextState != NULL, "GameStateChange called with null" );
+		ASSERT( pNextState != NULL, "GameStateChange called with null" );
 
-    	pActiveGameState->Kill();
+		pActiveGameState->Kill();
 		DELETEX pActiveGameState;
 
-    	pActiveGameState = pNextState;
+		pActiveGameState = pNextState;
 	}
 
 	void GameStateKill()

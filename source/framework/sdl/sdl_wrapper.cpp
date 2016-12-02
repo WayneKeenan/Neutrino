@@ -92,6 +92,10 @@ namespace Neutrino
 		}
 	}
 
+	
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
+
 
 	// Takes a controller ID and checks it for being a valid controller to add to our list
 	static void AddGameController(int iID, bool bLog=true)
@@ -148,29 +152,6 @@ namespace Neutrino
 	}
 
 
-	/*
-	// Detect the number of game controllers attached during boot and track them. 
-	static void AssignGameControllers()
-	{
-	s_iNumConnectedControllers = SDL_NumJoysticks();
-
-	if ( s_iNumConnectedControllers > 1)
-	LOG_INFO("Found %d possible game controllers", s_iNumConnectedControllers);
-	else
-	LOG_INFO("Found %d possible game controller", s_iNumConnectedControllers);
-
-	// Loop over all potential controllers and check them. There may be more
-	// attached than we actually want...
-	for(int i=0; i < s_iNumConnectedControllers; ++i)
-	{
-	if (!SDL_IsGameController(i))
-	continue;
-
-	AddGameController(i);
-	}
-	}
-	*/
-
 	// Basic cleanup for the SDLKill() function... May get called on return to menu state?
 	static void UnassignGameControllers()
 	{
@@ -186,6 +167,7 @@ namespace Neutrino
 
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
+
 
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
@@ -210,6 +192,10 @@ namespace Neutrino
 	}
 
 
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
+
+	
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
 	{
 		// Define OpenGL 3.1 core
@@ -285,6 +271,9 @@ namespace Neutrino
 	}
 
 
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
+
 
 
 	void SDLPresent()
@@ -327,6 +316,9 @@ namespace Neutrino
 		return s_pBasePath;
 	}
 
+
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
 
 
 	// Note: The bytes per pixel of PNG files changes depending on the PNG optimisation setting
@@ -373,6 +365,9 @@ namespace Neutrino
 	}
 
 
+
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
 
 
 

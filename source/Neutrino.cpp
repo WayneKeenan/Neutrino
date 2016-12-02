@@ -22,7 +22,7 @@ int main(int, char**)
 	}
 
 	Neutrino::CoreKill();
-	
-    return 0;
+
+	return 0;
 }
 

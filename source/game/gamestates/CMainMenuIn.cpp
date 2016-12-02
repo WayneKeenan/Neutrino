@@ -1,4 +1,5 @@
 #include "CMainMenuIn.h"
+#include "../../framework/Sprite.h"
 
 
 
@@ -18,6 +19,8 @@ void CMainMenuIn::Init()
 
 void CMainMenuIn::Update()
 {
+	// Generate some test sprites (TO BE REMOVED)
+	Neutrino::TestSprite();
 }
 
 void CMainMenuIn::Kill()

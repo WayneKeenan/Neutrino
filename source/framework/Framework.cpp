@@ -257,9 +257,6 @@ namespace Neutrino
 		// TODO: Need to get Game Camera Position and add it to this for MCV generation
 		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 
-		// Generate some test sprites (TO BE REMOVED)
-		TestSprite();
-
 		// Set the active shader for this pass
 		SetActiveShader(DEFAULT_SHADER);
 

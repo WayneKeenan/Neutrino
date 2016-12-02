@@ -16,6 +16,7 @@ namespace Neutrino
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
 	static bool s_bRunningStatus = true;
+	static uint8 s_iEditorModeFlag = 0x00;
 
 
 
@@ -236,6 +237,7 @@ namespace Neutrino
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 	bool CoreUpdate()
 	{
 		// TODO: Remove this, temporary calc of the camera position to support the flycam
@@ -245,16 +247,10 @@ namespace Neutrino
 		TimeUpdate();
 
 		// Poll input events, pass controls to IMGUI and capture Quit state
-		s_bRunningStatus = SDLProcessInput();
+		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);
 
 		// Reset active sprite count to zero
 		ResetSpriteCount();
-
-	#if defined DEBUG
-		// If this is a debug build check for editor hot keys and flip to the appropriate 
-		// editor state
-
-	#endif
 
 		// Process the active game state
 		GameStateUpdate();
@@ -276,6 +272,23 @@ namespace Neutrino
 
 		// Let SDL do its magic...
 		SDLPresent();
+
+#if defined DEBUG
+		// Check the editor mode flags. If we're to enter an editor mode
+		// FORCEKILL current state, and innit the editor mode. 
+		//
+		// TODO: Add a force kill mode to CGameState
+
+		if(s_iEditorModeFlag & _SPLINE_ED)
+			LOG_INFO("Spline Editor Detected");
+		
+		if(s_iEditorModeFlag & _MAP_ED)
+			LOG_INFO("Map Editor Detected");
+
+		if(s_iEditorModeFlag & _PARTICLE_ED)
+			LOG_INFO("Particle Editor Detected");
+
+#endif
 
 		return s_bRunningStatus;
 	}

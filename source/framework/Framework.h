@@ -28,9 +28,7 @@ namespace Neutrino {
 		int s_iInternalHeight;
 		const char* s_pResourcePath;		// Packfile locations
 		const char* s_pPrefsPath;			// Player prefs file location
-		
 	} NeutrinioPreferences_t;
-
 
 	extern NeutrinioPreferences_t* NeutrinoPreferences;
 	extern CGameGlobals* pGameGlobals;

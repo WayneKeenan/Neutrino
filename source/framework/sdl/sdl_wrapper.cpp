@@ -371,13 +371,14 @@ namespace Neutrino
 
 
 
-	bool SDLProcessInput()
+	bool SDLProcessInput(uint8* iEditorFlags)
 	{
 		ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
 
 		SDL_Event event;
 		bool bRet = true;
 		bool bKeyPressed = false;
+		*iEditorFlags = 0x00;
 
 		while( SDL_PollEvent( &event ) != 0 )
 		{
@@ -394,18 +395,23 @@ namespace Neutrino
 						// F1 toggles the default debug overlays (perf tracker, fly cam, etc.)
 						if (event.key.keysym.sym == SDLK_F1)
 							ToggleDebugOverlay();
-
-						// F2 toggle Spline Editor.
-						if(event.key.keysym.sym == SDLK_F2)
-						{}
-
-						// F3 togle map editor
-						if(event.key.keysym.sym == SDLK_F3)
-						{}
-
-						// F4 toggle particle editor
-						if(event.key.keysym.sym == SDLK_F4)
-						{}
+						
+						// Check F Keys for toggling the internal editor modes
+						{
+							if(event.key.keysym.sym == SDLK_F2)
+								*iEditorFlags |= _SPLINE_ED;
+							
+							if(event.key.keysym.sym == SDLK_F3)
+							{
+								LOG_INFO("F3 pressed");
+								*iEditorFlags |= _MAP_ED;
+							}
+							if(event.key.keysym.sym == SDLK_F4)
+							{
+								LOG_INFO("F4 pressed");
+								*iEditorFlags |= _PARTICLE_ED;
+							}
+						}
 					}
 				case SDL_KEYUP:
 					{

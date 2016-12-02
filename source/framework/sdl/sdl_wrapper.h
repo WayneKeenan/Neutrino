@@ -39,7 +39,7 @@ namespace Neutrino
 
 	// SDLProcessInput()
 	// 		Polls all SDL input events. Passes events on to IMGUI ad should - eventually - set our input mappings
-	bool SDLProcessInput();
+	bool SDLProcessInput(uint8* iEditorFlags);
 
 
 	// TestIMGUI()

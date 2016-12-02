@@ -26,5 +26,13 @@ static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;
 static const int iDEFAULT_INTERNAL_WIDTH = 320;
 static const int iDEFAULT_INTERNAL_HEIGHT = 180;
 
+// Debug builds will check for function keys to flip
+// the framework into specific editor modes. 
+//
+// (f2-f4 to toggle)
+static const uint8 _SPLINE_ED = 0x01;
+static const uint8 _MAP_ED = 0x02;
+static const uint8 _PARTICLE_ED = 0x04;
+
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)

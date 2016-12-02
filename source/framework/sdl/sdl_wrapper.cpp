@@ -92,7 +92,7 @@ namespace Neutrino
 		}
 	}
 
-	
+
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
 
@@ -195,7 +195,7 @@ namespace Neutrino
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
 
-	
+
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
 	{
 		// Define OpenGL 3.1 core
@@ -390,8 +390,23 @@ namespace Neutrino
 					break;
 
 				case SDL_KEYDOWN:
-					if (event.key.keysym.sym == SDLK_F1)
-						ToggleDebugOverlay();
+					{
+						// F1 toggles the default debug overlays (perf tracker, fly cam, etc.)
+						if (event.key.keysym.sym == SDLK_F1)
+							ToggleDebugOverlay();
+
+						// F2 toggle Spline Editor.
+						if(event.key.keysym.sym == SDLK_F2)
+						{}
+
+						// F3 togle map editor
+						if(event.key.keysym.sym == SDLK_F3)
+						{}
+
+						// F4 toggle particle editor
+						if(event.key.keysym.sym == SDLK_F4)
+						{}
+					}
 				case SDL_KEYUP:
 					{
 						int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;

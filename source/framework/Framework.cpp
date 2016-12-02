@@ -250,6 +250,12 @@ namespace Neutrino
 		// Reset active sprite count to zero
 		ResetSpriteCount();
 
+	#if defined DEBUG
+		// If this is a debug build check for editor hot keys and flip to the appropriate 
+		// editor state
+
+	#endif
+
 		// Process the active game state
 		GameStateUpdate();
 

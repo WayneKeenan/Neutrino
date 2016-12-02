@@ -60,33 +60,33 @@ namespace Neutrino
 		s_FPSSampler.Tick(GetMSDelta());
 
 		if (s_bDebugOverlayActive)
-        {
-        	// If fly cam is enabled, grab player 2's input and move the camera.
-        	if (s_pOverlayParams->_bFlyCameraMode)
+		{
+			// If fly cam is enabled, grab player 2's input and move the camera.
+			if (s_pOverlayParams->_bFlyCameraMode)
 			{
 				glm::vec3* vTraj = GetInputAxisGameDeltaScaled(1);
 				*s_pOverlayParams->_pvCameraOffset += *vTraj * s_pOverlayParams->_fFlyCamSpeed;
 			}
 
 			// Update performance counters
-        	snprintf(sFPS_Text, 32,   "FPS: %.2f [%.2f]", s_FPSSampler.GetAverageFrameRate(), s_FPSSampler.GetLatestFrameRate() );
-        	snprintf(sDELTA_Text, 32, "DELTA: [%.2f]", s_FPSSampler.GetAverageDeltaTime());
+			snprintf(sFPS_Text, 32,   "FPS: %.2f [%.2f]", s_FPSSampler.GetAverageFrameRate(), s_FPSSampler.GetLatestFrameRate() );
+			snprintf(sDELTA_Text, 32, "DELTA: [%.2f]", s_FPSSampler.GetAverageDeltaTime());
 
-        	ImGui::SetNextWindowPos(*s_pOverlayPosition, ImGuiSetCond_FirstUseEver);
-            ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Neutrino Debug", &s_bDebugOverlayActive);
-            ImGui::LabelText("", "Performance:");
-            ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 0.16f, ImVec2(150,32));
-            ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 30.0f, 60.0f, ImVec2(150,32));
+			ImGui::SetNextWindowPos(*s_pOverlayPosition, ImGuiSetCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiSetCond_FirstUseEver);
+			ImGui::Begin("Neutrino Debug", &s_bDebugOverlayActive);
+			ImGui::LabelText("", "Performance:");
+			ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 0.16f, ImVec2(150,32));
+			ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 30.0f, 60.0f, ImVec2(150,32));
 
-            // Output camera position
-        	ImGui::Separator();
-        	ImGui::LabelText("", "Camera:");
-        	ImGui::Checkbox("Fly Cam", &s_pOverlayParams->_bFlyCameraMode);
-        	ImGui::SameLine(95);
-        	ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
-        	ImGui::Text("Fly Cam Offset: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z );
-            ImGui::End();
-        }
+			// Output camera position
+			ImGui::Separator();
+			ImGui::LabelText("", "Camera:");
+			ImGui::Checkbox("Fly Cam", &s_pOverlayParams->_bFlyCameraMode);
+			ImGui::SameLine(95);
+			ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
+			ImGui::Text("Fly Cam Offset: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z );
+			ImGui::End();
+		}
 	}	
 }

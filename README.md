@@ -61,3 +61,9 @@ To make a release build, run:
 ##Documentation
 
 More to come.
+
+##Key Commands
+
+In DEBUG builds, the framework has the following shortcuts:
+- F1: Toggle performance panel
+- F2: Switch to spline editor (WIP)

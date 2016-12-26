@@ -141,11 +141,13 @@ namespace Neutrino
 						i );
 
 				// TO_DO: If we don't end up doing shader swaps in here, then merge these functions...
-				GLUtils::RenderVBO(
-						s_aSpriteRenderInfo[i]->_iActiveSpriteCount, 
-						s_aSpriteRenderInfo[i]->_iTextureID,
-						i );
-			}
+			}				
+			
+			GLUtils::RenderVBO(
+					s_aSpriteRenderInfo[i]->_iActiveSpriteCount, 
+					s_aSpriteRenderInfo[i]->_iTextureID,
+					i );
+
 		}
 	}
 

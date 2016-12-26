@@ -103,5 +103,10 @@ namespace Neutrino
 		//   	TO_DO: If there's not a lot of shader changes, merge this and Populate VBO above...
 		void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet);
 
+
+		// SetClearColour
+		// 		Changes the glClearColor parameter. This will remain the background colour every tick until 
+		// 		either the game or editor mode changes it. 
+		void SetClearColour(const float fR, const float fG, const float fB, const float fA);
 	};
 }

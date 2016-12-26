@@ -43,7 +43,8 @@ namespace Neutrino {
 
 		void SetClearColour(const float fR, const float fG, const float fB, const float fA)
 		{
-			s_vClearColour.x = fR; s_vClearColour.y = fG; s_vClearColour.z = fB; s_vClearColour.z = fA;
+			s_vClearColour.x = fR; s_vClearColour.y = fG; s_vClearColour.z = fB; s_vClearColour.w = fA;
+			//LOG_INFO("Clear Colour Set to: %.2f, %.2f, %.2f, %.2f",  s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
 		}
 
 		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)

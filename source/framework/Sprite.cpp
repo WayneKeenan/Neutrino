@@ -170,7 +170,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = vPos;
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle));
 		*(mySprite->_fRotDegrees) = fAngle;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -184,7 +184,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = glm::vec3(50, 50, 1.0f);
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle));
 		*(mySprite->_fRotDegrees) = fAngle * 0.5f;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -198,7 +198,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = glm::vec3(250, 80, 1.0f);
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle));
 		*(mySprite->_fRotDegrees) = fAngle * 1.5f;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -213,7 +213,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = glm::vec3(100, 100, 1.0f);
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle));
 		*(mySprite->_fRotDegrees) = fAngle;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -228,7 +228,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) =  glm::vec3(200, 100, 1.0f);
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.5f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle));
 		*(mySprite->_fRotDegrees) = fAngle  * 0.2f;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;
@@ -243,7 +243,7 @@ namespace Neutrino
 		*(mySprite->_vPosition) = glm::vec3(280, 150, 1.0f);
 		*(mySprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
 		*(mySprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
-		*(mySprite->_fScale) = (float)fabs(sin(fAngle))*0.25f;
+		*(mySprite->_fScale) = (float)fabs(sin(fAngle));
 		*(mySprite->_fRotDegrees) = fAngle;		
 		*(mySprite->_fX_S) = pSpriteInfo->_fX_S;
 		*(mySprite->_fY_T) = pSpriteInfo->_fY_T;

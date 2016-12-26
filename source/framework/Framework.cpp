@@ -225,10 +225,6 @@ namespace Neutrino
 		// Enter Initial Gamestate
 		GameStateInit();
 
-#if defined DEBUG
-		// Init params needed for debug overlay
-		DebugOverlayInit();
-#endif
 		
 		return s_bRunningStatus;
 	}

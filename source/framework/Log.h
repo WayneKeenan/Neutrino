@@ -51,7 +51,7 @@ namespace Neutrino
 		void OpenLogFile();
 		void CloseLogFile();
 		void WriteHeader();
-		void Write(const char *_sBuff);
+		void Write(const char *_sBuff, bool bLog=true);
 	};
 
 	Log *GetSystemLog();

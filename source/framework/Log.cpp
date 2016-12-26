@@ -3,10 +3,13 @@
 #include <string.h>
 #include <stdarg.h>
 #include "Time.h"
+#include "Debug.h"
 
 namespace Neutrino
 {
 	static Log *s_pSysLog=0;
+	static DebugLog* s_pDebugLog=0;
+
 	Log *GetSystemLog()
 	{
 		if(!s_pSysLog)
@@ -14,6 +17,10 @@ namespace Neutrino
 			s_pSysLog = NEWX Log("Neutrino.log");
 		}
 
+#if defined DEBUG
+		// Init params needed for debug overlay
+		s_pDebugLog = DebugOverlayInit();
+#endif
 		return s_pSysLog;
 	}
 
@@ -72,19 +79,18 @@ namespace Neutrino
 		{
 			case Neutrino::LOG_INFO:
 				snprintf(sBuff, 8, "%s", ANSI_COLOUR_GREEN);
-				Write(sBuff);
 			break;
 
 			case Neutrino::LOG_WARNING:
 				snprintf(sBuff, 8, "%s", ANSI_COLOUR_YELLOW);
-				Write(sBuff);
 			break;
 
 			case Neutrino::LOG_ERROR:
 				snprintf(sBuff, 8, "%s", ANSI_COLOUR_RED);
-				Write(sBuff);
 			break;
 		}
+
+		Write(sBuff, false);
 
 		snprintf(sBuff, 8, "%s: ", s_asTypeNameLUT[_nType]);
 		Write(sBuff);
@@ -98,6 +104,7 @@ namespace Neutrino
 
 		Write(sBuff);
 		Write("\n");
+
 	}
 
 	void Log::WriteHeader()
@@ -110,10 +117,13 @@ namespace Neutrino
 		Write(sBuff);
 	}
 
-	void Log::Write(const char *_sBuff)
+	void Log::Write(const char *_sBuff, bool bLog)
 	{
 		size_t nBufflen = strlen(_sBuff);
 		fwrite(_sBuff, nBufflen, 1, m_pFile);
 		fflush(m_pFile);
+
+		if(NULL != s_pDebugLog && bLog)
+			s_pDebugLog->AddLog("%s",_sBuff);
 	}
 }

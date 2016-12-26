@@ -1,5 +1,4 @@
 #include "Debug.h"
-#include "imgui/imgui.h"
 #include "Time.h"
 #include "Memory.h"
 #include <string.h>
@@ -9,10 +8,14 @@
 namespace Neutrino
 {
 	static bool s_bDebugOverlayActive = true;
+	static bool s_bOutputLogActive = true;
 
 	static const ImVec2* s_pOverlayPosition = NEWX ImVec2(50.0f, 50.0f);
+	static const ImVec2* s_pLogPosition = NEWX ImVec2(1100.0f, 850.0f);
 
 	static CFrameRate s_FPSSampler;
+	static DebugLog s_DebugLog;
+
 	static char sFPS_Text[32] = {0};
 	static char sDELTA_Text[32] = {0};
 
@@ -29,10 +32,17 @@ namespace Neutrino
 
 	static DebugOverlay_t* s_pOverlayParams;
 
-	void DebugOverlayInit()
+	
+	// ------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------
+	
+	
+	
+	DebugLog* DebugOverlayInit()
 	{
 		s_pOverlayParams = NEWX(DebugOverlay_t);
 		s_pOverlayParams->_pvCameraOffset = NEWX glm::vec3(0.0f, 0.0f, 0.0f);
+		return &s_DebugLog;
 	}
 
 
@@ -87,6 +97,10 @@ namespace Neutrino
 			ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
 			ImGui::Text("Fly Cam Offset: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z );
 			ImGui::End();
+
+
+			// Draw the log window
+			s_DebugLog.Draw("Output Log", &s_bOutputLogActive, s_pLogPosition);
 		}
 	}	
-}
+};

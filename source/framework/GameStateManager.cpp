@@ -26,9 +26,13 @@ namespace Neutrino
 		ASSERT( pNextState != pActiveGameState, "GameStateChange called with identical state" );
 		ASSERT( pNextState != NULL, "GameStateChange called with null" );
 
-		pActiveGameState->Kill();
-		DELETEX pActiveGameState;
-
+		// This might be NULL if AttemptForceKill has been called...
+		if(NULL != pActiveGameState)
+		{
+			pActiveGameState->Kill();
+			DELETEX pActiveGameState;
+		}	
+			
 		pActiveGameState = pNextState;
 	}
 
@@ -36,5 +40,17 @@ namespace Neutrino
 	{
 		pActiveGameState->Kill();
 		DELETEX pActiveGameState;
+	}
+
+	bool GameStateAttemptForceKill()
+	{
+		if(pActiveGameState->ForceKill())
+		{
+			DELETEX pActiveGameState;
+			pActiveGameState = NULL;
+			return true;
+		}
+		else
+			return false;
 	}
 };

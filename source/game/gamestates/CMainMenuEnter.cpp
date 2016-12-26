@@ -17,6 +17,7 @@ CMainMenuEnter::~CMainMenuEnter()
 
 void CMainMenuEnter::Init()
 {
+	Neutrino::GLUtils::SetClearColour( 0.25f, 0.25f, 0.0f, 1.0f );
 }
 
 void CMainMenuEnter::Update()

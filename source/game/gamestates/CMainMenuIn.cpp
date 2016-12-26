@@ -19,11 +19,18 @@ void CMainMenuIn::Init()
 
 void CMainMenuIn::Update()
 {
-	// Generate some test sprites (TO BE REMOVED)
 	Neutrino::TestSprite();
 }
 
 void CMainMenuIn::Kill()
 {
 	// Nothing to do...
+}
+
+
+bool CMainMenuIn::ForceKill()
+{
+	// No clean up to do atm...
+	LOG_INFO(">>>> %s, FORCEKILL called!", this->m_pStateName );
+	return true;
 }

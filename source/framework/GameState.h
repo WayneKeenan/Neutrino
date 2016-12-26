@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "Assert.h"
 #include "Memory.h"
+#include "GLUtils.h"
 
 class CGameState
 {

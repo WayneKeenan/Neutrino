@@ -17,6 +17,7 @@ namespace Neutrino
 
 	void GameStateUpdate()
 	{
+		// AttemptForceKill the most likely culprit to leave this hanging
 		ASSERT(pActiveGameState, "GameStateUpdate called without an active game state");
 		pActiveGameState->Update();
 	}
@@ -34,6 +35,7 @@ namespace Neutrino
 		}	
 			
 		pActiveGameState = pNextState;
+		pActiveGameState->Init();
 	}
 
 	void GameStateKill()
@@ -44,6 +46,7 @@ namespace Neutrino
 
 	bool GameStateAttemptForceKill()
 	{
+		ASSERT( NULL != pActiveGameState, "GameStateAttemptForceKill called with no active gamestate!" );
 		if(pActiveGameState->ForceKill())
 		{
 			DELETEX pActiveGameState;
@@ -51,6 +54,8 @@ namespace Neutrino
 			return true;
 		}
 		else
-			return false;
+			LOG_ERROR("Force Kill Failed!");
+
+		return false;
 	}
 };

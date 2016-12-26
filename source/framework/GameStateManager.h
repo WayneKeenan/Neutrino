@@ -6,7 +6,6 @@ namespace Neutrino
 
 	extern CGameState* pActiveGameState;
 
-
 	// GameStateInit()
 	// 		Should be called after engine bootstrap. 
 	//   	Initialiases the first gameState (cSplashScreen) ready for CoreUpdate game ticks

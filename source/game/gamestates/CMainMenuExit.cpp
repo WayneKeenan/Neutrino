@@ -30,3 +30,5 @@ void CMainMenuExit::Kill()
 {
 	// Nothing to do...
 }
+
+

@@ -2,6 +2,7 @@
 #include "libconfig.h"
 #if defined DEBUG
 #include "Debug.h"
+#include "editor/CMapEditorIn.h"
 #endif
 #include <stdio.h>
 
@@ -17,7 +18,7 @@ namespace Neutrino
 
 	static bool s_bRunningStatus = true;
 	static uint8 s_iEditorModeFlag = 0x00;
-
+	static uint8 s_iIsInMode = 0x00;
 
 
 	// TODO: This is temporary, should be retrieved from the active game state.
@@ -40,7 +41,7 @@ namespace Neutrino
 			GetSystemLog();
 		}
 
-		
+
 		// Get PlayerPrefs.tdi for this game, parse it and populate engine preferences
 		//
 		{
@@ -136,7 +137,7 @@ namespace Neutrino
 
 					const char* pInputMappingsText = GetInputMappingsString();
 					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 320\ninternalheight: 180\n";
-				
+
 					fprintf(pPlayerPrefsFile, "%s", pPrefsText);
 					fprintf(pPlayerPrefsFile, "%s", pInputMappingsText);
 
@@ -173,27 +174,27 @@ namespace Neutrino
 			LOG_ERROR("Unable to load Game Config file, exiting.");
 			return false;
 		}
-	
+
 
 		// Create an SDL window with an OGL 3 Context and compile standard shaders
 		// 
 		{
 			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
 			LOG_INFO("Internal dimensions: %d x %d", NeutrinoPreferences->s_iInternalWidth, NeutrinoPreferences->s_iInternalHeight);
-			
+
 
 			if( !SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight) )
 				return false;
-			
+
 			if( !AttachShaders() )
 				return false;
 
 			GLUtils::SetViewport(	
-									NeutrinoPreferences->s_iScreenWidth, 
-									NeutrinoPreferences->s_iScreenHeight,
-									NeutrinoPreferences->s_iInternalWidth, 
-									NeutrinoPreferences->s_iInternalHeight 
-								);
+					NeutrinoPreferences->s_iScreenWidth, 
+					NeutrinoPreferences->s_iScreenHeight,
+					NeutrinoPreferences->s_iInternalWidth, 
+					NeutrinoPreferences->s_iInternalHeight 
+					);
 			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 		}
 
@@ -225,7 +226,7 @@ namespace Neutrino
 		// Enter Initial Gamestate
 		GameStateInit();
 
-		
+
 		return s_bRunningStatus;
 	}
 
@@ -233,6 +234,7 @@ namespace Neutrino
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	static CGameState* s_pEditorState = NULL;
 
 	bool CoreUpdate()
 	{
@@ -270,20 +272,21 @@ namespace Neutrino
 		SDLPresent();
 
 #if defined DEBUG
-		// Check the editor mode flags. If we're to enter an editor mode
-		// FORCEKILL current state, and innit the editor mode. 
-		//
-		// TODO: Add a force kill mode to CGameState
+		// If we're to enter an editor mode FORCEKILL current state, and innit the editor mode. 
+		// Note: not all states will let themselves be forcekilled so this attempt may fail. 
 
+		// Spline Editor
 		if(s_iEditorModeFlag & _SPLINE_ED)
-			LOG_INFO("Spline Editor Detected");
-		
+			LOG_INFO("Spline Editor Not Implemented");
+
+
+		// Particle Editor
+		if( s_iEditorModeFlag & _PARTICLE_ED )
+			LOG_INFO("Particle Editor Not Implemented");
+
+		// Tile Map Editor
 		if(s_iEditorModeFlag & _MAP_ED)
-			LOG_INFO("Map Editor Detected");
-
-		if(s_iEditorModeFlag & _PARTICLE_ED)
-			LOG_INFO("Particle Editor Detected");
-
+			EnterEditorMode();
 #endif
 
 		return s_bRunningStatus;
@@ -303,7 +306,7 @@ namespace Neutrino
 
 			if (!UnmountResources(pResourcesFilename))
 				LOG_ERROR("Unable to unmount resources file: %s", pResourcesFilename);
-	
+
 			// Remove any singletons we created...
 			CGameGlobals::Destroy();
 			DELETEX(NeutrinoPreferences);
@@ -322,4 +325,38 @@ namespace Neutrino
 		return true;
 	}
 
+
+	void EnterEditorMode()
+	{
+		// Can we even do this?
+		if( !GameStateAttemptForceKill() )
+		{
+			LOG_WARNING("Attempt to enter editor mode failed, current game mode does not support immediate exit");
+			return; 
+		}
+
+		// Which mode do we want?
+
+		// Tile Map Editor
+		if(s_iEditorModeFlag & _MAP_ED)
+		{
+			if( !(s_iIsInMode & _MAP_ED) )
+			{
+				// Ok, we're good to go and can enter the new mode...
+				s_iIsInMode |= _MAP_ED;
+				s_pEditorState = NEWX(CMapEditorIn);
+			}
+			else
+			{
+				s_iIsInMode ^= _MAP_ED;
+				s_pEditorState = NULL;
+			}
+		}
+	
+		// Change the game mode, either to our editor state, or back to the splash screen...
+		if( NULL != s_pEditorState && s_iEditorModeFlag != 0x00)
+			GameStateChange(s_pEditorState);
+		else
+			GameStateInit();
+	}
 }

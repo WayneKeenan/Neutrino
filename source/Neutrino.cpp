@@ -7,7 +7,13 @@
 #include "framework/Log.h"
 #include "framework/Framework.h"
 
-int main(int, char**)
+#if defined (WIN32)
+#undef main
+#include <tchar.h>
+int _tmain(int argc, _TCHAR* argv[])
+#else
+int main(int argc, char* argv[])
+#endif()
 {
 	if( !Neutrino::CoreInit("Neutrino") ) 
 	{

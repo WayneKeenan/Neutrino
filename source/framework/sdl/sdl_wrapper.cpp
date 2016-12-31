@@ -262,8 +262,17 @@ namespace Neutrino
 		SDL_StartTextInput();
 
 		// Setup ImGUI
-		ImGui_ImplSdlGL3_Init(pSDL_WindowHandle);
-		ImGui_ImplSdlGL3_CreateDeviceObjects();
+		if (!ImGui_ImplSdlGL3_Init(pSDL_WindowHandle))
+		{
+			LOG_ERROR("ImGUI Init failed, exiting");
+			return false;
+		}
+		
+		if (!ImGui_ImplSdlGL3_CreateDeviceObjects())
+		{
+			LOG_ERROR("ImGUI Create Device failed, exiting...");
+			return false;
+		}
 
 		//SDL_SetWindowFullscreen(pSDL_WindowHandle,SDL_WINDOW_FULLSCREEN);
 

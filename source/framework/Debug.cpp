@@ -14,7 +14,7 @@ namespace Neutrino
 	static const ImVec2* s_pLogPosition = NEWX ImVec2(1100.0f, 850.0f);
 
 	static CFrameRate s_FPSSampler;
-	static DebugLog s_DebugLog;
+	static DebugLog* s_pDebugLog;
 
 	static char sFPS_Text[32] = {0};
 	static char sDELTA_Text[32] = {0};
@@ -42,7 +42,8 @@ namespace Neutrino
 	{
 		s_pOverlayParams = NEWX(DebugOverlay_t);
 		s_pOverlayParams->_pvCameraOffset = NEWX glm::vec3(0.0f, 0.0f, 0.0f);
-		return &s_DebugLog;
+		s_pDebugLog = NEWX(DebugLog);
+		return s_pDebugLog;
 	}
 
 
@@ -100,7 +101,7 @@ namespace Neutrino
 
 
 			// Draw the log window
-			s_DebugLog.Draw("Output Log", &s_bOutputLogActive, s_pLogPosition);
+			s_pDebugLog->Draw("Output Log", &s_bOutputLogActive, s_pLogPosition);
 		}
 	}	
 };

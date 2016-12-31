@@ -34,14 +34,6 @@ namespace Neutrino
 	{
 		if(	!SDLInit(s_pOrganisation, pGameName) ) return false;
 
-		// Init timing and logging facility
-		//
-		{
-			TimeInit();
-			GetSystemLog();
-		}
-
-
 		// Get PlayerPrefs.tdi for this game, parse it and populate engine preferences
 		//
 		{
@@ -198,6 +190,12 @@ namespace Neutrino
 			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 		}
 
+		// Init timing and logging facility
+		//
+		{
+			TimeInit();
+			GetSystemLog();
+		}
 
 		// Load all the textures defined in GameCofig.txt
 		// There's a current assumption that we can probably load all our textures on init 
@@ -223,6 +221,7 @@ namespace Neutrino
 		pGameGlobals = CGameGlobals::InstancePtr(); // Remove this, just a test...
 
 
+
 		// Enter Initial Gamestate
 		GameStateInit();
 
@@ -239,8 +238,9 @@ namespace Neutrino
 	bool CoreUpdate()
 	{
 		// TODO: Remove this, temporary calc of the camera position to support the flycam
+#if defined DEBUG
 		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;
-
+#endif
 		// Update clocks 
 		TimeUpdate();
 
@@ -317,7 +317,9 @@ namespace Neutrino
 		}
 
 		InputKill();
+#if defined DEBUG
 		DebugOverlayKill();
+#endif
 		GameStateKill();
 		SDLKill();
 

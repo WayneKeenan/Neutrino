@@ -21,9 +21,9 @@
 			if (m_samples < m_sample.size())
 			{
 				// Still reading the first 'm_sample.size()' numbers
+				m_fps[m_samples] = (1 / GetLatestDeltaTime());
 				m_sample[m_samples++] = sample;
 				m_sum += sample;
-				m_fps[m_samples] = (1 / GetLatestDeltaTime());
 			}
 			else
 			{

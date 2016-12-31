@@ -7,7 +7,7 @@
 // https://github.com/ocornut/imgui
 
 
-#if defined(DEBUG)
+#if defined DEBUG 
 	#include "../GLUtils.h"
 	#define IMGUI_GL_ERROR do{Neutrino::GLUtils::LogGlError(__FILE__,__LINE__);}while(0)
 #else

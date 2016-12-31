@@ -12,8 +12,8 @@
 #include <tchar.h>
 int _tmain(int argc, _TCHAR* argv[])
 #else
-int main(int argc, char* argv[])
-#endif()
+int main(int , char**) 
+#endif
 {
 	if( !Neutrino::CoreInit("Neutrino") ) 
 	{

@@ -32,18 +32,25 @@ if ( OPENGL_FOUND )
 endif()
 
 find_package(SDL2 REQUIRED)
+find_package(SDL2IMAGE REQUIRED)
 include_directories(
-    ${SDL2_INCLUDE_DIR} 
+    ${SDL2_INCLUDE_DIR}
+    ${SDL2_IMAGE_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}/external_dependencies/glm/
     ${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
     ${PROJECT_SOURCE_DIR}/external_dependencies/inih/
     ${PROJECT_SOURCE_DIR}/external_dependencies/inih/cpp/
 )
 
-find_package(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+
+if(SDL2_IMAGE_FOUND)
+    MESSAGE("SDL2 Image found...")
+    link_libraries(${SDL2_IMAGE_LIBRARY})
+endif()
 
 find_package(GLEW REQUIRED)
 if (GLEW_FOUND)
+    MESSAGE("Glew found...")
     include_directories(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
 endif()

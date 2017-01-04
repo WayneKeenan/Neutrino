@@ -5,6 +5,12 @@
 #include "Time.h"
 #include "Debug.h"
 
+#if defined _WIN32
+	#include <windows.h>
+	#define strcpy strcpy_s
+	#define sprintf sprintf_s
+#endif
+
 namespace Neutrino
 {
 	static Log *s_pSysLog=0;
@@ -49,7 +55,11 @@ namespace Neutrino
 		if(m_pFile)
 			return;
 
+#if defined _WIN32
+		fopen_s(&m_pFile, m_sFilename, "w");
+#else
 		m_pFile = fopen(m_sFilename, "w");
+#endif
 		WriteHeader();
 	}
 
@@ -125,5 +135,10 @@ namespace Neutrino
 
 		if(NULL != s_pDebugLog && bLog)
 			s_pDebugLog->AddLog("%s",_sBuff);
+
+
+#if defined _WIN32
+		::OutputDebugString(_sBuff);
+#endif
 	}
 }

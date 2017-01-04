@@ -453,8 +453,10 @@ int main(int arg, char **argv)
 #define STBTT_DEF extern
 #endif
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push  // require GCC 4.6
 #pragma GCC diagnostic ignored "-Wcast-qual"
+#endif 
 
 #ifdef __cplusplus
 extern "C" {
@@ -3267,4 +3269,6 @@ STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *font_collection, const
 //   0.1  (2009-03-09) First public release
 //
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop  // require GCC 4.6
+#endif

@@ -6,11 +6,12 @@
 // If you are new to ImGui, see examples/.txt and documentation at the top of imgui.cpp.
 // https://github.com/ocornut/imgui
 
-
+#if defined(__GNUC__)
 #pragma GCC diagnostic push  // require GCC 4.6
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #pragma GCC diagnostic push  // require GCC 4.6
 #pragma GCC diagnostic ignored "-Wconversion"
+#endif
 
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
@@ -463,5 +464,7 @@ void ImGui_ImplSdlGL3_NewFrame(SDL_Window* window)
 
 
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop  // require GCC 4.6
 #pragma GCC diagnostic pop  // require GCC 4.6
+#endif

@@ -19,6 +19,9 @@ namespace Neutrino
 	static const char* s_pGameName;
 
 	static int s_iKeyDown[512];
+	static bool s_bIsFullscreen = false;
+	static bool s_bAltPressed = false;
+	static bool s_bEnterPressed = false;
 
 	static JoypadInput_t* s_pJoypad_1_Input;
 	static JoypadInput_t* s_pJoypad_2_Input;
@@ -213,6 +216,13 @@ namespace Neutrino
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+
+// 		if (SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1"))
+// 		{
+// 			LOG_INFO("SDL_HINT_VIDEO_HIGHDPI_DISABLED set OK.");
+// 		}
+
+
 		// Create SDL window
 		pSDL_WindowHandle = SDL_CreateWindow( 
 				s_pGameName, 
@@ -220,7 +230,7 @@ namespace Neutrino
 				SDL_WINDOWPOS_CENTERED, 
 				iScreenWidth, 
 				iScreenHeight, 
-				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI); // | SDL_WINDOW_FULLSCREEN);
 
 
 		if( NULL == pSDL_WindowHandle )
@@ -377,6 +387,29 @@ namespace Neutrino
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
 
+	// Setup responses to standard controls, like Alt+Enter, Esc to bring up exit overly, etc. 
+	static void ProcessStandardInputs()
+	{
+
+		if (s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] && s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK])
+		{
+			// Debounce the keys so we don't flip back and forth
+			s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] = 0;
+			s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK] = 0;
+
+			if(!s_bIsFullscreen)
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN);
+			else
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, 0);
+
+			s_bIsFullscreen = !s_bIsFullscreen;
+		}
+
+	}
+
+
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
 
 
 	bool SDLProcessInput(uint8* iEditorFlags)
@@ -386,6 +419,8 @@ namespace Neutrino
 		SDL_Event event;
 		bool bRet = true;
 		bool bKeyPressed = false;
+
+
 		*iEditorFlags = 0x00;
 
 		while( SDL_PollEvent( &event ) != 0 )
@@ -413,7 +448,7 @@ namespace Neutrino
 							if(event.key.keysym.sym == SDLK_F4)
 								*iEditorFlags |= _PARTICLE_ED;
 						}
-					}
+					}	// Note there's no break here!
 				case SDL_KEYUP:
 					{
 						int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;
@@ -442,6 +477,13 @@ namespace Neutrino
 
 		// Let the Input functions build the input axis for this frame
 		BuildInputAxis(bKeyPressed);
+
+		// Handle framework standard inputs
+		ProcessStandardInputs();
+
 		return bRet;
 	}
+
+
+
 }

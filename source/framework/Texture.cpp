@@ -8,6 +8,10 @@
 #include "Sprite.h"
 #include "ConfigFile.h"
 
+#if defined _WIN32
+#define sprintf sprintf_s
+#endif
+
 namespace Neutrino {
 	static uint8 s_iLoadedTextureCount = 0;
 	static TPage_t* s_aTexturePages;

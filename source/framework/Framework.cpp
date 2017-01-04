@@ -1,11 +1,16 @@
 #include "Framework.h"
 #include "libconfig.h"
-#if defined DEBUG
-#include "Debug.h"
-#include "editor/CMapEditorIn.h"
-#endif
 #include <stdio.h>
 
+#if defined DEBUG
+	#include "Debug.h"
+	#include "editor/CMapEditorIn.h"
+#endif
+
+
+#if defined _WIN32
+	#define sprintf sprintf_s
+#endif
 namespace Neutrino 
 {
 
@@ -119,7 +124,12 @@ namespace Neutrino
 
 				// write out a default player prefs file since this is looks like the first run
 				//
+#if defined _WIN32
+				fopen_s(&pPlayerPrefsFile, pPlayerPrefsFilename, "w");
+				if(pPlayerPrefsFile)
+#else
 				if( (pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")) )
+#endif
 				{
 
 					NeutrinoPreferences->s_iScreenWidth = iDEFAULT_VIEWPORT_WIDTH;

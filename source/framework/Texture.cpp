@@ -28,7 +28,23 @@ namespace Neutrino {
 		return &pTpage->aSprintInfo[iSpriteCount];
 	}
 
+	
+	const uint8 GetLoadedTextureCount()
+	{
+		return s_iLoadedTextureCount;
+	}
 
+	const uint16 GetSpriteCountForTexture(const uint8 iTextureSet)
+	{
+		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetSpriteCountForTexture iTextureSetIndex out of range!");
+		return s_aTexturePages[iTextureSet]._iMaxSprites;
+	}
+
+	const TPage_t* GetTPage(const uint8 iTextureSet)
+	{
+		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetTPage iTextureSetIndex out of range!");
+		return &s_aTexturePages[iTextureSet];
+	}
 
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
 	{
@@ -217,6 +233,8 @@ namespace Neutrino {
 		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
 		return true;
 	}
+
+
 
 
 	void DeallocateAllTextures()

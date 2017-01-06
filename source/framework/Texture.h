@@ -77,7 +77,7 @@ namespace Neutrino {
 
 	// GetLoadedTextureCount()
 	//		Returns the number currently loaded textures
-	const uint8 GetLoadedTextureCount();
+	uint8 GetLoadedTextureCount();
 
 	// GetTpage()
 	//		Returns the TPage_t at index. Used by the tilemap editor to dig into the loaded textures so it can 

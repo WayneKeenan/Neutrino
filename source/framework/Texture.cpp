@@ -29,12 +29,12 @@ namespace Neutrino {
 	}
 
 	
-	const uint8 GetLoadedTextureCount()
+	uint8 GetLoadedTextureCount()
 	{
 		return s_iLoadedTextureCount;
 	}
 
-	const uint16 GetSpriteCountForTexture(const uint8 iTextureSet)
+	uint16 GetSpriteCountForTexture(const uint8 iTextureSet)
 	{
 		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetSpriteCountForTexture iTextureSetIndex out of range!");
 		return s_aTexturePages[iTextureSet]._iMaxSprites;

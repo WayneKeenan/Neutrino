@@ -78,7 +78,7 @@ namespace Neutrino {
 		fopen_s(&pFile, pFilename, "r");
 #else
 		FILE *pFile = fopen(pFilename, "r");
-#endif;
+#endif
 		ASSERT( NULL != pFile, "Unable to load resource: %s", pFilename);
 
 		fseek(pFile, 0, SEEK_END);

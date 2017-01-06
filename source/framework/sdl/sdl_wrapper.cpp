@@ -20,8 +20,6 @@ namespace Neutrino
 
 	static int s_iKeyDown[512];
 	static bool s_bIsFullscreen = false;
-	static bool s_bAltPressed = false;
-	static bool s_bEnterPressed = false;
 
 	static JoypadInput_t* s_pJoypad_1_Input;
 	static JoypadInput_t* s_pJoypad_2_Input;
@@ -378,7 +376,7 @@ namespace Neutrino
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );        
 		}
 
-		LOG_INFO("Texture bound: %d/%dpx @ %d bytes per pixel", pSurf->w, pSurf->h, pSurf->format->BytesPerPixel );
+		LOG_INFO("Texture bound: %d/%dpx @ %d bytes per pixel to id %d", pSurf->w, pSurf->h, pSurf->format->BytesPerPixel, *pTextureID);
 		return true;
 	}
 

@@ -19,7 +19,6 @@
 static const ImVec2* s_pWindowPosition = NEWX ImVec2(1300.0f, 50.0f);
 static const float s_iRowPixels = 400.0f;
 static bool s_bSnapToGrid = false;
-static int s_iGridSize;
 
 
 CMapEditorIn::CMapEditorIn()
@@ -45,8 +44,8 @@ void CMapEditorIn::Init()
 	Neutrino::GLUtils::SetClearColour(0.0f, 0.05f, 0.0f, 1.0f);
 }
 
-static int iSelectedTexture = 0;
-static int iSelectedGridSize = 4;
+static int s_iSelectedTexture = 0;
+static int s_iSelectedGridSize = 4;
 
 void CMapEditorIn::Update()
 {
@@ -59,7 +58,7 @@ void CMapEditorIn::Update()
 		// Display Grid Settings 
 		{
 			ImGui::PushItemWidth(150); 
-			ImGui::Combo("Grid Size", &iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0", 6); 
+			ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0", 6); 
 			ImGui::PopItemWidth();
 			ImGui::SameLine();
 			ImGui::Checkbox("Snap", &s_bSnapToGrid); 
@@ -76,12 +75,12 @@ void CMapEditorIn::Update()
 			for (int i = 0; i < iTextureCount; ++i)
 				sBuff += " Texture: " + std::to_string(i) + " \0 ";
 
-			ImGui::Combo("Select Texture", &iSelectedTexture, sBuff.c_str(), iTextureCount + 1);
+			ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount + 1);
 		}
 
 
 		// Display selected texture info
-		static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage(iSelectedTexture);
+		static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage((uint8)s_iSelectedTexture);
 		ImGui::Separator();
 
 		// Display all the sprites in the texture page
@@ -102,7 +101,11 @@ void CMapEditorIn::Update()
 				vUV1->y = pTpage->aSprintInfo[i]._fY_TnT;
 
 				iPixelsUsed += vDim->x;
-				ImGui::ImageButton((ImTextureID)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1);
+
+				// Note to future Gareth: GCC warns about casting to pointer from int of different size here.
+				// The intptr_t cast removes that, but this was the first time that you saw that warning. 
+				// Step through with a debugger to see where this goes, and read a book. 
+				ImGui::ImageButton((void*)(intptr_t)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1);
 				if (iPixelsUsed < s_iRowPixels) ImGui::SameLine(); else iPixelsUsed = 0;
 
 			}

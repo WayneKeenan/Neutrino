@@ -36,6 +36,8 @@ namespace Neutrino
 
 	typedef std::vector<GameController_t*> ControllerList;
 
+	
+
 
 	// The Controller list is a vector of MaxJoypads that we will poll for input each frame. 
 	// 
@@ -469,11 +471,11 @@ namespace Neutrino
 					}
 					break;
 
-					// TODO: Add in joypad Polling
+					// TODO: Add in joypad Polling, None of the buttons are bound yet
 			}   
 		}
 
-		// Let the Input functions build the input axis for this frame
+		// Let Input store the player's 
 		BuildInputAxis(bKeyPressed);
 
 		// Handle framework standard inputs

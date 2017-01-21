@@ -19,6 +19,15 @@
 
 namespace Neutrino
 {
+#ifdef _WIN32
+	#define ANSI_COLOUR_RED     ""
+	#define ANSI_COLOUR_GREEN   ""
+	#define ANSI_COLOUR_YELLOW  ""
+	#define ANSI_COLOUR_BLUE    ""
+	#define ANSI_COLOUR_MAGENTA ""
+	#define ANSI_COLOUR_CYAN    ""
+	#define ANSI_COLOUR_RESET   ""
+#else
 	#define ANSI_COLOUR_RED     "\x1b[31m"
 	#define ANSI_COLOUR_GREEN   "\x1b[32m"
 	#define ANSI_COLOUR_YELLOW  "\x1b[33m"
@@ -26,6 +35,7 @@ namespace Neutrino
 	#define ANSI_COLOUR_MAGENTA "\x1b[35m"
 	#define ANSI_COLOUR_CYAN    "\x1b[36m"
 	#define ANSI_COLOUR_RESET   "\x1b[0m"
+#endif
 
 	enum eLogMsgType
 	{

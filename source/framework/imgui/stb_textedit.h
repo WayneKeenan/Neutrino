@@ -270,8 +270,10 @@
 #ifndef INCLUDE_STB_TEXTEDIT_H
 #define INCLUDE_STB_TEXTEDIT_H
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push  // require GCC 4.6
 #pragma GCC diagnostic ignored "-Wcast-qual"
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1322,4 +1324,6 @@ static void stb_textedit_initialize_state(STB_TexteditState *state, int is_singl
 }
 #endif//STB_TEXTEDIT_IMPLEMENTATION
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop  // require GCC 4.6
+#endif

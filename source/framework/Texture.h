@@ -18,8 +18,6 @@ namespace Neutrino {
 		float	_fY_T;
 		float 	_fX_SnS;	// Top Right UV
 		float 	_fY_TnT;
-//		uint16	_iX;		
-//		uint16	_iY;
 		float	_fHalfWidth;
 		float 	_fHalfHeight;
 	} TPageSpriteInfo_t;
@@ -42,6 +40,7 @@ namespace Neutrino {
 		TPageSpriteInfo_t* aSprintInfo;
 	} TPage_t;
 
+
 	// LoadTexturesFromConfigFile()
 	// 		
 	//		The framework assumes textures come in two parts: 1) the binary image file, and 2) an associated tpage info 
@@ -63,13 +62,25 @@ namespace Neutrino {
 	//      
 	bool LoadTexturesFromConfigFile();
 
+
 	// GetSpriteInfo
 	// 		Returns pointer to the correct TPageSpriteInfo_t structure for a given sprite index in the packed texture page
 	//   	Sprite will call this to grab UV and Dimension info 
 	const TPageSpriteInfo_t* GetSpriteInfo(const int iTextureSet, const int iSpriteCount);
 
+
 	// ClearAllTextures()
 	// 		Free memory allocated for TPage_t arrays created during LoadTexturesFromConfigFile(), delete the texture
 	//   	and call the GLUtils framework to delete the associated VBOS
 	void DeallocateAllTextures();
+
+
+	// GetLoadedTextureCount()
+	//		Returns the number currently loaded textures
+	uint8 GetLoadedTextureCount();
+
+	// GetTpage()
+	//		Returns the TPage_t at index. Used by the tilemap editor to dig into the loaded textures so it can 
+	//		present the available tiles. 
+	const TPage_t* GetTPage(const uint8 iTextureSet);
 }

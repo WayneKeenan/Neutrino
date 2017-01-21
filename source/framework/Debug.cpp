@@ -42,7 +42,10 @@ namespace Neutrino
 	{
 		s_pOverlayParams = NEWX(DebugOverlay_t);
 		s_pOverlayParams->_pvCameraOffset = NEWX glm::vec3(0.0f, 0.0f, 0.0f);
-		s_pDebugLog = NEWX(DebugLog);
+		
+		// Log must be created after ImGUI init, or there'll be no context and buffer memory can't be allocated
+		static DebugLog log;
+		s_pDebugLog = &log;
 		return s_pDebugLog;
 	}
 

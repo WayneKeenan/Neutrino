@@ -9786,10 +9786,11 @@ void ImGui::ShowMetricsWindow(bool* p_open)
 
 //-----------------------------------------------------------------------------
 
-
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop  // require GCC 4.6
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic pop  // require GCC 4.6
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic pop  // require GCC 4.6
 #pragma GCC diagnostic pop
+#endif

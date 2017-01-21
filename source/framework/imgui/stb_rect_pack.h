@@ -75,10 +75,10 @@ typedef int            stbrp_coord;
 typedef unsigned short stbrp_coord;
 #endif
 
-
+#if defined(__GNUC__)
 #pragma GCC diagnostic push  // require GCC 4.6
 #pragma GCC diagnostic ignored "-Wcast-qual"
-
+#endif
 
 STBRP_DEF void stbrp_pack_rects (stbrp_context *context, stbrp_rect *rects, int num_rects);
 // Assign packed locations to rectangles. The rectangles are of type
@@ -580,4 +580,6 @@ STBRP_DEF void stbrp_pack_rects(stbrp_context *context, stbrp_rect *rects, int n
 #endif
 
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif

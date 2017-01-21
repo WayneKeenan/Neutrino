@@ -8,6 +8,10 @@
 #include "Sprite.h"
 #include "ConfigFile.h"
 
+#if defined _WIN32
+#define sprintf sprintf_s
+#endif
+
 namespace Neutrino {
 	static uint8 s_iLoadedTextureCount = 0;
 	static TPage_t* s_aTexturePages;
@@ -24,7 +28,23 @@ namespace Neutrino {
 		return &pTpage->aSprintInfo[iSpriteCount];
 	}
 
+	
+	uint8 GetLoadedTextureCount()
+	{
+		return s_iLoadedTextureCount;
+	}
 
+	uint16 GetSpriteCountForTexture(const uint8 iTextureSet)
+	{
+		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetSpriteCountForTexture iTextureSetIndex out of range!");
+		return s_aTexturePages[iTextureSet]._iMaxSprites;
+	}
+
+	const TPage_t* GetTPage(const uint8 iTextureSet)
+	{
+		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetTPage iTextureSetIndex out of range!");
+		return &s_aTexturePages[iTextureSet];
+	}
 
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
 	{
@@ -213,6 +233,8 @@ namespace Neutrino {
 		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
 		return true;
 	}
+
+
 
 
 	void DeallocateAllTextures()

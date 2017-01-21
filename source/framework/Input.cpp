@@ -274,6 +274,6 @@ namespace Neutrino
 	bool GetRawKeyState(const int iRawKey)
 	{
 		ASSERT(iRawKey<512, "Raw Key called with index out of bounds of keymap");
-		return (bool)s_pKeyState[iRawKey];
+		return s_pKeyState[iRawKey] != 0;
 	}
 }

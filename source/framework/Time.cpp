@@ -3,6 +3,10 @@
 #include "Assert.h"
 #include <time.h>
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4996 ) 
+#endif
 namespace Neutrino
 {
 	static uint32 s_iSystemMS_Elapsed;
@@ -111,3 +115,6 @@ namespace Neutrino
 		s_bUITimerPaused = bState;
 	}
 }
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif

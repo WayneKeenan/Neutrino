@@ -58,6 +58,17 @@ namespace Neutrino
 	} JoypadInput_t;
 
 
+	// Container for mouse input. Framework assumes there's one mouse, and SDL wrapper will populate this during the 
+	// normal input processing event loop
+	//
+	typedef struct MouseInput_t
+	{
+		glm::vec2 _MOUSE_COORDS;
+		bool _LEFT_BUTTON;
+		bool _RIGHT_BUTTON;
+		float _MOUSE_WHEEL;
+	} MouseInput_t;
+
 	// InputInit()
 	// 		Allocates memory for the input mappings array and parses the Player's Prefs file for the current input mappings
 	bool InputInit(config_t* cfg);
@@ -86,6 +97,14 @@ namespace Neutrino
 	// 	GetInputAxis()
 	//  	Return the raw input axis, created above
 	glm::vec3* GetInputAxis(int iPlayer);
+
+
+	// GetMouseCoords()
+	//		Return the current X/Y coordinates of the mouse
+	//glm::vec2* GetMouseCoords();
+
+
+	// GetMouseButton
 
 	// GetInputAxisGameDeltaScaled()
 	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h)

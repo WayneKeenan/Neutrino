@@ -73,7 +73,12 @@ namespace Neutrino {
 		if (!FileExists(pFilename))
 			return NULL;
 
+#if defined _WIN32
+		FILE *pFile;
+		fopen_s(&pFile, pFilename, "r");
+#else
 		FILE *pFile = fopen(pFilename, "r");
+#endif
 		ASSERT( NULL != pFile, "Unable to load resource: %s", pFilename);
 
 		fseek(pFile, 0, SEEK_END);
@@ -97,8 +102,8 @@ namespace Neutrino {
 
 		PHYSFS_file *pFileHandle = PHYSFS_openRead( pFilename );
 		PHYSFS_sint64 iSize = PHYSFS_fileLength( pFileHandle );
-		char* pLoadedResource = NEWX char[ iSize + 1 ];
-		memset(pLoadedResource, '\0', sizeof(char)*(iSize+1));
+		char* pLoadedResource = NEWX char[ (int)iSize + 1 ];
+		memset(pLoadedResource, '\0', sizeof(char)*((int)iSize+1));
 
 		LOG_INFO("Loading: %s, Bytes: %d", pFilename, iSize);
 

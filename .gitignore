@@ -55,3 +55,8 @@ build/Win32/Debug/ZERO_CHECK/ZERO_CHECK.tlog/custombuild.read.1.tlog
 build/Win32/Debug/ZERO_CHECK/ZERO_CHECK.tlog/custombuild.write.1.tlog
 build/ZERO_CHECK.vcxproj
 build/ZERO_CHECK.vcxproj.filters
+build/Neutrino.dir/
+build/Win32/
+.vscode/tasks.json
+.vscode/
+build/.vs/Neutrino/v14/.suo

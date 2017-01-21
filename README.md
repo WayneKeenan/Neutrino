@@ -1,4 +1,4 @@
-#Neutrino
+﻿#Neutrino
 
 Neutrino is a 2D shoot-em-up, originally concieved by Wayne Keenan, Nigel Rudgley and Gareth Noyce. It is also the name
 of the framework/2D engine that will be used for this and future games from Triple Eh.
@@ -57,6 +57,15 @@ To make a release build, run:
 - `./MakePackfile.sh`
 - `./BuildAndRun.sh`
 
+##Windows
+
+After manually installing the dependencies (you may have to compile Glew) you'll need to use the CMake GUI to locate the libraries and add include paths. Make sure
+'advanced' is ticked and populate the filepaths as required. You should make sure /DDEBUG is added to the solution properties in order to 
+compile. (Release config has had no work done on it so far, so there will be compilation errors) and also flag the correct DPI Awareness setting in "Project->Neutrino Properties->Manifest->Input & Output".
+"Per monitor DPI Awareness" will probably do what you expect. 
+
+On first run Visual Studio will most likely have ALL_BUILD set as the start-up project. Right click on "Neutrino" and choose "Set as StartUp project" and you'll be able to run 
+and debug from within VS.
 
 ##Documentation
 
@@ -66,4 +75,4 @@ More to come.
 
 In DEBUG builds, the framework has the following shortcuts:
 - F1: Toggle performance panel
-- F2: Switch to spline editor (WIP)
+- F3: Enter tile map editor (Current WIP)

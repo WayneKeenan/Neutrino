@@ -23,8 +23,8 @@ static const int iMAX_SPRITES = 2048;
 
 static const int iDEFAULT_VIEWPORT_WIDTH = 1920;
 static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;
-static const int iDEFAULT_INTERNAL_WIDTH = 320;
-static const int iDEFAULT_INTERNAL_HEIGHT = 180;
+static const int iDEFAULT_INTERNAL_WIDTH = 1920;
+static const int iDEFAULT_INTERNAL_HEIGHT = 1080;
 
 // Debug builds will check for function keys to flip
 // the framework into specific editor modes. 

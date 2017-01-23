@@ -360,7 +360,7 @@ namespace Neutrino
 			case SDL_CONTROLLER_AXIS_RIGHTY:		pJoypad->_RIGHT_STICK.y = (float)event.value / 32768.0f; break;
 			case SDL_CONTROLLER_AXIS_TRIGGERLEFT:	pJoypad->_ACTION_TRIGGER_1 = (float)event.value / 32768.0f; break;
 			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:	pJoypad->_ACTION_TRIGGER_2 = (float)event.value / 32768.0f; break;
-			case SDL_CONTROLLER_AXIS_INVALID:		default:	break;
+			default:	break;
 			}
 		}
 		else

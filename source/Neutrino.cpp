@@ -17,7 +17,7 @@ int main(int , char**)
 {
 	if( !Neutrino::CoreInit("Neutrino") ) 
 	{
-		LOG_WARNING("Neutrino framework init failed. If you encountered parse errors please delete the PlayerPrefs.tdi file from the Userdata dir and try again. A default preferences file will be created. ");
+		LOG_WARNING("Neutrino framework init failed. Please check the log file for information regarding the problem.");
 		return 1;
 	}
 

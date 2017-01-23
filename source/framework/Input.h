@@ -51,7 +51,7 @@ namespace Neutrino
 	// Helper for GetButton...() functions
 	enum eJoypad_GameInputs
 	{
-
+		// TODO
 
 	};
 

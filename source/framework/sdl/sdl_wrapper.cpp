@@ -22,10 +22,10 @@ namespace Neutrino
 	static int s_iKeyDown[512];
 	static bool s_bIsFullscreen = false;
 
-	static const int s_iMaxJoypads = 4;
+
 	static const uint16 s_iAxisDeadZone = 8000;		// TODO: This will probably need to be configurable from the front end. 
 
-	static JoypadInput_t* s_aJoypads[s_iMaxJoypads];
+	static JoypadInput_t* s_aJoypads[_MAX_JOYPADS];
 
 
 	typedef struct GameController_t
@@ -72,11 +72,19 @@ namespace Neutrino
 		s_pPrefsPath = SDL_GetPrefPath(pOrgName, pGameName);
 		s_pBasePath = SDL_GetBasePath();
 
-		for (int i = 0; i < s_iMaxJoypads; ++i)
+		for (int i = 0; i < _MAX_JOYPADS; ++i)
+		{
 			s_aJoypads[i] = NEWX(JoypadInput_t);
-
+			s_aJoypads[i]->_LEFT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
+			s_aJoypads[i]->_RIGHT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
+			s_aJoypads[i]->_ACTION_TRIGGER_1 = 0.0f;
+			s_aJoypads[i]->_ACTION_TRIGGER_2 = 0.0f;
+			s_aJoypads[i]->_FACE_BUTTONS = 0x00;
+			s_aJoypads[i]->_META_BUTTONS = 0x00;
+			s_aJoypads[i]->_DPAD = 0x00;
+		}
 		// Tell the Input functions where to find our key state array and joypad states
-		SetControls(&s_iKeyDown[0], s_aJoypads[0], s_aJoypads[1], s_aJoypads[2], s_aJoypads[3]);
+		SetControls(&s_iKeyDown[0], s_aJoypads);
 		return true;
 	}
 
@@ -92,9 +100,9 @@ namespace Neutrino
 			 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 			 */
 
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -172,6 +180,8 @@ namespace Neutrino
 
 
 
+
+
 	void SDLPresent()
 	{
 		ImGui::Render();
@@ -210,9 +220,9 @@ namespace Neutrino
 	static void AddGameController(const int iID, const bool bLog = true)
 	{
 		// If we're already tracking Max Controllers ignore whatever this is...
-		if (s_aControllers.size() >= s_iMaxJoypads)
+		if (s_aControllers.size() >= _MAX_JOYPADS)
 		{
-			LOG_WARNING("A new controller has been attached, but Neutrino is already tracking %d. Ignoring thie device.", s_iMaxJoypads);
+			LOG_WARNING("A new controller has been attached, but Neutrino is already tracking %d. Ignoring thie device.", _MAX_JOYPADS);
 			return;
 		}
 
@@ -300,14 +310,26 @@ namespace Neutrino
 	// Basic cleanup for the SDLKill() function... May get called on return to menu state?
 	static void UnassignGameControllers()
 	{
-		for (ControllerList::iterator it = s_aControllers.begin(); it != s_aControllers.end(); ++it)
+		int iIndex = 0;
+		for (ControllerList::iterator it = s_aControllers.begin(); it != s_aControllers.end(); ++it, ++iIndex)
 		{
 			GameController_t* pElem = *it;
 			SDL_GameControllerClose(pElem->_GAMEPAD);
 			DELETEX pElem;
+
+			// Clear what ever we have stored as an input for this pad
+			s_aJoypads[iIndex]->_LEFT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
+			s_aJoypads[iIndex]->_RIGHT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
+			s_aJoypads[iIndex]->_ACTION_TRIGGER_1 = 0.0f;
+			s_aJoypads[iIndex]->_ACTION_TRIGGER_2 = 0.0f;
+			s_aJoypads[iIndex]->_FACE_BUTTONS = 0x00;
+			s_aJoypads[iIndex]->_META_BUTTONS = 0x00;
+			s_aJoypads[iIndex]->_DPAD = 0x00;
 		}
 		s_aControllers.clear();
 	}
+
+
 
 	static void OnGameControllerAxis(const SDL_ControllerAxisEvent& event)
 	{
@@ -325,46 +347,67 @@ namespace Neutrino
 			}
 		}
 
-		JoypadInput_t* pJoypad = s_aJoypads[iIndex];
-
 		if (bFound)
 		{
+			JoypadInput_t* pJoypad = s_aJoypads[iIndex];
 			switch (event.axis)
 			{
-			case SDL_CONTROLLER_AXIS_LEFTX:
-			{
-			}
-			break;
-			case SDL_CONTROLLER_AXIS_LEFTY:
-			{}
-			break;
-
-			case SDL_CONTROLLER_AXIS_RIGHTX:
-			{}
-			break;
-			case SDL_CONTROLLER_AXIS_RIGHTY:
-			{}
-			break;
-
-			case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-			{}
-			break;
-			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-			{}
-			break;
-
-			case SDL_CONTROLLER_AXIS_INVALID:
-			default:
-			{}
-			break;
+			case SDL_CONTROLLER_AXIS_LEFTX:			pJoypad->_LEFT_STICK.x = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_LEFTY:			pJoypad->_LEFT_STICK.y = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_RIGHTX:		pJoypad->_RIGHT_STICK.x = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_RIGHTY:		pJoypad->_RIGHT_STICK.y = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_TRIGGERLEFT:	pJoypad->_ACTION_TRIGGER_1 = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:	pJoypad->_ACTION_TRIGGER_2 = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_INVALID:		default:	break;
 			}
 		}
-
+		else
+		{
+			LOG_WARNING("SDL_ControllerAxisEvent passed for gamepad mapping that's not in the connected pad list.");
+		}
 	}
+
 
 	static void OnGameControllerButton(const SDL_ControllerButtonEvent& event)
 	{
+		ControllerList::iterator it;
+		GameController_t* pElem;
+		bool bFound = false;
+		int iIndex = 0;
+		for (it = s_aControllers.begin(); it != s_aControllers.end(); ++it, ++iIndex)
+		{
+			pElem = *it;
+			if (pElem->_INSTANCE == event.which)
+			{
+				bFound = true;
+				break;
+			}
+		}
 
+		if (bFound)
+		{
+			JoypadInput_t* pJoypad = s_aJoypads[iIndex];
+			switch (event.button)
+			{
+			case SDL_CONTROLLER_BUTTON_A:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_A; break;
+			case SDL_CONTROLLER_BUTTON_B:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_B; break;
+			case SDL_CONTROLLER_BUTTON_X:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_X; break;
+			case SDL_CONTROLLER_BUTTON_Y:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_Y; break;
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:	pJoypad->_FACE_BUTTONS ^= 1 << _SHOULDER_LEFT; break;
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:	pJoypad->_FACE_BUTTONS ^= 1 << _SHOULDER_RIGHT; break;
+			case SDL_CONTROLLER_BUTTON_START:			pJoypad->_META_BUTTONS ^= 1 << _META_START; break;
+			case SDL_CONTROLLER_BUTTON_BACK:			pJoypad->_META_BUTTONS ^= 1 << _META_BACK; break;
+			case SDL_CONTROLLER_BUTTON_GUIDE:			pJoypad->_META_BUTTONS ^= 1 << _META_GUIDE; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:			pJoypad->_DPAD ^= 1 << _DPAD_UP; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:		pJoypad->_DPAD ^= 1 << _DPAD_DOWN; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:		pJoypad->_DPAD ^= 1 << _DPAD_LEFT; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:		pJoypad->_DPAD ^= 1 << _DPAD_RIGHT; break;
+			}
+		}
+		else
+		{
+			LOG_WARNING("SDL_ControllerButtonEvent passed for gamepad mapping that's not in the connected pad list.");
+		}
 	}
 
 	
@@ -374,17 +417,8 @@ namespace Neutrino
 	{
 		ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
 
-		// Clear previous input for any attached gamepads
-		for (int i = 0; i < s_iMaxJoypads; ++i)
-		{
-			s_aJoypads[i]->_LEFT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
-			s_aJoypads[i]->_RIGHT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
-			s_aJoypads[i]->_ACTION_TRIGGER_1 = 0.0f;
-			s_aJoypads[i]->_ACTION_TRIGGER_2 = 0.0f;
-			s_aJoypads[i]->_FACE_BUTTONS = 0x00;
-			s_aJoypads[i]->_META_BUTTONS = 0x00;
-		}
-
+		// NOTE: Don't clear any of the pad inputs as we'll only be getting changes through the event queue!
+		// 
 		// clear the editor flags bitfield
 		*iEditorFlags = 0x00;
 
@@ -540,7 +574,7 @@ namespace Neutrino
 		UnassignGameControllers();
 		SDL_Quit();
 
-		for (int i = 0; i < s_iMaxJoypads; ++i)
+		for (int i = 0; i < _MAX_JOYPADS; ++i)
 			DELETEX(s_aJoypads[i]);
 
 		return true;

@@ -3,19 +3,25 @@
 #include "Types.h"
 #include <glm/glm.hpp> 
 
-// Bitfield indexes for joypad face buttons
-#define _ACTIONBUTTON1 = 1;
-#define _ACTIONBUTTON2 = 2;
-#define _ACTIONBUTTON3 = 4;
-#define _ACTIONBUTTON4 = 8;
-#define _SHOULDERLEFT = 16;
-#define _SHOULDERRIGHT = 32;
-// Bitfield indexes for joypad meta buttons (Home, Share, etc.)
-#define _META1 = 1;
-#define _META2 = 2;
-#define _META3 = 4;
-#define _META4 = 8;
+// Bitfield shifters for joypad face buttons
+#define _ACTIONBUTTON_A  0x00
+#define _ACTIONBUTTON_B  0x01
+#define _ACTIONBUTTON_X  0x02
+#define _ACTIONBUTTON_Y  0x03
+#define _SHOULDER_LEFT  0x04
+#define _SHOULDER_RIGHT  0x05
+// Bitfield shifters for joypad meta buttons (Home, Share, etc.)
+#define _META_BACK  0x00
+#define _META_START  0x01
+#define _META_GUIDE  0x02
+#define _META4  0x03
+// Bitfield shifters for the DPAD
+#define _DPAD_UP 0x00
+#define _DPAD_DOWN 0x01
+#define _DPAD_LEFT 0x02
+#define _DPAD_RIGHT 0x03
 
+#define _MAX_JOYPADS 4
 
 namespace Neutrino
 {
@@ -61,6 +67,7 @@ namespace Neutrino
 		float _ACTION_TRIGGER_1;	// Triggers
 		float _ACTION_TRIGGER_2;
 		uint8 _FACE_BUTTONS;		// Bitfield for facebuttons
+		uint8 _DPAD;
 		uint8 _META_BUTTONS;		// Bitfield for home, share, options, back etc.
 	} JoypadInput_t;
 
@@ -95,7 +102,7 @@ namespace Neutrino
 	// SetKeys()
 	// 		SDL creates the array of key states that we want to use in these files. This function will set up the static pointer
 	//   	in this compilation unit to point to the correct location
-	void SetControls(int* pKeys, JoypadInput_t* pPad1, JoypadInput_t* pPad2, JoypadInput_t* pPad3, JoypadInput_t* pPad4);
+	void SetControls(int* pKeys, JoypadInput_t* pPads[]);
 
 	// BuildInputAxis()
 	// 		Should be called once per tick. Will create a glm::vec3 for the current input direction. Keyboard only atm

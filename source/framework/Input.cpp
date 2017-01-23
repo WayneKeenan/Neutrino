@@ -13,10 +13,7 @@ namespace Neutrino
 	static char* s_pKeyboardMappingsString;
 	static int* s_pKeyState;
 	
-	static JoypadInput_t* s_pPad1State;
-	static JoypadInput_t* s_pPad2State;
-	static JoypadInput_t* s_pPad3State;
-	static JoypadInput_t* s_pPad4State;
+	static JoypadInput_t** s_aJoypads;
 
 	static glm::vec3 s_vInputAxis_Player1;
 	static glm::vec3 s_vInputAxisScaled_Player1;
@@ -150,13 +147,10 @@ namespace Neutrino
 		return s_pKeyboardMappingsString;
 	}
 
-	void SetControls(int* pKeys, JoypadInput_t* pPad1, JoypadInput_t* pPad2, JoypadInput_t* pPad3, JoypadInput_t* pPad4)
+	void SetControls(int* pKeys, JoypadInput_t* pPads[])
 	{
 		s_pKeyState = pKeys;
-		s_pPad1State = pPad1;
-		s_pPad2State = pPad2;
-		s_pPad3State = pPad3;
-		s_pPad4State = pPad4;
+		s_aJoypads = pPads;
 	}
 
 	void BuildInputAxis(const bool bState)

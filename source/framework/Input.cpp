@@ -14,6 +14,7 @@ namespace Neutrino
 	static int* s_pKeyState;
 	
 	static JoypadInput_t** s_aJoypads;
+	static MouseInput_t* s_pMouseInput;
 
 	static glm::vec3 s_vInputAxis_Player1;
 	static glm::vec3 s_vInputAxisScaled_Player1;
@@ -26,7 +27,6 @@ namespace Neutrino
 
 	static glm::vec3 s_vInputAxis_Player4;
 	static glm::vec3 s_vInputAxisScaled_Player4;
-
 
 	static void Init()
 	{
@@ -147,41 +147,39 @@ namespace Neutrino
 		return s_pKeyboardMappingsString;
 	}
 
-	void SetControls(int* pKeys, JoypadInput_t* pPads[])
+	void SetControls(int* pKeys, JoypadInput_t* pPads[], MouseInput_t* pMouse)
 	{
 		s_pKeyState = pKeys;
 		s_aJoypads = pPads;
+		s_pMouseInput = pMouse;
 	}
 
-	void BuildInputAxis(const bool bState)
+	void BuildKeyboardInputAxis()
 	{
 		float fVert;
 		float fHoriz;
 		fVert = fHoriz = 0.0f;
 
-		// Had a couple of instance on Lumo where it was useful to know if the player was using keyboard
-		// vs Joypad, so we'll keep track of it per frame just for belt and braces. 
-		s_pInputMappings->_bKeyWasPressed = bState;
 
 
 		// Build Player 1 input axis from keyboard
 		{
 			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]])
 			{
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] )
 					fVert = 1.0f;
 
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]] )
 					fVert = -1.0f;
 			}
 
 
 			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]])
 			{
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] )
 					fHoriz = -1.0f;
 
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]] )
 					fHoriz = 1.0f;
 			}
 
@@ -198,20 +196,20 @@ namespace Neutrino
 		{
 			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]])
 			{
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] )
 					fVert = 1.0f;
 
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]] )
 					fVert = -1.0f;
 			}
 
 
 			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]])
 			{
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] )
 					fHoriz = -1.0f;
 
-				if (  s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]] )
+				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]] )
 					fHoriz = 1.0f;
 			}
 
@@ -225,42 +223,69 @@ namespace Neutrino
 		// TODO: Take the keyboard scaling from Lumo to emulate the stick throw speed
 	}
 
-	glm::vec3* GetInputAxis(int iPlayer)
+	void ScaleJoypadAxis()
+	{
+		for (int i = 0; i < _MAX_JOYPADS; ++i)
+		{
+			s_aJoypads[i]->_LEFT_STICK_SCALED = s_aJoypads[i]->_LEFT_STICK * GetGameMSDelta();
+			s_aJoypads[i]->_RIGHT_STICK_SCALED = s_aJoypads[i]->_RIGHT_STICK * GetGameMSDelta();
+		}
+	}
+
+	void ProcessFrameInput()
+	{
+		// TODO: This has been factored out of SDL_wrapper, so if you do still want to store this
+		// iterate over the keyboard mappings you care about and find one that's set...
+		//s_pInputMappings->_bKeyWasPressed = bKeyState;
+
+		// Process Keyboard inputs and build the directional axis
+		BuildKeyboardInputAxis();
+
+		// TODO: THe same needs to be done for the DPad? Remember we can add the Unity like scaling to emulate stick throw speed
+		// BuildDpadInputAxis()
+
+		// Scale the current Joypad stick axis for GetInputAxisGameDeltaScaled calls
+		ScaleJoypadAxis();
+	}
+
+
+	glm::vec3* GetInputAxis(int iPlayer, bool bKeyOverride)
 	{
 		switch(iPlayer)
 		{
 			default:
 			case 0:
-				return &s_vInputAxis_Player1;
+				if (bKeyOverride) return &s_vInputAxis_Player1; else return &s_aJoypads[0]->_LEFT_STICK;
 				break;
 			case 1:
-				return &s_vInputAxis_Player2;
+				if (bKeyOverride) return &s_vInputAxis_Player2; else return &s_aJoypads[1]->_LEFT_STICK;
 				break;
 			case 2:
-				return &s_vInputAxis_Player3;
+				if (bKeyOverride) return &s_vInputAxis_Player3; else return &s_aJoypads[2]->_LEFT_STICK;
 				break;
 			case 3:
-				return &s_vInputAxis_Player4;
+				if (bKeyOverride) return &s_vInputAxis_Player4; else return &s_aJoypads[3]->_LEFT_STICK;
 				break;
 		}
 	}
 
-	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer)
+	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride)
 	{
+		ASSERT(iPlayer < _MAX_JOYPADS, "GetInputAxisGameDeltaScaled, index exceeds MAX_JOYPADS");
 		switch(iPlayer)
 		{
 			default:
 			case 0:
-				return &s_vInputAxisScaled_Player1;
+				if (bKeyOverride) return &s_vInputAxisScaled_Player1; else return &s_aJoypads[0]->_LEFT_STICK_SCALED;
 				break;
 			case 1:
-				return &s_vInputAxisScaled_Player2;
+				if (bKeyOverride) return &s_vInputAxisScaled_Player2; else return &s_aJoypads[1]->_LEFT_STICK_SCALED;
 				break;
 			case 2:
-				return &s_vInputAxisScaled_Player3;
+				if (bKeyOverride) return &s_vInputAxisScaled_Player3; else return &s_aJoypads[2]->_LEFT_STICK_SCALED;
 				break;
 			case 3:
-				return &s_vInputAxisScaled_Player4;
+				if (bKeyOverride) return &s_vInputAxisScaled_Player4; else return &s_aJoypads[3]->_LEFT_STICK_SCALED;
 				break;
 		}
 	}
@@ -269,5 +294,17 @@ namespace Neutrino
 	{
 		ASSERT(iRawKey<512, "Raw Key called with index out of bounds of keymap");
 		return s_pKeyState[iRawKey] != 0;
+	}
+
+	bool GetButton(const eJoypad_GameInputs iInput, const uint8 iPlayerIndex)
+	{
+		ASSERT(iPlayerIndex < _MAX_JOYPADS, "Get button called for a player index larger than _MAX_JOYPADS");
+		return false;
+	}
+
+	glm::vec2* GetMouseCoords()
+	{
+		ASSERT(s_pMouseInput);
+		return &(s_pMouseInput->_MOUSE_COORDS);
 	}
 }

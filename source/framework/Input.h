@@ -26,7 +26,6 @@
 namespace Neutrino
 {
 	// Indexes into the input mapping array for Keyboard inputs within the framework. 
-	// Joypads will be processed separately...
 	enum eKeyboard_GameInputs
 	{
 		_PLAYER1_UP,
@@ -49,12 +48,19 @@ namespace Neutrino
 		_NUM_INPUTS,
 	};
 
+	// Helper for GetButton...() functions
+	enum eJoypad_GameInputs
+	{
+
+
+	};
+
 	// Array of possible keyboard inputs we want to track that map to the lower level event processing (SDL atm)
 	// 
 	typedef struct InputMappings_t
 	{
 		int* _aKeyboardMappings;
-		bool _bKeyWasPressed;
+		bool _bKeyWasPressed;		// This isn't implemented atm
 	} InputMappings_t;
 
 
@@ -64,6 +70,8 @@ namespace Neutrino
 	{
 		glm::vec3 _LEFT_STICK;		// Sticks
 		glm::vec3 _RIGHT_STICK;
+		glm::vec3 _LEFT_STICK_SCALED;	
+		glm::vec3 _RIGHT_STICK_SCALED;
 		float _ACTION_TRIGGER_1;	// Triggers
 		float _ACTION_TRIGGER_2;
 		uint8 _FACE_BUTTONS;		// Bitfield for facebuttons
@@ -102,23 +110,29 @@ namespace Neutrino
 	// SetKeys()
 	// 		SDL creates the array of key states that we want to use in these files. This function will set up the static pointer
 	//   	in this compilation unit to point to the correct location
-	void SetControls(int* pKeys, JoypadInput_t* pPads[]);
+	void SetControls(int* pKeys, JoypadInput_t* pPads[], MouseInput_t* pMouse);
 
-	// BuildInputAxis()
-	// 		Should be called once per tick. Will create a glm::vec3 for the current input direction. Keyboard only atm
-	void BuildInputAxis(const bool bKeyPressed);
+
+	// ProcessFrameInput()
+	//		Should be called by whatever is handling the low level input (SDL currently) to flag that all frame input events have
+	//		been handled. This function will do any input cleaning/setup expected by the rest of the framework. 
+	void ProcessFrameInput();
 
 	// 	GetInputAxis()
-	//  	Return the raw input axis, created above
-	glm::vec3* GetInputAxis(int iPlayer);
+	//  	Return the raw input axis, created above. If bKeyOverride, this will return keyboard input in preference to joypad axis
+	//  	otherwise joypad axis will always be returned. 
+	glm::vec3* GetInputAxis(int iPlayer, bool bKeyOverride = false);
 
 	// GetMouseCoords()
 	//		Return the current X/Y coordinates of the mouse
-	//glm::vec2* GetMouseCoords();
+	glm::vec2* GetMouseCoords();
+
+	bool GetButton(const eJoypad_GameInputs iInput, const uint8 iPlayerIndex = 0);
 
 	// GetInputAxisGameDeltaScaled()
-	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h)
-	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer);
+	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h) If bKeyOverride, this will return keyboard 
+	// 		input in preference to joypad axis otherwise joypad axis will always be returned. 
+	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride = false);
 
 	// GetRawKeyState()
 	//		Shouldn't really use this, but if you want to peek into the keyboard input state directly, this will give you access.

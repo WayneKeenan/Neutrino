@@ -1,14 +1,15 @@
 #include "sdl_wrapper.h"
 #include "../Log.h"
 #include "../GLUtils.h"
-#include "../imgui/imgui.h"
-#include "imgui_impl_sdl_gl3.h"
 #include "../Input.h"
 #include "../Debug.h"
 #include "../Memory.h"
+#include "../Time.h"
+#include "../Clamp.h"
+#include "../imgui/imgui.h"
+#include "imgui_impl_sdl_gl3.h"
 #include <vector>
 #include <math.h>
-#include "../Time.h"
 
 namespace Neutrino
 {
@@ -26,7 +27,7 @@ namespace Neutrino
 	static const uint16 s_iAxisDeadZone = 8000;		// TODO: This will probably need to be configurable from the front end. 
 
 	static JoypadInput_t* s_aJoypads[_MAX_JOYPADS];
-
+	static MouseInput_t* s_pMouseInput;
 
 	typedef struct GameController_t
 	{
@@ -71,6 +72,7 @@ namespace Neutrino
 		s_pGameName = pGameName;
 		s_pPrefsPath = SDL_GetPrefPath(pOrgName, pGameName);
 		s_pBasePath = SDL_GetBasePath();
+		s_pMouseInput = NEWX(MouseInput_t);
 
 		for (int i = 0; i < _MAX_JOYPADS; ++i)
 		{
@@ -84,7 +86,7 @@ namespace Neutrino
 			s_aJoypads[i]->_DPAD = 0x00;
 		}
 		// Tell the Input functions where to find our key state array and joypad states
-		SetControls(&s_iKeyDown[0], s_aJoypads);
+		SetControls(&s_iKeyDown[0], s_aJoypads, s_pMouseInput);
 		return true;
 	}
 
@@ -368,6 +370,17 @@ namespace Neutrino
 	}
 
 
+	static void UpdateMouse()
+	{
+		int x = 0; int y = 0;
+		uint32 iButtonMask = SDL_GetMouseState(&x, &y);
+		s_pMouseInput->_MOUSE_COORDS.x = (float)x;
+		s_pMouseInput->_MOUSE_COORDS.y = (float)y;
+		(iButtonMask & SDL_BUTTON(SDL_BUTTON_LEFT)) == 1 ? s_pMouseInput->_LEFT_BUTTON = true : s_pMouseInput->_LEFT_BUTTON = false;
+		(iButtonMask & SDL_BUTTON(SDL_BUTTON_RIGHT)) == 1 ? s_pMouseInput->_RIGHT_BUTTON = true : s_pMouseInput->_RIGHT_BUTTON = false;
+	}
+
+
 	static void OnGameControllerButton(const SDL_ControllerButtonEvent& event)
 	{
 		ControllerList::iterator it;
@@ -418,14 +431,17 @@ namespace Neutrino
 		ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
 
 		// NOTE: Don't clear any of the pad inputs as we'll only be getting changes through the event queue!
-		// 
+		
+		// Clear the mouse wheel - TODO: This should roll back to zero...
+		s_pMouseInput->_MOUSE_WHEEL = 0.0f;
+
 		// clear the editor flags bitfield
 		*iEditorFlags = 0x00;
 
 		// Poll for events
 		SDL_Event event;
 		bool bRet = true;
-		bool bKeyPressed = false;
+
 
 		while (SDL_PollEvent(&event) != 0)
 		{
@@ -457,7 +473,6 @@ namespace Neutrino
 			{
 				int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;
 				s_iKeyDown[key] = (event.type == SDL_KEYDOWN);
-				bKeyPressed = true;
 			}
 			break;
 
@@ -484,14 +499,21 @@ namespace Neutrino
 				if(fabs(event.caxis.value) > s_iAxisDeadZone)
 					OnGameControllerAxis(event.caxis);
 				break;
+
+			case SDL_MOUSEWHEEL:
+				s_pMouseInput->_MOUSE_WHEEL = (float)event.wheel.y;
+				break;
 			}
 		}
 
-		// Let Input store the player's 
-		BuildInputAxis(bKeyPressed);
+		// Set mouse pointer coords and button state
+		UpdateMouse();
 
 		// Handle framework standard inputs
 		ProcessStandardInputs();
+
+		// Let Input process current frame's events for the rest of the framework. 
+		ProcessFrameInput();
 
 		return bRet;
 	}

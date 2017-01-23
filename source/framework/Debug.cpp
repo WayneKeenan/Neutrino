@@ -72,7 +72,7 @@ namespace Neutrino
 	{
 		//float fFPS = (float)floorf( 1.0f / (float)fmax(fEPSILON, (float)fAvgFPS )+0.5f );
 		s_FPSSampler.Tick(GetMSDelta());
-
+	
 		if (s_bDebugOverlayActive)
 		{
 			// If fly cam is enabled, grab player 2's input and move the camera.
@@ -101,7 +101,6 @@ namespace Neutrino
 			ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
 			ImGui::Text("Fly Cam Offset: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z );
 			ImGui::End();
-
 
 			// Draw the log window
 			s_pDebugLog->Draw("Output Log", &s_bOutputLogActive, s_pLogPosition);

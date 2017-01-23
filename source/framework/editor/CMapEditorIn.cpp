@@ -2,12 +2,13 @@
 #include "../GameStateManager.h"
 #include "../Sprite.h"
 #include "../GLUtils.h"
-#include <glm/glm.hpp> 
 #include "../imgui/imgui.h"
 #include "../Texture.h"
 #include "../Sprite.h"
-#include <string>
 #include "../Memory.h"
+#include "../Input.h"
+#include <string>
+#include <glm/glm.hpp> 
 
 
 #if defined _WIN32
@@ -49,11 +50,15 @@ static int s_iSelectedGridSize = 4;
 
 void CMapEditorIn::Update()
 {
+	glm::vec2* pMouseCoords = Neutrino::GetMouseCoords();
 	// Draw the window
 	ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 200.0f), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Tilemap Editor");
 	ImGui::LabelText("", "Grid Settings:");
+	ImGui::SameLine(240);
+	ImGui::Text("[%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
+
 	{
 		// Display Grid Settings 
 		{
@@ -112,7 +117,6 @@ void CMapEditorIn::Update()
 			DELETEX vDim;
 			DELETEX vUV0;
 			DELETEX vUV1;
-
 		}
 	}
 	ImGui::End();

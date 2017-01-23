@@ -1,6 +1,21 @@
 #pragma once
 #include "libconfig.h"
+#include "Types.h"
 #include <glm/glm.hpp> 
+
+// Bitfield indexes for joypad face buttons
+#define _ACTIONBUTTON1 = 1;
+#define _ACTIONBUTTON2 = 2;
+#define _ACTIONBUTTON3 = 4;
+#define _ACTIONBUTTON4 = 8;
+#define _SHOULDERLEFT = 16;
+#define _SHOULDERRIGHT = 32;
+// Bitfield indexes for joypad meta buttons (Home, Share, etc.)
+#define _META1 = 1;
+#define _META2 = 2;
+#define _META3 = 4;
+#define _META4 = 8;
+
 
 namespace Neutrino
 {
@@ -45,16 +60,8 @@ namespace Neutrino
 		glm::vec3 _RIGHT_STICK;
 		float _ACTION_TRIGGER_1;	// Triggers
 		float _ACTION_TRIGGER_2;
-		bool _ACTION_1;				// Face buttons and shoulder buttons
-		bool _ACTION_2;
-		bool _ACTION_3;
-		bool _ACTION_4;
-		bool _ACTION_5;
-		bool _ACTION_6;
-		bool _META_1;				// Home / Start / Options / Back...?
-		bool _META_2;
-		bool _META_3;
-		bool _META_4;
+		uint8 _FACE_BUTTONS;		// Bitfield for facebuttons
+		uint8 _META_BUTTONS;		// Bitfield for home, share, options, back etc.
 	} JoypadInput_t;
 
 
@@ -98,13 +105,9 @@ namespace Neutrino
 	//  	Return the raw input axis, created above
 	glm::vec3* GetInputAxis(int iPlayer);
 
-
 	// GetMouseCoords()
 	//		Return the current X/Y coordinates of the mouse
 	//glm::vec2* GetMouseCoords();
-
-
-	// GetMouseButton
 
 	// GetInputAxisGameDeltaScaled()
 	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h)

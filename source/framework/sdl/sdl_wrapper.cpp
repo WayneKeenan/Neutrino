@@ -7,6 +7,7 @@
 #include "../Debug.h"
 #include "../Memory.h"
 #include <vector>
+#include <math.h>
 #include "../Time.h"
 
 namespace Neutrino
@@ -21,12 +22,11 @@ namespace Neutrino
 	static int s_iKeyDown[512];
 	static bool s_bIsFullscreen = false;
 
-	static JoypadInput_t* s_pJoypad_1_Input;
-	static JoypadInput_t* s_pJoypad_2_Input;
-	static JoypadInput_t* s_pJoypad_3_Input;
-	static JoypadInput_t* s_pJoypad_4_Input;
-
 	static const int s_iMaxJoypads = 4;
+	static const uint16 s_iAxisDeadZone = 8000;		// TODO: This will probably need to be configurable from the front end. 
+
+	static JoypadInput_t* s_aJoypads[s_iMaxJoypads];
+
 
 	typedef struct GameController_t
 	{
@@ -35,8 +35,6 @@ namespace Neutrino
 	} GameController_t;
 
 	typedef std::vector<GameController_t*> ControllerList;
-
-	
 
 
 	// The Controller list is a vector of MaxJoypads that we will poll for input each frame. 
@@ -62,116 +60,6 @@ namespace Neutrino
 	// ------------------------------------------------------------------------------------------------------------------
 
 
-	// Handler for the SDL event...
-	static void RemoveGameController(int iID)
-	{
-		LOG_INFO("Looking to remove controller matching istance ID: %d.", iID);
-
-		ControllerList::iterator it;
-		GameController_t* pElem;
-		bool bFound = false;
-
-		for(it = s_aControllers.begin(); it != s_aControllers.end(); ++it )
-		{
-			pElem = *it;
-			if ( pElem->_INSTANCE == iID)
-			{
-				LOG_INFO("GameController %d [Instance ID: %d] has been removed from the list of attached controllers.", it - s_aControllers.begin(), iID);
-				SDL_GameControllerClose( pElem->_GAMEPAD );
-				bFound = true;
-				break;
-			}				
-		}
-
-		if(bFound)
-		{
-			DELETEX pElem;
-			s_aControllers.erase(it);		
-			LOG_INFO("There are now %d game controllers attached.", s_aControllers.size());					
-		}
-		else
-		{
-			LOG_ERROR("Unable to find a game controller matching ID %d in the list of attached controllers! You may have a player assigned to a disconnected controller!", iID);
-		}
-	}
-
-
-	// ------------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------------------------------------------------------------------------
-
-
-	// Takes a controller ID and checks it for being a valid controller to add to our list
-	static void AddGameController(int iID, bool bLog=true)
-	{
-		// If we're already tracking Max Controllers ignore whatever this is...
-		if ( s_aControllers.size() >= s_iMaxJoypads)
-		{
-			LOG_WARNING("A new controller has been attached, but Neutrino is already tracking %d. Ignoring thie device.", s_iMaxJoypads);
-			return;
-		}
-
-		// If this isn't even a valid controller, ignore it
-		if( !SDL_IsGameController( iID ) ) 
-			return;
-
-		// Get the pad associated with this ID
-		SDL_GameController *pPad = SDL_GameControllerOpen( iID );
-
-		// Have we been able to open the controller for reading?
-		if( !pPad ) 
-		{
-			LOG_WARNING("Unable to open GameController [InstanceID %d], ignoring...");
-			return;
-		}
-
-		SDL_Joystick *pJoy = SDL_GameControllerGetJoystick( pPad );
-		int iInstance = SDL_JoystickInstanceID( pJoy );
-
-		GameController_t* pElem = NEWX(GameController_t);
-		pElem->_GAMEPAD = pPad;
-		pElem->_INSTANCE = iInstance;
-
-		// Add this to our controller list. 
-		s_aControllers.push_back(pElem);
-
-		if ( bLog )
-		{
-			// Output some debug log info about this pad
-			{
-
-				SDL_JoystickGUID guid = SDL_JoystickGetGUID(pJoy);
-				char guid_str[1024];
-				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
-				LOG_INFO("Info for game controller %d:", s_aControllers.size()-1);
-				LOG_INFO("Joystick Name: '%s'", SDL_JoystickName(pJoy));
-				LOG_INFO("Controller Name: '%s'", SDL_GameControllerName(pElem->_GAMEPAD));
-				LOG_INFO("GUID: %s", guid_str);
-				LOG_INFO("SDL Instance ID: %d", SDL_JoystickInstanceID(pJoy));
-				LOG_INFO("Number of Axes: %2d", SDL_JoystickNumAxes(pJoy));
-				LOG_INFO("Number of Buttons: %2d", SDL_JoystickNumButtons(pJoy));
-				LOG_INFO("Mapping: '%s'", SDL_GameControllerMappingForGUID(guid));
-			}
-		}
-	}
-
-
-	// Basic cleanup for the SDLKill() function... May get called on return to menu state?
-	static void UnassignGameControllers()
-	{
-		for(ControllerList::iterator it = s_aControllers.begin(); it != s_aControllers.end(); ++it )
-		{
-			GameController_t* pElem = *it;
-			SDL_GameControllerClose( pElem->_GAMEPAD );
-			DELETEX pElem;
-		}
-		s_aControllers.clear();
-	}
-
-
-	// ------------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------------------------------------------------------------------------
-
-
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
 		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -184,19 +72,14 @@ namespace Neutrino
 		s_pPrefsPath = SDL_GetPrefPath(pOrgName, pGameName);
 		s_pBasePath = SDL_GetBasePath();
 
-		s_pJoypad_1_Input = NEWX(JoypadInput_t);
-		s_pJoypad_2_Input = NEWX(JoypadInput_t);
-		s_pJoypad_3_Input = NEWX(JoypadInput_t);
-		s_pJoypad_4_Input = NEWX(JoypadInput_t);
+		for (int i = 0; i < s_iMaxJoypads; ++i)
+			s_aJoypads[i] = NEWX(JoypadInput_t);
 
 		// Tell the Input functions where to find our key state array and joypad states
-		SetControls(&s_iKeyDown[0], s_pJoypad_1_Input, s_pJoypad_2_Input, s_pJoypad_3_Input, s_pJoypad_4_Input);
+		SetControls(&s_iKeyDown[0], s_aJoypads[0], s_aJoypads[1], s_aJoypads[2], s_aJoypads[3]);
 		return true;
 	}
 
-
-	// ------------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------------------------------------------------------------------------
 
 
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
@@ -265,7 +148,6 @@ namespace Neutrino
 		if( SDL_GL_SetSwapInterval( 1 ) < 0 )
 		{
 			LOG_ERROR( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
-			return false;
 		}
 
 		SDL_StartTextInput();
@@ -289,10 +171,6 @@ namespace Neutrino
 	}
 
 
-	// ------------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------------------------------------------------------------------------
-
-
 
 	void SDLPresent()
 	{
@@ -303,18 +181,332 @@ namespace Neutrino
 
 
 
-	bool SDLKill()
-	{
-		ImGui_ImplSdlGL3_Shutdown();
-		SDL_GL_DeleteContext( SDL_GLContext );
-		SDL_DestroyWindow( pSDL_WindowHandle );
-		UnassignGameControllers();
-		SDL_Quit();
 
-		DELETEX(s_pJoypad_1_Input);
-		DELETEX(s_pJoypad_2_Input);
-		DELETEX(s_pJoypad_3_Input);
-		DELETEX(s_pJoypad_4_Input);
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
+
+	// Setup responses to standard controls, like Alt+Enter, Esc to bring up exit overly, etc. 
+	static void ProcessStandardInputs()
+	{
+
+		if (s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] && s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK])
+		{
+			// Debounce the keys so we don't flip back and forth
+			s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] = 0;
+			s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK] = 0;
+
+			if (!s_bIsFullscreen)
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN);
+			else
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, 0);
+
+			s_bIsFullscreen = !s_bIsFullscreen;
+		}
+
+	}
+
+
+	// Takes a controller ID and checks it for being a valid controller to add to our list
+	static void AddGameController(const int iID, const bool bLog = true)
+	{
+		// If we're already tracking Max Controllers ignore whatever this is...
+		if (s_aControllers.size() >= s_iMaxJoypads)
+		{
+			LOG_WARNING("A new controller has been attached, but Neutrino is already tracking %d. Ignoring thie device.", s_iMaxJoypads);
+			return;
+		}
+
+		// If this isn't even a valid controller, ignore it
+		if (!SDL_IsGameController(iID))
+			return;
+
+		// Get the pad associated with this ID
+		SDL_GameController *pPad = SDL_GameControllerOpen(iID);
+
+		// Have we been able to open the controller for reading?
+		if (!pPad)
+		{
+			LOG_WARNING("Unable to open GameController [InstanceID %d], ignoring...");
+			return;
+		}
+
+		SDL_Joystick *pJoy = SDL_GameControllerGetJoystick(pPad);
+		int iInstance = SDL_JoystickInstanceID(pJoy);
+
+		GameController_t* pElem = NEWX(GameController_t);
+		pElem->_GAMEPAD = pPad;
+		pElem->_INSTANCE = iInstance;
+
+		// Add this to our controller list. 
+		s_aControllers.push_back(pElem);
+
+		if (bLog)
+		{
+			// Output some debug log info about this pad
+			{
+
+				SDL_JoystickGUID guid = SDL_JoystickGetGUID(pJoy);
+				char guid_str[1024];
+				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
+				LOG_INFO("Info for game controller %d:", s_aControllers.size() - 1);
+				LOG_INFO("Joystick Name: '%s'", SDL_JoystickName(pJoy));
+				LOG_INFO("Controller Name: '%s'", SDL_GameControllerName(pElem->_GAMEPAD));
+				LOG_INFO("GUID: %s", guid_str);
+				LOG_INFO("SDL Instance ID: %d", SDL_JoystickInstanceID(pJoy));
+				LOG_INFO("Number of Axes: %2d", SDL_JoystickNumAxes(pJoy));
+				LOG_INFO("Number of Buttons: %2d", SDL_JoystickNumButtons(pJoy));
+				LOG_INFO("Mapping: '%s'", SDL_GameControllerMappingForGUID(guid));
+			}
+		}
+	}
+
+
+
+	// Handler for the SDL event...
+	static void RemoveGameController(const int iID)
+	{
+		LOG_INFO("Looking to remove controller matching istance ID: %d.", iID);
+
+		ControllerList::iterator it;
+		GameController_t* pElem;
+		bool bFound = false;
+
+		for (it = s_aControllers.begin(); it != s_aControllers.end(); ++it)
+		{
+			pElem = *it;
+			if (pElem->_INSTANCE == iID)
+			{
+				LOG_INFO("GameController %d [Instance ID: %d] has been removed from the list of attached controllers.", it - s_aControllers.begin(), iID);
+				SDL_GameControllerClose(pElem->_GAMEPAD);
+				bFound = true;
+				break;
+			}
+		}
+
+		if (bFound)
+		{
+			DELETEX pElem;
+			s_aControllers.erase(it);
+			LOG_INFO("There are now %d game controllers attached.", s_aControllers.size());
+		}
+		else
+		{
+			LOG_ERROR("Unable to find a game controller matching ID %d in the list of attached controllers! You may have a player assigned to a disconnected controller!", iID);
+		}
+	}
+
+
+
+	// Basic cleanup for the SDLKill() function... May get called on return to menu state?
+	static void UnassignGameControllers()
+	{
+		for (ControllerList::iterator it = s_aControllers.begin(); it != s_aControllers.end(); ++it)
+		{
+			GameController_t* pElem = *it;
+			SDL_GameControllerClose(pElem->_GAMEPAD);
+			DELETEX pElem;
+		}
+		s_aControllers.clear();
+	}
+
+	static void OnGameControllerAxis(const SDL_ControllerAxisEvent& event)
+	{
+		ControllerList::iterator it;
+		GameController_t* pElem;
+		bool bFound = false;
+		int iIndex = 0;
+		for (it = s_aControllers.begin(); it != s_aControllers.end(); ++it, ++iIndex)
+		{
+			pElem = *it;
+			if (pElem->_INSTANCE == event.which)
+			{
+				bFound = true;
+				break;
+			}
+		}
+
+		JoypadInput_t* pJoypad = s_aJoypads[iIndex];
+
+		if (bFound)
+		{
+			switch (event.axis)
+			{
+			case SDL_CONTROLLER_AXIS_LEFTX:
+			{
+			}
+			break;
+			case SDL_CONTROLLER_AXIS_LEFTY:
+			{}
+			break;
+
+			case SDL_CONTROLLER_AXIS_RIGHTX:
+			{}
+			break;
+			case SDL_CONTROLLER_AXIS_RIGHTY:
+			{}
+			break;
+
+			case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+			{}
+			break;
+			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+			{}
+			break;
+
+			case SDL_CONTROLLER_AXIS_INVALID:
+			default:
+			{}
+			break;
+			}
+		}
+
+	}
+
+	static void OnGameControllerButton(const SDL_ControllerButtonEvent& event)
+	{
+
+	}
+
+	
+
+
+	bool SDLProcessInput(uint8* iEditorFlags)
+	{
+		ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
+
+		// Clear previous input for any attached gamepads
+		for (int i = 0; i < s_iMaxJoypads; ++i)
+		{
+			s_aJoypads[i]->_LEFT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
+			s_aJoypads[i]->_RIGHT_STICK = glm::vec3(0.0f, 0.0f, 0.0f);
+			s_aJoypads[i]->_ACTION_TRIGGER_1 = 0.0f;
+			s_aJoypads[i]->_ACTION_TRIGGER_2 = 0.0f;
+			s_aJoypads[i]->_FACE_BUTTONS = 0x00;
+			s_aJoypads[i]->_META_BUTTONS = 0x00;
+		}
+
+		// clear the editor flags bitfield
+		*iEditorFlags = 0x00;
+
+		// Poll for events
+		SDL_Event event;
+		bool bRet = true;
+		bool bKeyPressed = false;
+
+		while (SDL_PollEvent(&event) != 0)
+		{
+			ImGui_ImplSdlGL3_ProcessEvent(&event);
+
+			switch (event.type)
+			{
+			case SDL_QUIT:
+				bRet = false;
+				break;
+
+			case SDL_KEYDOWN:
+			{
+				// F1 toggles the default debug overlays (perf tracker, fly cam, etc.)
+				if (event.key.keysym.sym == SDLK_F1)
+					ToggleDebugOverlay();
+
+				// Check F Keys for toggling the internal editor modes
+				{
+					if (event.key.keysym.sym == SDLK_F2)
+						*iEditorFlags |= _SPLINE_ED;
+					if (event.key.keysym.sym == SDLK_F3)
+						*iEditorFlags |= _MAP_ED;
+					if (event.key.keysym.sym == SDLK_F4)
+						*iEditorFlags |= _PARTICLE_ED;
+				}
+			}	// Note there's no break here!
+			case SDL_KEYUP:
+			{
+				int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;
+				s_iKeyDown[key] = (event.type == SDL_KEYDOWN);
+				bKeyPressed = true;
+			}
+			break;
+
+			case SDL_CONTROLLERDEVICEADDED:
+			{
+				LOG_WARNING("Frame %d - A controller device has been added!", GetFrameCount());
+				AddGameController((int)event.cdevice.which);
+			}
+			break;
+
+			case SDL_CONTROLLERDEVICEREMOVED:
+			{
+				LOG_WARNING("Frame %d - A controller device has been removed!", GetFrameCount());
+				RemoveGameController((int)event.cdevice.which);
+			}
+			break;
+
+			case SDL_CONTROLLERBUTTONDOWN:
+			case SDL_CONTROLLERBUTTONUP:
+				OnGameControllerButton(event.cbutton);
+				break;
+
+			case SDL_CONTROLLERAXISMOTION:
+				if(fabs(event.caxis.value) > s_iAxisDeadZone)
+					OnGameControllerAxis(event.caxis);
+				break;
+			}
+		}
+
+		// Let Input store the player's 
+		BuildInputAxis(bKeyPressed);
+
+		// Handle framework standard inputs
+		ProcessStandardInputs();
+
+		return bRet;
+	}
+
+
+	// ------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------
+
+
+	// Note: The bytes per pixel of PNG files changes depending on the PNG optimisation setting
+	// 			 PNG may revert to indexed colour for simple images unless you expressly turn compression off
+	// 			 In texture packer, set the optimisation level to 0 to avoid this. 
+	bool GLTextureFromSDLSurface(GLuint* pTextureID, const SDL_Surface* pSurf, const bool bFiltered)
+	{
+		int iMode = 0;
+		if (pSurf->format->BytesPerPixel == 3)
+		{
+			iMode = GL_RGB;
+		}
+		else if (pSurf->format->BytesPerPixel == 4)
+		{
+			iMode = GL_RGBA;
+		}
+		else
+		{
+			LOG_ERROR("UploadTextureFromSDLSurface: Only 24 and 32bit SDL surfaces are supported");
+			LOG_ERROR("Bytes per pixel: %d ", pSurf->format->BytesPerPixel);
+			return false;
+		}
+
+		glGenTextures(1, pTextureID);
+		ASSERT_GL_ERROR;
+		glBindTexture(GL_TEXTURE_2D, *pTextureID);
+		ASSERT_GL_ERROR;
+		glTexImage2D(GL_TEXTURE_2D, 0, pSurf->format->BytesPerPixel, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels);
+		ASSERT_GL_ERROR;
+
+		if (bFiltered)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+
+		LOG_INFO("Texture bound: %d/%dpx @ %d bytes per pixel to id %d", pSurf->w, pSurf->h, pSurf->format->BytesPerPixel, *pTextureID);
 		return true;
 	}
 
@@ -335,153 +527,23 @@ namespace Neutrino
 	}
 
 
+
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
 
 
-	// Note: The bytes per pixel of PNG files changes depending on the PNG optimisation setting
-	// 			 PNG may revert to indexed colour for simple images unless you expressly turn compression off
-	// 			 In texture packer, set the optimisation level to 0 to avoid this. 
-	bool GLTextureFromSDLSurface(GLuint* pTextureID, const SDL_Surface* pSurf, const bool bFiltered)
+	bool SDLKill()
 	{
-		int iMode = 0;
-		if (pSurf->format->BytesPerPixel == 3) 
-		{ 
-			iMode = GL_RGB;
-		} 
-		else if (pSurf->format->BytesPerPixel == 4) 
-		{ 
-			iMode = GL_RGBA;
-		} 
-		else 
-		{
-			LOG_ERROR("UploadTextureFromSDLSurface: Only 24 and 32bit SDL surfaces are supported");
-			LOG_ERROR("Bytes per pixel: %d ", pSurf->format->BytesPerPixel);
-			return false;
-		}
+		ImGui_ImplSdlGL3_Shutdown();
+		SDL_GL_DeleteContext(SDL_GLContext);
+		SDL_DestroyWindow(pSDL_WindowHandle);
+		UnassignGameControllers();
+		SDL_Quit();
 
-		glGenTextures( 1, pTextureID );
-		ASSERT_GL_ERROR;        
-		glBindTexture( GL_TEXTURE_2D, *pTextureID );
-		ASSERT_GL_ERROR;                
-		glTexImage2D( GL_TEXTURE_2D, 0, pSurf->format->BytesPerPixel, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels );
-		ASSERT_GL_ERROR;        
+		for (int i = 0; i < s_iMaxJoypads; ++i)
+			DELETEX(s_aJoypads[i]);
 
-		if (bFiltered)
-		{
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		}
-		else
-		{
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );        
-		}
-
-		LOG_INFO("Texture bound: %d/%dpx @ %d bytes per pixel to id %d", pSurf->w, pSurf->h, pSurf->format->BytesPerPixel, *pTextureID);
 		return true;
-	}
-
-
-
-	// ------------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------------------------------------------------------------------------
-
-	// Setup responses to standard controls, like Alt+Enter, Esc to bring up exit overly, etc. 
-	static void ProcessStandardInputs()
-	{
-
-		if (s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] && s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK])
-		{
-			// Debounce the keys so we don't flip back and forth
-			s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] = 0;
-			s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK] = 0;
-
-			if(!s_bIsFullscreen)
-				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN);
-			else
-				SDL_SetWindowFullscreen(pSDL_WindowHandle, 0);
-
-			s_bIsFullscreen = !s_bIsFullscreen;
-		}
-
-	}
-
-
-	// ------------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------------------------------------------------------------------------
-
-
-	bool SDLProcessInput(uint8* iEditorFlags)
-	{
-		ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
-
-		SDL_Event event;
-		bool bRet = true;
-		bool bKeyPressed = false;
-
-
-		*iEditorFlags = 0x00;
-
-		while( SDL_PollEvent( &event ) != 0 )
-		{
-			ImGui_ImplSdlGL3_ProcessEvent(&event);
-
-			switch(event.type)
-			{
-				case SDL_QUIT:
-					bRet = false;
-					break;
-
-				case SDL_KEYDOWN:
-					{
-						// F1 toggles the default debug overlays (perf tracker, fly cam, etc.)
-						if (event.key.keysym.sym == SDLK_F1)
-							ToggleDebugOverlay();
-						
-						// Check F Keys for toggling the internal editor modes
-						{
-							if(event.key.keysym.sym == SDLK_F2)
-								*iEditorFlags |= _SPLINE_ED;
-							if(event.key.keysym.sym == SDLK_F3)
-								*iEditorFlags |= _MAP_ED;
-							if(event.key.keysym.sym == SDLK_F4)
-								*iEditorFlags |= _PARTICLE_ED;
-						}
-					}	// Note there's no break here!
-				case SDL_KEYUP:
-					{
-						int key = event.key.keysym.sym & ~SDLK_SCANCODE_MASK;
-						s_iKeyDown[key] = (event.type == SDL_KEYDOWN);
-						bKeyPressed = true;
-					}
-					break;
-
-				case SDL_CONTROLLERDEVICEADDED:
-					{
-						LOG_WARNING("Frame %d - A controller device has been added!", GetFrameCount());
-						AddGameController( (int)event.cdevice.which );            		
-					}
-					break;
-
-				case SDL_CONTROLLERDEVICEREMOVED:
-					{		        	
-						LOG_WARNING("Frame %d - A controller device has been removed!", GetFrameCount());
-						RemoveGameController( (int)event.cdevice.which );
-					}
-					break;
-
-					// TODO: Add in joypad Polling, None of the buttons are bound yet
-			}   
-		}
-
-		// Let Input store the player's 
-		BuildInputAxis(bKeyPressed);
-
-		// Handle framework standard inputs
-		ProcessStandardInputs();
-
-		return bRet;
 	}
 
 

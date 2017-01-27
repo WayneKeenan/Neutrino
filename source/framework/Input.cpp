@@ -289,6 +289,16 @@ namespace Neutrino
 		return s_pKeyState[iRawKey] != 0;
 	}
 
+	bool GetKeyState(const eKeyboard_EditorInputs iKey)
+	{
+		switch (iKey)
+		{
+			case eKeyboard_EditorInputs::_ESC: return s_pKeyState[SDLK_ESCAPE & ~SDLK_SCANCODE_MASK]; break;
+			default: break;
+		}
+		return false;
+	}
+
 	bool GetButton(const uint8 iInput, const uint8 iPlayerIndex)
 	{
 		ASSERT(iPlayerIndex < _MAX_JOYPADS, "Get button called for a player index larger than _MAX_JOYPADS");

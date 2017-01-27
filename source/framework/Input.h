@@ -48,6 +48,12 @@ namespace Neutrino
 		_NUM_INPUTS,
 	};
 
+	// This enum masks the SDL_KEYCODE so the rest of the framework doesn't care that SDL is under the hood. 
+	enum eKeyboard_EditorInputs
+	{
+		_ESC,
+	};
+
 	// Array of possible keyboard inputs we want to track that map to the lower level event processing (SDL atm)
 	// 
 	typedef struct InputMappings_t
@@ -144,8 +150,12 @@ namespace Neutrino
 	// 		input in preference to joypad axis otherwise joypad axis will always be returned. 
 	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride = true);
 
+	// GetKeyState()
+	//		Will return the keydown status of the key
+	bool GetKeyState(const eKeyboard_EditorInputs iKey);
+
 	// GetRawKeyState()
-	//		Shouldn't really use this, but if you want to peek into the keyboard input state directly, this will give you access.
+	//		If you desperately want to peek into the keyboard input state directly, this will give you access.
 	//  	iRawKey is: (SDLK_<key> & ~SDLK_SCANCODE_MASK) 
 	bool GetRawKeyState(const int iRawKey);
 }

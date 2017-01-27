@@ -48,13 +48,6 @@ namespace Neutrino
 		_NUM_INPUTS,
 	};
 
-	// Helper for GetButton...() functions
-	enum eJoypad_GameInputs
-	{
-		// TODO
-
-	};
-
 	// Array of possible keyboard inputs we want to track that map to the lower level event processing (SDL atm)
 	// 
 	typedef struct InputMappings_t
@@ -63,13 +56,14 @@ namespace Neutrino
 		bool _bKeyWasPressed;		// This isn't implemented atm
 	} InputMappings_t;
 
-
 	// Container struct for possible joypad inputs on a regular next gen joypad. 
 	// 
 	typedef struct JoypadInput_t
 	{
 		glm::vec3 _LEFT_STICK;		// Sticks
 		glm::vec3 _RIGHT_STICK;
+		glm::vec3 _DPAD_AXIS;
+		glm::vec3 _DPAD_AXIS_SCALED;
 		glm::vec3 _LEFT_STICK_SCALED;	
 		glm::vec3 _RIGHT_STICK_SCALED;
 		float _ACTION_TRIGGER_1;	// Triggers
@@ -78,7 +72,6 @@ namespace Neutrino
 		uint8 _DPAD;
 		uint8 _META_BUTTONS;		// Bitfield for home, share, options, back etc.
 	} JoypadInput_t;
-
 
 	// Container for mouse input. Framework assumes there's one mouse, and SDL wrapper will populate this during the 
 	// normal input processing event loop
@@ -112,7 +105,6 @@ namespace Neutrino
 	//   	in this compilation unit to point to the correct location
 	void SetControls(int* pKeys, JoypadInput_t* pPads[], MouseInput_t* pMouse);
 
-
 	// ProcessFrameInput()
 	//		Should be called by whatever is handling the low level input (SDL currently) to flag that all frame input events have
 	//		been handled. This function will do any input cleaning/setup expected by the rest of the framework. 
@@ -121,13 +113,31 @@ namespace Neutrino
 	// 	GetInputAxis()
 	//  	Return the raw input axis, created above. If bKeyOverride, this will return keyboard input in preference to joypad axis
 	//  	otherwise joypad axis will always be returned. 
-	glm::vec3* GetInputAxis(int iPlayer, bool bKeyOverride = false);
+	glm::vec3* GetInputAxis(const int iPlayer = 0, bool bKeyOverride = false);
 
 	// GetMouseCoords()
 	//		Return the current X/Y coordinates of the mouse
 	glm::vec2* GetMouseCoords();
 
-	bool GetButton(const eJoypad_GameInputs iInput, const uint8 iPlayerIndex = 0);
+	// GetButton()
+	// 		Returns the button state for a given player's joypad. The uint8 should be one of the #defines at the top of this header 
+	bool GetButton(const uint8 iInput, const uint8 iPlayerIndex = 0);
+
+	// GetDpadDir()
+	// 		Return the state of a given dpad direction for a given player's joypad
+	bool GetDPadDir(const uint8 iInput, const uint8 iPlayerIndex = 0);
+
+	// Shortcut getters for facebuttons
+	inline bool GetShoulderL(const uint8 iPlayerIndex = 0) { return GetButton(_SHOULDER_LEFT, iPlayerIndex);}
+	inline bool GetShoulderR(const uint8 iPlayerIndex = 0) { return GetButton(_SHOULDER_RIGHT, iPlayerIndex);}
+	inline bool GetButtonA(const uint8 iPlayerIndex = 0) { return GetButton(_ACTIONBUTTON_A, iPlayerIndex);}
+	inline bool GetButtonB(const uint8 iPlayerIndex = 0) { return GetButton(_ACTIONBUTTON_B, iPlayerIndex);}
+	inline bool GetButtonX(const uint8 iPlayerIndex = 0) { return GetButton(_ACTIONBUTTON_X, iPlayerIndex);}
+	inline bool GetButtonY(const uint8 iPlayerIndex = 0) { return GetButton(_ACTIONBUTTON_Y, iPlayerIndex);}
+	inline bool GetDPadU(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_UP, iPlayerIndex);}
+	inline bool GetDPadD(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_DOWN, iPlayerIndex);}
+	inline bool GetDPadL(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_LEFT, iPlayerIndex);}
+	inline bool GetDPadR(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_RIGHT, iPlayerIndex);}
 
 	// GetInputAxisGameDeltaScaled()
 	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h) If bKeyOverride, this will return keyboard 

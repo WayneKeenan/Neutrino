@@ -154,77 +154,86 @@ namespace Neutrino
 		s_pMouseInput = pMouse;
 	}
 
-	void BuildKeyboardInputAxis()
+
+	void ProcessFrameInput()
 	{
 		float fVert;
 		float fHoriz;
 		fVert = fHoriz = 0.0f;
 
 
-
-		// Build Player 1 input axis from keyboard
+		// Build the keyboard Input Axis
 		{
-			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]])
+			// Build Player 1 input axis from keyboard
 			{
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] )
-					fVert = 1.0f;
+				if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]])
+				{
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]] ) fVert = 1.0f;
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]] ) fVert = -1.0f;
+				}
 
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]] )
-					fVert = -1.0f;
+				if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]])
+				{
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] ) fHoriz = -1.0f;
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]] ) fHoriz = 1.0f;
+				}
+
+				s_vInputAxis_Player1.x = fHoriz;
+				s_vInputAxis_Player1.y = fVert;
+				s_vInputAxis_Player1.z = 0.0f;
+
+				s_vInputAxisScaled_Player1 = s_vInputAxis_Player1 * GetGameMSDelta();
 			}
 
+			fVert = fHoriz = 0.0f;
 
-			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]])
+			// Build Player 2 input axis from keyboard
 			{
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]] )
-					fHoriz = -1.0f;
+				if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]])
+				{
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] ) fVert = 1.0f;
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]] ) fVert = -1.0f;
+				}
 
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]] )
-					fHoriz = 1.0f;
+				if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]])
+				{
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] ) fHoriz = -1.0f;
+					if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]] ) fHoriz = 1.0f;
+				}
+
+				s_vInputAxis_Player2.x = fHoriz;
+				s_vInputAxis_Player2.y = fVert;
+				s_vInputAxis_Player2.z = 0.0f;
+
+				s_vInputAxisScaled_Player2 = s_vInputAxis_Player2 * GetGameMSDelta();
 			}
-
-			s_vInputAxis_Player1.x = fHoriz;
-			s_vInputAxis_Player1.y = fVert;
-			s_vInputAxis_Player1.z = 0.0f;
-
-			s_vInputAxisScaled_Player1 = s_vInputAxis_Player1 * GetGameMSDelta();
 		}
 
-		fVert = fHoriz = 0.0f;
-
-		// Build Player 2 input axis from keyboard
+		// Build the DPAD Axis for each pad
 		{
-			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]])
+			fVert = fHoriz = 0.0f;
+			for (uint8 i = 0; i < _MAX_JOYPADS; ++i)
 			{
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]] )
-					fVert = 1.0f;
+				if( GetDPadU(i) != GetDPadD(i))
+				{
+					if (GetDPadU(i)) fVert = 1.0f;
+					if (GetDPadD(i)) fVert = -1.0f;
+				}
 
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]] )
-					fVert = -1.0f;
+				if( GetDPadL(i) != GetDPadR(i))
+				{
+					if (GetDPadL(i)) fHoriz = -1.0f;
+					if (GetDPadR(i)) fHoriz = 1.0f;
+				}
+
+				s_aJoypads[i]->_DPAD_AXIS.x = fHoriz;
+				s_aJoypads[i]->_DPAD_AXIS.y = fVert;
+				s_aJoypads[i]->_DPAD_AXIS.z = 0.0f;
+				s_aJoypads[i]->_DPAD_AXIS_SCALED = s_aJoypads[i]->_DPAD_AXIS * GetGameMSDelta();
 			}
-
-
-			if( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] != s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]])
-			{
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]] )
-					fHoriz = -1.0f;
-
-				if ( s_pKeyState[s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]] )
-					fHoriz = 1.0f;
-			}
-
-			s_vInputAxis_Player2.x = fHoriz;
-			s_vInputAxis_Player2.y = fVert;
-			s_vInputAxis_Player2.z = 0.0f;
-
-			s_vInputAxisScaled_Player2 = s_vInputAxis_Player2 * GetGameMSDelta();
 		}
 
-		// TODO: Take the keyboard scaling from Lumo to emulate the stick throw speed
-	}
-
-	void ScaleJoypadAxis()
-	{
+		// Scale Joypad axis
 		for (int i = 0; i < _MAX_JOYPADS; ++i)
 		{
 			s_aJoypads[i]->_LEFT_STICK_SCALED = s_aJoypads[i]->_LEFT_STICK * GetGameMSDelta();
@@ -232,24 +241,8 @@ namespace Neutrino
 		}
 	}
 
-	void ProcessFrameInput()
-	{
-		// TODO: This has been factored out of SDL_wrapper, so if you do still want to store this
-		// iterate over the keyboard mappings you care about and find one that's set...
-		//s_pInputMappings->_bKeyWasPressed = bKeyState;
 
-		// Process Keyboard inputs and build the directional axis
-		BuildKeyboardInputAxis();
-
-		// TODO: THe same needs to be done for the DPad? Remember we can add the Unity like scaling to emulate stick throw speed
-		// BuildDpadInputAxis()
-
-		// Scale the current Joypad stick axis for GetInputAxisGameDeltaScaled calls
-		ScaleJoypadAxis();
-	}
-
-
-	glm::vec3* GetInputAxis(int iPlayer, bool bKeyOverride)
+	glm::vec3* GetInputAxis(const int iPlayer, bool bKeyOverride)
 	{
 		switch(iPlayer)
 		{
@@ -296,10 +289,16 @@ namespace Neutrino
 		return s_pKeyState[iRawKey] != 0;
 	}
 
-	bool GetButton(const eJoypad_GameInputs iInput, const uint8 iPlayerIndex)
+	bool GetButton(const uint8 iInput, const uint8 iPlayerIndex)
 	{
 		ASSERT(iPlayerIndex < _MAX_JOYPADS, "Get button called for a player index larger than _MAX_JOYPADS");
-		return false;
+		return (s_aJoypads[iPlayerIndex]->_FACE_BUTTONS >> iInput) & 1;
+	}
+
+	bool GetDPadDir(const uint8 iInput, const uint8 iPlayerIndex)
+	{
+		ASSERT(iPlayerIndex < _MAX_JOYPADS, "Get dpad dir  called for a player index larger than _MAX_JOYPADS");
+		return (s_aJoypads[iPlayerIndex]->_DPAD >> iInput) & 1;
 	}
 
 	glm::vec2* GetMouseCoords()

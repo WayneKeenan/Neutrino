@@ -129,6 +129,7 @@ void CMapEditorIn::Update()
 			ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
 			s_pSelectedTile->_vPosition->x = pMouseCoords->x;
 			s_pSelectedTile->_vPosition->y = pMouseCoords->y;
+			s_bSpriteSelected = !Neutrino::GetKeyState(Neutrino::eKeyboard_EditorInputs::_ESC);
 		}
 
 		DELETEX vDim;

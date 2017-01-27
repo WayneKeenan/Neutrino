@@ -4,7 +4,6 @@
 #include "../GLUtils.h"
 #include "../imgui/imgui.h"
 #include "../Texture.h"
-#include "../Sprite.h"
 #include "../Memory.h"
 #include "../Input.h"
 #include <string>
@@ -45,9 +44,6 @@ void CMapEditorIn::Init()
 	Neutrino::GLUtils::SetClearColour(0.0f, 0.05f, 0.0f, 1.0f);
 }
 
-static int s_iSelectedTexture = 0;
-static int s_iSelectedGridSize = 4;
-
 void CMapEditorIn::Update()
 {
 	glm::vec2* pMouseCoords = Neutrino::GetMouseCoords();
@@ -59,66 +55,87 @@ void CMapEditorIn::Update()
 	ImGui::SameLine(240);
 	ImGui::Text("[%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
 
+	static int s_iSelectedTexture = 0;
+	static int s_iSelectedGridSize = 4;
+
+	// Display Grid Settings 
 	{
-		// Display Grid Settings 
-		{
-			ImGui::PushItemWidth(150); 
-			ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0", 6); 
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
-			ImGui::Checkbox("Snap", &s_bSnapToGrid); 
-			ImGui::Separator();
-		}
-
-		// Display framework texture count
-		static uint8 iTextureCount = Neutrino::GetLoadedTextureCount();
-		ImGui::LabelText("", "Texture Settings:"); ImGui::SameLine(165); ImGui::LabelText("", "[%d Loaded]", iTextureCount);
-
-		// Build a string of Texture Identifiers for a drop down list
-		{
-			std::string sBuff;
-			for (int i = 0; i < iTextureCount; ++i)
-				sBuff += " Texture: " + std::to_string(i) + " \0 ";
-
-			ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount + 1);
-		}
-
-
-		// Display selected texture info
-		static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage((uint8)s_iSelectedTexture);
+		ImGui::PushItemWidth(150); 
+		ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0", 6); 
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		ImGui::Checkbox("Snap", &s_bSnapToGrid); 
 		ImGui::Separator();
-
-		// Display all the sprites in the texture page
-		{
-			ImGui::LabelText("", "Available Tiles:");
-			ImVec2* vDim = NEWX ImVec2(0.0f, 0.0f);
-			ImVec2* vUV0 = NEWX ImVec2(0.0f, 0.0f);
-			ImVec2* vUV1 = NEWX ImVec2(0.0f, 0.0f);
-
-			float iPixelsUsed = 0.0f;
-			for (int i = 0; i < pTpage->_iMaxSprites; ++i)
-			{
-				vDim->x = pTpage->aSprintInfo[i]._fHalfWidth *2.0f;
-				vDim->y = pTpage->aSprintInfo[i]._fHalfHeight * 2.0f;
-				vUV0->x = pTpage->aSprintInfo[i]._fX_S;
-				vUV0->y = pTpage->aSprintInfo[i]._fY_T;
-				vUV1->x = pTpage->aSprintInfo[i]._fX_SnS;
-				vUV1->y = pTpage->aSprintInfo[i]._fY_TnT;
-
-				iPixelsUsed += vDim->x;
-
-				// Note to future Gareth: GCC warns about casting to pointer from int of different size here.
-				// The intptr_t cast removes that, but this was the first time that you saw that warning. 
-				// Step through with a debugger to see where this goes, and read a book. 
-				ImGui::ImageButton((void*)(intptr_t)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1);
-				if (iPixelsUsed < s_iRowPixels) ImGui::SameLine(); else iPixelsUsed = 0;
-
-			}
-			DELETEX vDim;
-			DELETEX vUV0;
-			DELETEX vUV1;
-		}
 	}
+
+	// Display framework texture count
+	static uint8 iTextureCount = Neutrino::GetLoadedTextureCount();
+	ImGui::LabelText("", "Texture Settings:"); ImGui::SameLine(165); ImGui::LabelText("", "[%d Loaded]", iTextureCount);
+
+	// Build a string of Texture Identifiers for a drop down list
+	{
+		std::string sBuff;
+		for (int i = 0; i < iTextureCount; ++i)
+			sBuff += " Texture: " + std::to_string(i) + " \0 ";
+
+		ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount + 1);
+	}
+
+	// Display selected texture info
+	static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage((uint8)s_iSelectedTexture);
+	ImGui::Separator();
+
+	// Display all the sprites in the texture page
+	{
+		ImGui::LabelText("", "Available Tiles:");
+		ImVec2* vDim = NEWX ImVec2(0.0f, 0.0f);
+		ImVec2* vUV0 = NEWX ImVec2(0.0f, 0.0f);
+		ImVec2* vUV1 = NEWX ImVec2(0.0f, 0.0f);
+
+		static Neutrino::Sprite_t* s_pSelectedTile;
+		static uint16 s_iTileIndex=0;
+		static bool s_bSpriteSelected;
+
+		float iPixelsUsed = 0.0f;
+		for (uint16 i = 0; i < pTpage->_iMaxSprites; ++i)
+		{
+			vDim->x = pTpage->aSprintInfo[i]._fHalfWidth *2.0f;
+			vDim->y = pTpage->aSprintInfo[i]._fHalfHeight * 2.0f;
+			vUV0->x = pTpage->aSprintInfo[i]._fX_S;
+			vUV0->y = pTpage->aSprintInfo[i]._fY_T;
+			vUV1->x = pTpage->aSprintInfo[i]._fX_SnS;
+			vUV1->y = pTpage->aSprintInfo[i]._fY_TnT;
+
+			iPixelsUsed += vDim->x;
+
+			// Note to future Gareth: GCC warns about casting to pointer from int of different size here.
+			// The intptr_t cast removes that, but this was the first time that you saw that warning. 
+			// Step through with a debugger to see where this goes, and read a book. 
+	
+			ImGui::PushID(i);
+			if( ImGui::ImageButton((void*)(intptr_t)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1) )
+			{
+					s_bSpriteSelected = true;
+					s_iTileIndex = i;
+			}
+			ImGui::PopID();
+			if (iPixelsUsed < s_iRowPixels) ImGui::SameLine(); else iPixelsUsed = 0;
+		}
+
+		// Hover the sprite over the mouse location
+		if( s_bSpriteSelected )
+		{
+			s_pSelectedTile = Neutrino::NewSprite(pTpage->_iTextureID, s_iTileIndex);
+			ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
+			s_pSelectedTile->_vPosition->x = pMouseCoords->x;
+			s_pSelectedTile->_vPosition->y = pMouseCoords->y;
+		}
+
+		DELETEX vDim;
+		DELETEX vUV0;
+		DELETEX vUV1;
+	}
+
 	ImGui::End();
 }
 

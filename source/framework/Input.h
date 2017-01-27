@@ -60,17 +60,17 @@ namespace Neutrino
 	// 
 	typedef struct JoypadInput_t
 	{
-		glm::vec3 _LEFT_STICK;		// Sticks
+		glm::vec3 _LEFT_STICK;		
 		glm::vec3 _RIGHT_STICK;
 		glm::vec3 _DPAD_AXIS;
 		glm::vec3 _DPAD_AXIS_SCALED;
 		glm::vec3 _LEFT_STICK_SCALED;	
 		glm::vec3 _RIGHT_STICK_SCALED;
-		float _ACTION_TRIGGER_1;	// Triggers
+		float _ACTION_TRIGGER_1;	
 		float _ACTION_TRIGGER_2;
-		uint8 _FACE_BUTTONS;		// Bitfield for facebuttons
+		uint8 _FACE_BUTTONS;			
 		uint8 _DPAD;
-		uint8 _META_BUTTONS;		// Bitfield for home, share, options, back etc.
+		uint8 _META_BUTTONS;			
 	} JoypadInput_t;
 
 	// Container for mouse input. Framework assumes there's one mouse, and SDL wrapper will populate this during the 
@@ -116,7 +116,7 @@ namespace Neutrino
 	glm::vec3* GetInputAxis(const int iPlayer = 0, bool bKeyOverride = false);
 
 	// GetMouseCoords()
-	//		Return the current X/Y coordinates of the mouse
+	//		Return the current X/Y coordinates of the mouse relative to the window (0,0 is top left)
 	glm::vec2* GetMouseCoords();
 
 	// GetButton()
@@ -142,7 +142,7 @@ namespace Neutrino
 	// GetInputAxisGameDeltaScaled()
 	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h) If bKeyOverride, this will return keyboard 
 	// 		input in preference to joypad axis otherwise joypad axis will always be returned. 
-	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride = false);
+	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride = true);
 
 	// GetRawKeyState()
 	//		Shouldn't really use this, but if you want to peek into the keyboard input state directly, this will give you access.

@@ -74,8 +74,8 @@ namespace Neutrino {
 				s_fScaledHeight = s_fOGL_Y_RATIO / (float)iInternalHeight;
 			}
 
-			// Set the projection matrix for this viewport. 0,0 at bottom left.
-			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO,  0.0f, s_fOGL_Y_RATIO, 1.0f, -1.0f );
+			// Set the projection matrix for this viewport. 0,0 at TOP LEFT.
+			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO, s_fOGL_Y_RATIO,  0.0f,  1.0f, -1.0f );
 
 		}
 

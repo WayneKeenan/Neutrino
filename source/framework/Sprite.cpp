@@ -22,7 +22,7 @@ namespace Neutrino
 	static uint8 s_iAllocatedSets = 0;
 
 
-	void AllocateSpriteArrays(GLuint iTextureID)
+	void AllocateSpriteArrays(const GLuint iTextureID)
 	{
 		ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
 
@@ -88,7 +88,7 @@ namespace Neutrino
 		LOG_INFO("Sprite Arrays deallocated.");
 	}
 
-	Sprite_t* GetActiveSprite(GLuint iTextureID)
+	Sprite_t* GetActiveSprite(const GLuint iTextureID)
 	{
 		Sprite_t* pRet = NULL;
 
@@ -101,14 +101,41 @@ namespace Neutrino
 					pRet = &s_aSpriteRenderInfo[i]->_SpriteBasePointers[ s_aSpriteRenderInfo[i]->_iActiveSpriteCount ]; 
 					s_aSpriteRenderInfo[i]->_iActiveSpriteCount++;
 				}
+				else
+				{
+					LOG_ERROR("iMAX_SPRITES limit reached for texture: %d", iTextureID);
+				}
 			}
 		}
 
-		ASSERT(NULL != pRet, "GetActiveSprite was unable to find the TextureID, or iMAX_SPRITES limit has been reached...");
-
+		if(NULL == pRet) LOG_ERROR("GetActiveSprite was unable to find the TextureID %d, or sprite limit reached for texture: %d", iTextureID);
 		return pRet;		
 	}
 
+	Sprite_t* NewSprite(const GLuint iTextureID, const uint16 iSprIndex)
+	{
+		// Try and get the next available sprite or bail out
+		Sprite_t* pSprite = GetActiveSprite(iTextureID);
+		if( NULL == pSprite)
+			return NULL;
+
+		// Try and populate it from the tpage info
+		{
+			const TPageSpriteInfo_t* pSpriteInfo = GetSpriteInfo(GetTextureSet(iTextureID), iSprIndex);
+			*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			*(pSprite->_vPosition) = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			*(pSprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+			*(pSprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+			*(pSprite->_fScale) = 1.0f;
+			*(pSprite->_fRotDegrees) = 0.0f;		
+			*(pSprite->_fX_S) = pSpriteInfo->_fX_S;
+			*(pSprite->_fY_T) = pSpriteInfo->_fY_T;
+			*(pSprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+			*(pSprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+		}
+
+		return pSprite;
+	}
 
 	void ResetSpriteCount()
 	{

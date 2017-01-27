@@ -17,7 +17,7 @@ namespace Neutrino {
 	static TPage_t* s_aTexturePages;
 
 
-	const TPageSpriteInfo_t* GetSpriteInfo(const int iTextureSet, const int iSpriteCount)
+	const TPageSpriteInfo_t* GetSpriteInfo(const uint16 iTextureSet, const uint16 iSpriteCount)
 	{
 		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetSpriteInfo number of textures loaded: %d, iTextureSet asked for: %d", s_iLoadedTextureCount, iTextureSet);
 
@@ -26,6 +26,19 @@ namespace Neutrino {
 		ASSERT(iSpriteCount < pTpage->_iMaxSprites, "GetSpriteInfo called for a Sprite that doesn't exist. Max: %d, iSpriteCount: %d", pTpage->_iMaxSprites, iSpriteCount );
 
 		return &pTpage->aSprintInfo[iSpriteCount];
+	}
+
+	uint16 GetTextureSet( const GLuint iTextureID )
+	{
+		for(uint16 i=0; i < s_iLoadedTextureCount; ++i)
+		{
+			if (s_aTexturePages[i]._iTextureID == iTextureID)
+			{
+				return i;
+			}
+		}
+		ASSERT(true, "GetTextureSet: unable to find a loaded texture with this id: %d", iTextureID);
+		return 0;
 	}
 
 	

@@ -16,10 +16,10 @@ namespace Neutrino {
 	{
 		float	_fX_S;		// Bot Left UV
 		float	_fY_T;
-		float 	_fX_SnS;	// Top Right UV
-		float 	_fY_TnT;
+		float _fX_SnS;	// Top Right UV
+		float _fY_TnT;
 		float	_fHalfWidth;
-		float 	_fHalfHeight;
+		float _fHalfHeight;
 	} TPageSpriteInfo_t;
 
 
@@ -66,14 +66,17 @@ namespace Neutrino {
 	// GetSpriteInfo
 	// 		Returns pointer to the correct TPageSpriteInfo_t structure for a given sprite index in the packed texture page
 	//   	Sprite will call this to grab UV and Dimension info 
-	const TPageSpriteInfo_t* GetSpriteInfo(const int iTextureSet, const int iSpriteCount);
+	const TPageSpriteInfo_t* GetSpriteInfo(const uint16 iTextureSet, const uint16 iSpriteCount);
 
+	// GetTextureSet
+	//		Will return the index of the packed texture page for the given ID. This index can be passed to GetSpriteInfo if 
+	// 		you only know the texture's OGL id
+	uint16 GetTextureSet( const GLuint iTextureID );
 
 	// ClearAllTextures()
 	// 		Free memory allocated for TPage_t arrays created during LoadTexturesFromConfigFile(), delete the texture
 	//   	and call the GLUtils framework to delete the associated VBOS
 	void DeallocateAllTextures();
-
 
 	// GetLoadedTextureCount()
 	//		Returns the number currently loaded textures

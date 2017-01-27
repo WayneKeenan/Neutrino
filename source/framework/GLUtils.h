@@ -10,11 +10,11 @@
 // Macros for glError Wrapper
 //
 #if defined(DEBUG)
-#define GL_ERROR do{GLUtils::LogGlError(__FILE__,__LINE__);}while(0)
-#define ASSERT_GL_ERROR do{ASSERT(!GLUtils::LogGlError(__FILE__,__LINE__));}while(0)
+	#define GL_ERROR do{GLUtils::LogGlError(__FILE__,__LINE__);}while(0)
+	#define ASSERT_GL_ERROR do{ASSERT(!GLUtils::LogGlError(__FILE__,__LINE__));}while(0)
 #else
-#define GL_ERROR
-#define ASSERT_GL_ERROR
+	#define GL_ERROR
+	#define ASSERT_GL_ERROR
 #endif
 
 namespace Neutrino 

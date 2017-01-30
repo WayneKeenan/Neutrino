@@ -293,7 +293,7 @@ namespace Neutrino
 	{
 		switch (iKey)
 		{
-			case eKeyboard_EditorInputs::_ESC: return s_pKeyState[SDLK_ESCAPE & ~SDLK_SCANCODE_MASK]; break;
+			case eKeyboard_EditorInputs::_ESC: return s_pKeyState[SDLK_ESCAPE & ~SDLK_SCANCODE_MASK] == 1; break;
 			default: break;
 		}
 		return false;

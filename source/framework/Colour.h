@@ -1,5 +1,5 @@
 #pragma once
-#include "Clamp.h"
+#include "NeutrinoMath.h"
 #include "Types.h"
 #include <math.h>
 #include <glm/glm.hpp> 

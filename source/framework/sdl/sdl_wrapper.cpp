@@ -5,7 +5,7 @@
 #include "../Debug.h"
 #include "../Memory.h"
 #include "../Time.h"
-#include "../Clamp.h"
+#include "../NeutrinoMath.h"
 #include "../imgui/imgui.h"
 #include "imgui_impl_sdl_gl3.h"
 #include <vector>

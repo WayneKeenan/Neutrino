@@ -10,22 +10,66 @@
 #include <string>
 #include <math.h>
 #include <glm/glm.hpp> 
+#include <vector>
 
 
 #if defined _WIN32
 #define sprintf sprintf_s
 #endif
 
-#define ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR) / sizeof(*_ARR)))
-
 static const ImVec2* s_pWindowPosition = NEWX ImVec2(1300.0f, 50.0f);
 static const float s_iRowPixels = 400.0f;
 static bool s_bSnapToGrid = true;
 static int s_iSelectedTexture = 0;
-static int s_iSelectedGridSize = 5;
+static int s_iSelectedGridSize = 4;
 static Neutrino::Sprite_t* s_pSelectedTile;
 static uint16 s_iTileIndex = 0;
 static bool s_bSpriteSelected;
+
+// Level Details statics
+static const int s_iFilenameLength = 64;
+static int s_iLevelWidth = 180 / 32;
+static int s_iLevelHeight = 320 / 32;
+static bool s_bCentreLevel = false;
+
+
+// Command type enumerates the actions the editor can perform
+enum eCommandType
+{
+	_TileAdd,
+	_TileRem,
+};
+
+// Each action will generate a Command_t action that's stored in a vector. 
+// We can use this to Undo/Redo editor actions...
+// 
+// _iTilemapIndex = Where did this command happen?
+// _iPrevContent  = Previous contents of the tile array at this index
+// _iNewContent   = New tile to be stored at this index, if any
+// _iAction		  = What action did this command perform?
+// 
+typedef struct Command_t
+{
+	uint16 _iTilemapIndex;
+	uint16 _iPrevContent;
+	uint16 _iNewContent;
+	eCommandType _iAction;
+}Command_t;
+typedef std::vector<Command_t*> CommandList;
+
+// Vector of all actions the editor has performed. Move through this vector
+// To replay / undo editor actions...
+// 
+static CommandList s_aCommandList;
+
+
+// This array holds the Tilemap values. Just records the sprite index. 
+// TODO: This needs to be part of a struct that contains the TPage_t info
+static std::vector<uint16> s_aTileMapIndex;
+
+//-------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------- 
 
 CMapEditorIn::CMapEditorIn()
 {
@@ -61,12 +105,34 @@ void CMapEditorIn::Update()
 	ImGui::Text(" Camera Offset: [%.1f, %.1f]\n", pCamerCoords->x, pCamerCoords->y);
 	ImGui::Text("");
 
+	// Define the settings for this level
+	static char s_FilenameBuf[s_iFilenameLength] = "\0";
+	if (ImGui::CollapsingHeader("Level Details:", iFlags))
+	{
+		ImGui::TextWrapped("To generate a new level enter a filename, dimensions (in tiles) and click \"New\". To save your changes click \"Save\".");
+		ImGui::InputText("Level Name", s_FilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank|ImGuiInputTextFlags_AutoSelectAll);
+		ImGui::InputInt("Level Width", &s_iLevelWidth, 1, 5);
+		ImGui::InputInt("Level Height", &s_iLevelHeight, 1, 5);
+		ImGui::Checkbox("Centre Level", &s_bCentreLevel);
+	}
+
+	// Respond to "New Level" button being pressed
+	if (ImGui::Button("New Level") )
+	{
+		if (s_FilenameBuf[0] == '\0') 
+			LOG_ERROR("Filename buffer is empty, unable to generate a new level without a filename being set");
+		else
+		{
+			LOG_INFO("Generating new level...");
+			s_aTileMapIndex.clear();
+		}
+	}
 
 	// Display Grid Settings 
 	if (ImGui::CollapsingHeader("Editor Grid Settings:", iFlags))
 	{
 		ImGui::PushItemWidth(150);
-		ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0 128x128 \0", 7); 
+		ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0 128x128 \0", -1); 
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::Checkbox("Snap To Grid", &s_bSnapToGrid); 
@@ -98,8 +164,8 @@ void CMapEditorIn::Update()
 		for (uint16 i = 0; i < pTpage->_iMaxSprites; ++i)
 		{
 			// Set params ImageButton needs
-			vDim->x = pTpage->aSprintInfo[i]._fHalfWidth *2.0f;
-			vDim->y = pTpage->aSprintInfo[i]._fHalfHeight * 2.0f;
+			vDim->x = pTpage->aSprintInfo[i]._fHalfWidth*2.0f;
+			vDim->y = pTpage->aSprintInfo[i]._fHalfHeight*2.0f;
 			vUV0->x = pTpage->aSprintInfo[i]._fX_S;
 			vUV0->y = pTpage->aSprintInfo[i]._fY_T;
 			vUV1->x = pTpage->aSprintInfo[i]._fX_SnS;
@@ -134,8 +200,8 @@ void CMapEditorIn::Update()
 	{
 		static ImVec2 s_pWindowDim = ImGui::GetWindowSize();
 		static ImVec2 s_pWindowPos = ImGui::GetWindowPos();
-// 		ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
-// 		ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
+		// 		ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
+		// 		ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
 
 		if ((pMouseCoords->x >= s_pWindowPos.x) && (pMouseCoords->y >= s_pWindowPos.y) &&
 			(pMouseCoords->x <= (s_pWindowPos.x + s_pWindowDim.x)) && (pMouseCoords->y <= (s_pWindowPos.y + s_pWindowDim.y)))
@@ -157,7 +223,7 @@ void CMapEditorIn::Update()
 		// Update for the grid setting
 		if (s_bSnapToGrid)
 		{
-			float fGridSize = (float)pow(2, s_iSelectedGridSize);
+			float fGridSize = (float)pow(2, s_iSelectedGridSize+1);	// Plus one as the grid starts at 2x2
 			s_pSelectedTile->_vPosition->x -= ((int)(pMouseCoords->x) % (int)fGridSize);
 			s_pSelectedTile->_vPosition->y -= ((int)(pMouseCoords->y) % (int)fGridSize);
 			s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;

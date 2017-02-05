@@ -6,6 +6,7 @@
 #include "../Texture.h"
 #include "../Memory.h"
 #include "../Input.h"
+#include "../Debug.h"
 #include <string>
 #include <math.h>
 #include <glm/glm.hpp> 
@@ -48,45 +49,47 @@ void CMapEditorIn::Init()
 
 void CMapEditorIn::Update()
 {
-	glm::vec2* pMouseCoords = Neutrino::GetMouseCoords();
+	const glm::vec2* pMouseCoords = Neutrino::GetMouseCoords();
+	const glm::vec3* pCamerCoords = Neutrino::GetFlyCamOffset();
+	const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
+
 	// Draw the window
 	ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 200.0f), ImGuiSetCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 250.0f), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Tilemap Editor");
-	ImGui::LabelText("", "Grid Settings:");
-	ImGui::SameLine(240);
-	ImGui::Text("[%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
+	ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
+	ImGui::Text(" Camera Offset: [%.1f, %.1f]\n", pCamerCoords->x, pCamerCoords->y);
+	ImGui::Text("");
+
 
 	// Display Grid Settings 
+	if (ImGui::CollapsingHeader("Editor Grid Settings:", iFlags))
 	{
-		ImGui::PushItemWidth(150); 
-		ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0", 6); 
+		ImGui::PushItemWidth(150);
+		ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0 128x128 \0", 7); 
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
-		ImGui::Checkbox("Snap", &s_bSnapToGrid); 
-		ImGui::Separator();
+		ImGui::Checkbox("Snap To Grid", &s_bSnapToGrid); 
+		ImGui::Text("");
 	}
 
-	// Display framework texture count
-	static uint8 iTextureCount = Neutrino::GetLoadedTextureCount();
-	ImGui::LabelText("", "Texture Settings:"); ImGui::SameLine(165); ImGui::LabelText("", "[%d Loaded]", iTextureCount);
-
 	// Build a string of Texture Identifiers for a drop down list
+	static uint8 iTextureCount = Neutrino::GetLoadedTextureCount();
+	if (ImGui::CollapsingHeader("Editor Texture Settings:", iFlags))
 	{
+		ImGui::Text("Available Textures:"); ImGui::SameLine(165); ImGui::Text("%d", iTextureCount);		
 		std::string sBuff;
 		for (int i = 0; i < iTextureCount; ++i)
 			sBuff += " Texture: " + std::to_string(i) + " \0";
 
 		ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
+		ImGui::Text("");
 	}
 
 	// Display selected texture info
-	static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage((uint8)s_iSelectedTexture);
-	ImGui::Separator();
-
-	// Display all the sprites in the texture page
+	static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage((uint8)s_iSelectedTexture);	
+	if(ImGui::CollapsingHeader("Available Tiles", iFlags))
 	{
-		ImGui::LabelText("", "Available Tiles:");
 		ImVec2* vDim = NEWX ImVec2(0.0f, 0.0f);
 		ImVec2* vUV0 = NEWX ImVec2(0.0f, 0.0f);
 		ImVec2* vUV1 = NEWX ImVec2(0.0f, 0.0f);
@@ -119,48 +122,49 @@ void CMapEditorIn::Update()
 			// New line?
 			if (iPixelsUsed < s_iRowPixels) ImGui::SameLine(); else iPixelsUsed = 0;
 		}
-
-
-		// Bounds check mouse to this window. We'll hide the sprite while we're over the window. 
-		bool bMouseOverWindow = false;
-		{
-			static ImVec2 s_pWindowDim = ImGui::GetWindowSize();
-			static ImVec2 s_pWindowPos = ImGui::GetWindowPos();
-			ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
-			ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
-
-			if ((pMouseCoords->x >= s_pWindowPos.x) && (pMouseCoords->y >= s_pWindowPos.y) &&
-				(pMouseCoords->x <= (s_pWindowPos.x + s_pWindowDim.x)) && (pMouseCoords->y <= (s_pWindowPos.y + s_pWindowDim.y)))
-				bMouseOverWindow = true;
-		}
-
-
-		// Set Sprite correct location, nearest the mouse pointer 
-		if(s_bSpriteSelected && !bMouseOverWindow)
-		{
-			// ESC key will turn off the sprite selection next Tick
-			s_bSpriteSelected = !Neutrino::GetKeyState(Neutrino::eKeyboard_EditorInputs::_ESC);
-
-			s_pSelectedTile = Neutrino::NewSprite(pTpage->_iTextureID, s_iTileIndex);
-			ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
-			s_pSelectedTile->_vPosition->x = pMouseCoords->x;
-			s_pSelectedTile->_vPosition->y = pMouseCoords->y;
-
-			// Update for the grid setting
-			if (s_bSnapToGrid)
-			{
-				float fGridSize = (float)pow(2, s_iSelectedGridSize);
-				s_pSelectedTile->_vPosition->x -= ((int)(pMouseCoords->x) % (int)fGridSize);
-				s_pSelectedTile->_vPosition->y -= ((int)(pMouseCoords->y) % (int)fGridSize);
-				s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
-				s_pSelectedTile->_vPosition->y += fGridSize * 0.5f;
-			}
-		}
 		
 		DELETEX vDim;
 		DELETEX vUV0;
 		DELETEX vUV1;
 	}
+
+
+	// Bounds check mouse to this window. We'll hide the sprite while we're over the window. 
+	bool bMouseOverWindow = false; 
+	{
+		static ImVec2 s_pWindowDim = ImGui::GetWindowSize();
+		static ImVec2 s_pWindowPos = ImGui::GetWindowPos();
+// 		ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
+// 		ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
+
+		if ((pMouseCoords->x >= s_pWindowPos.x) && (pMouseCoords->y >= s_pWindowPos.y) &&
+			(pMouseCoords->x <= (s_pWindowPos.x + s_pWindowDim.x)) && (pMouseCoords->y <= (s_pWindowPos.y + s_pWindowDim.y)))
+			bMouseOverWindow = true;
+	}
+
+
+	// Set Sprite correct location, nearest the mouse pointer 
+	if (s_bSpriteSelected && !bMouseOverWindow)
+	{
+		// ESC key will turn off the sprite selection next Tick
+		s_bSpriteSelected = !Neutrino::GetKeyState(Neutrino::eKeyboard_EditorInputs::_ESC);
+
+		s_pSelectedTile = Neutrino::NewSprite(pTpage->_iTextureID, s_iTileIndex);
+		ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
+		s_pSelectedTile->_vPosition->x = pMouseCoords->x;
+		s_pSelectedTile->_vPosition->y = pMouseCoords->y;
+
+		// Update for the grid setting
+		if (s_bSnapToGrid)
+		{
+			float fGridSize = (float)pow(2, s_iSelectedGridSize);
+			s_pSelectedTile->_vPosition->x -= ((int)(pMouseCoords->x) % (int)fGridSize);
+			s_pSelectedTile->_vPosition->y -= ((int)(pMouseCoords->y) % (int)fGridSize);
+			s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
+			s_pSelectedTile->_vPosition->y += fGridSize * 0.5f;
+		}
+	}
+
 
 	ImGui::End();
 }

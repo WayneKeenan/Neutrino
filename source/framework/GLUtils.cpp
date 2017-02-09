@@ -434,6 +434,196 @@ namespace Neutrino {
 				DELETEX s_pDebugVBOs;
 				LOG_INFO("Debug VBOs Deallocated.");
 			}
+
+
+
+			// This is an untextured variant of the Populate VBO function with hardcoded UV to maintain the vertext_t structure in the VBO
+			// It's not really worth generalising between the two  as this is only used in the editor modes and not the main RELEASE runtime. 
+			void PopulateDebugVBO(const float* pHWidths, 
+														const float* pHHeights, 
+														const float* pRots, 
+														const float* pScales, 
+														glm::vec4* pColours, 
+														glm::vec3* pPos, 
+														const int iCount)
+		{
+			ASSERT(iCount < iMAX_SPRITES, "PopulateDebugVBO: Sprite count is greater than VBO limits, something's gone very horribly wrong...");
+
+			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4* vQuadTL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4* vQuadTR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4 vTransBL = glm::vec4();
+			glm::vec4 vTransBR = glm::vec4();
+			glm::vec4 vTransTL = glm::vec4();
+			glm::vec4 vTransTR = glm::vec4();
+			glm::vec3* vPos = NEWX glm::vec3();
+
+			// Get the position of the first vertex in the VBO
+			GLuint iVBO_ID = s_pDebugVBOs->_aVBOs[s_pDebugVBOs->_iVBOCounter];
+
+			glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
+			ASSERT_GL_ERROR;
+			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+			// Traverse the sprite arrays
+			{
+				// For each sprite up to iCount
+				for(int i=0; i<iCount; i++)
+				{
+					// Build the transform matrix for this sprite
+					glm::mat4 mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
+					glm::mat4 mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
+
+					vPos->x = pPos->x * s_fScaledWidth;
+					vPos->y = pPos->y * s_fScaledHeight;
+					vPos->z = pPos->z;
+
+					glm::mat4 mTranslate = glm::translate(*vPos);
+					glm::mat4 mTransform = mTranslate * mRotation * mScale;
+
+
+					// Build the vertex positions
+					{
+						float fScaledWidth = (*pHWidths * s_fScaledWidth);
+						float fScaledHeight = (*pHHeights * s_fScaledHeight);
+
+						vQuadTL_Pos->x = 0.0f - fScaledWidth;
+						vQuadTL_Pos->y = 0.0f + fScaledHeight;
+						vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
+						vQuadTL_Pos->w = 1.0f;   
+
+						vQuadTR_Pos->x = 0.0f + fScaledWidth;
+						vQuadTR_Pos->y = 0.0f + fScaledHeight;
+						vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
+						vQuadTR_Pos->w = 1.0f;   
+
+						vQuadBL_Pos->x = 0.0f - fScaledWidth;
+						vQuadBL_Pos->y = 0.0f - fScaledHeight;
+						vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
+						vQuadBL_Pos->w = 1.0f;   
+
+						vQuadBR_Pos->x = 0.0f + fScaledWidth;
+						vQuadBR_Pos->y = 0.0f - fScaledHeight;
+						vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
+						vQuadBR_Pos->w = 1.0f;   
+					}
+
+
+					// Transform the vertex positions
+					vTransBL = mTransform * *vQuadBL_Pos;
+					vTransBR = mTransform * *vQuadBR_Pos;
+					vTransTL = mTransform * *vQuadTL_Pos;
+					vTransTR = mTransform * *vQuadTR_Pos;
+
+					// Get the packed colour
+					uint32 iColour = GetPackedColourV4(pColours);
+
+					// Populate the VBO vertex corners
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = 0;
+					pVertex->_uv[1] = 1;
+					pVertex->_position[0] = vTransBL.x;
+					pVertex->_position[1] = vTransBL.y;
+					pVertex->_position[2] = vTransBL.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = 1;
+					pVertex->_uv[1] = 1;
+					pVertex->_position[0] = vTransBR.x;
+					pVertex->_position[1] = vTransBR.y;
+					pVertex->_position[2] = vTransBR.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = 0;
+					pVertex->_uv[1] = 0;
+					pVertex->_position[0] = vTransTL.x;
+					pVertex->_position[1] = vTransTL.y;
+					pVertex->_position[2] = vTransTL.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = 1;
+					pVertex->_uv[1] = 1;
+					pVertex->_position[0] = vTransBR.x;
+					pVertex->_position[1] = vTransBR.y;
+					pVertex->_position[2] = vTransBR.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = 1;
+					pVertex->_uv[1] = 0;
+					pVertex->_position[0] = vTransTR.x;
+					pVertex->_position[1] = vTransTR.y;
+					pVertex->_position[2] = vTransTR.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = 0;
+					pVertex->_uv[1] = 0;
+					pVertex->_position[0] = vTransTL.x;
+					pVertex->_position[1] = vTransTL.y;
+					pVertex->_position[2] = vTransTL.z;
+					pVertex++;
+
+					// VBO Vertex pointer is now pointing at the next sprite, so increment through the 
+					// sprite settings arrays to get the data for the next iteration
+					++pHWidths;
+					++pHHeights;
+					++pRots;
+					++pScales;
+					++pColours;
+					++pPos;
+				}
+			}
+
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+
+			DELETEX vQuadBL_Pos;
+			DELETEX vQuadBR_Pos;
+			DELETEX vQuadTL_Pos;
+			DELETEX vQuadTR_Pos;
+			DELETEX vPos;
+		}
+
+
+		void RenderDebugVBO(const int iSpriteCount)
+		{
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glClearColor( s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
+			glBindBuffer ( GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[s_pDebugVBOs->_iVBOCounter]);
+			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			ASSERT_GL_ERROR;
+
+			if (iSpriteCount != 0)
+			{
+				glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+				ASSERT_GL_ERROR;
+
+				glEnableVertexAttribArray(ATTRIB_VERTEX);
+				ASSERT_GL_ERROR;
+
+				glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+				ASSERT_GL_ERROR;
+
+				glEnableVertexAttribArray(ATTRIB_COLOR);
+				ASSERT_GL_ERROR;
+
+				// glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+				// ASSERT_GL_ERROR;
+
+				// glEnableVertexAttribArray(ATTRIB_TEXTURE);
+				// ASSERT_GL_ERROR;
+
+				glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
+				ASSERT_GL_ERROR;            
+			}
+
+			s_pDebugVBOs->_iVBOCounter++;
+			if ( s_pDebugVBOs->_iVBOCounter == 3) s_pDebugVBOs->_iVBOCounter = 0;
+		}
 #endif
 
 

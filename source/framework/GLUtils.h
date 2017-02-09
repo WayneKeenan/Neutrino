@@ -70,20 +70,6 @@ namespace Neutrino
 		// 		Safely cleans up any created VBOs, with error checking.
 		void DeallocateVBOs();
 
-#if defined DEBUG
-		// CreateDebugVBOs()
-		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
-		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
-		// 		buffered in the same way the main render path is. 
-		//
-		//		This will be called by the Framework Init
-		void CreateDebugVBOs();
-
-		// DeleteDebugVBO
-		// 		Safely cleans up any created VBOs, with error checking.
-		void DeallocateDebugVBOs();
-#endif
-
 		// GetCameraMatrix
 		// 		Returns address of the camera matrix for current viewport
 		float* GetCameraMatrix();
@@ -117,5 +103,34 @@ namespace Neutrino
 		// 		Changes the glClearColor parameter. This will remain the background colour every tick until 
 		// 		either the game or editor mode changes it. 
 		void SetClearColour(const float fR, const float fG, const float fB, const float fA);
+
+#if defined DEBUG
+		// CreateDebugVBOs()
+		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
+		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
+		// 		buffered in the same way the main render path is. 
+		//
+		//		This will be called by the Framework Init
+		void CreateDebugVBOs();
+
+		// DeleteDebugVBO
+		// 		Safely cleans up any created VBOs, with error checking.
+		void DeallocateDebugVBOs();
+
+		// PopulateDebugVBO
+		// 		Debug version of the above. 
+		// TODO: pass in the baseptr struct here 
+		void PopulateDebugVBO(const float* pHWidths, 
+													const float* pHHeights, 
+													const float* pRots, 
+													const float* pScales, 
+													glm::vec4* pColours, 
+													glm::vec3* pPos, 
+													const int iCount);
+
+		// RenderVBO
+		// 		Bind the DEBUG VBO and render it. 
+		void RenderDebugVBO(const int iSpriteCount);
+#endif
 	};
 }

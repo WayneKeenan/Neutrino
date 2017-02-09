@@ -220,6 +220,7 @@ namespace Neutrino
 		// If we're a DEBUG build, allocate some sprite arrays for untextured sprites. The 
 		// editor modes will use these. 
 		AllocateUntexturedSpriteArrays();
+		GLUtils::CreateDebugVBOs();
 #endif
 
 		// Parse through the list of levels and store the meta-data so we can transition 
@@ -334,6 +335,7 @@ namespace Neutrino
 #if defined DEBUG
 		DebugOverlayKill();
 		DeallocateUntexturedSpriteArrays();
+		GLUtils::DeallocateDebugVBOs();
 #endif
 		GameStateKill();
 		SDLKill();

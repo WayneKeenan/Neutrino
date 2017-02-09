@@ -88,26 +88,25 @@ namespace Neutrino
 		// 		Returns address of the camera matrix for current viewport
 		float* GetCameraMatrix();
 
-
-
 		// GetMaxSpriteCount
 		// 		Return maximum number of sprites per VBO
 		uint16 GetMaxSpriteCount();
 
 		// PopulateVBO
 		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame
-		void PopulateVBO(	float* pX_S,
-                            float* pY_T,
-                            float* pX_SnS,
-                            float* pY_TnT,
-                            float* pHWidths, 
-                            float* pHHeights, 
-                            float* pRots, 
-                            float* pScales, 
-                            glm::vec4* pColours, 
-                            glm::vec3* pPos, 
-                            const int iCount, 
-                            const int iVBOSet	);
+		// TODO: Pass in the basePtr struct, rather than all the pointers. 
+		void PopulateVBO(	const float* pX_S,
+                      const float* pY_T,
+                      const float* pX_SnS,
+                      const float* pY_TnT,
+                      const float* pHWidths, 
+                      const float* pHHeights, 
+                      const float* pRots, 
+                      const float* pScales, 
+                      glm::vec4* pColours, 
+                      glm::vec3* pPos, 
+                      const int iCount, 
+                      const int iVBOSet	);
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays

@@ -42,11 +42,13 @@ namespace Neutrino {
 			return glm::value_ptr(s_mCameraMatrix);
 		}
 
+
 		void SetClearColour(const float fR, const float fG, const float fB, const float fA)
 		{
 			s_vClearColour.x = fR; s_vClearColour.y = fG; s_vClearColour.z = fB; s_vClearColour.w = fA;
 			//LOG_INFO("Clear Colour Set to: %.2f, %.2f, %.2f, %.2f",  s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
 		}
+
 
 		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
 		{
@@ -80,6 +82,7 @@ namespace Neutrino {
 
 		}
 
+
 		void GenerateMVCMatrices(glm::vec3* vPos)
 		{
 			// We're not going to rotate the camera: 
@@ -91,7 +94,6 @@ namespace Neutrino {
 			s_mModelViewMatrix = mTranslationMatrix;    // * mRotationMatrix;  // Add in scale? Are we going to zoom in and out?
 			s_mCameraMatrix = s_mProjectionMatrix * s_mModelViewMatrix;
 		}
-
 
 
 		void CreateVBOs()
@@ -186,18 +188,18 @@ namespace Neutrino {
 		}
 
 
-		void PopulateVBO(   float* pX_S,
-				float* pY_T,
-				float* pX_SnS,
-				float* pY_TnT,
-				float* pHWidths, 
-				float* pHHeights, 
-				float* pRots, 
-				float* pScales, 
-				glm::vec4* pColours, 
-				glm::vec3* pPos, 
-				const int iCount, 
-				const int iVBOSet   )
+		void PopulateVBO( const float* pX_S,
+											const float* pY_T,
+											const float* pX_SnS,
+											const float* pY_TnT,
+											const float* pHWidths, 
+											const float* pHHeights, 
+											const float* pRots, 
+											const float* pScales, 
+											glm::vec4* pColours, 
+											glm::vec3* pPos, 
+											const int iCount, 
+											const int iVBOSet   )
 		{
 			ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
@@ -211,15 +213,12 @@ namespace Neutrino {
 			glm::vec4 vTransTR = glm::vec4();
 			glm::vec3* vPos = NEWX glm::vec3();
 
-
 			// Get the position of the first vertex in the VBO
-
 			GLuint iVBO_ID = s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter];
 
 			glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
 			ASSERT_GL_ERROR;
 			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-
 
 			// Traverse the sprite arrays
 			{

@@ -35,9 +35,9 @@ namespace Neutrino
 	} SpriteArraySet_t;
 
 	// Sprite_t is a struct of pointers into the SpriteArraysSet_t arrays, defined above.
-	// This is just a utility BasePtr collection that can be grabbed / passed around for 
-	// simpler indexing into the SpriteArraySet.  
-	// 
+	// This is just a utility collection that can be grabbed / passed around for 
+	// simpler indexing into the SpriteArraySet. Dereferncing an instance of this gives you
+	// one sprite's data. 
 	typedef struct Sprite_t			
 	{ 
 		float* 		_fX_S;
@@ -47,22 +47,21 @@ namespace Neutrino
 		float*		_fHalfWidth;		// The pixel dimensions, as mapped to the internal coord system, not the GL pixel output
 		float* 		_fHalfHeight;
 		float*		_fRotDegrees;		// Sprite rotation
-		float*		_fScale;				// Sprite's scale
+		float*		_fScale;			// Sprite's scale
 		glm::vec4*	_vColour;			// Sprite's RGBA colour values
-		glm::vec3* 	_vPosition;		// Sprites position, as mapped to the internal coord system, not the GL pixel output
+		glm::vec3* 	_vPosition;			// Sprites position, as mapped to the internal coord system, not the GL pixel output
 	} Sprite_t;
 
-	// SpriteRenderInfo_t contains the information GLUtils needs to know about each texture 
-	// (and it's SpriteArraySet) in order to decide whether to populate and render VBOs for 
-	// this frame. 
-	//  
+	// SpriteRenderInfo_t contains the information Sprite functions pass to GLUtils so it can 
+	// populate and render VBOs for a given texture's sprites during this frame.  
 	typedef struct SpriteRenderInfo_t
 	{
 		uint16 	_iActiveSpriteCount;
 		GLuint 	_iTextureID;
 		Sprite_t* _SpriteBasePointers;
 		SpriteArraySet_t 	_SprArrayBase;
-	} TextureApriteArrayInfo_t;
+	} TextureSpriteArrayInfo_t;
+
 
 	// AllocateSpriteArrays
 	// 		Called by a successfully loaded texture to allocate the SpriteArraySet_t, and
@@ -71,20 +70,20 @@ namespace Neutrino
 
 	// DeallocateSpriteArrays
 	// 		Called by the framework to release the sprite settings arrays
-	//   	TO DO: Actually delete all of them...
 	void DeallocateSpriteArrays();
 
 	// NewSprite()
 	// 		Returns a populated Sprite_t for the sprite at the given index on the given texture 
 	// 		page. Will return NULL if the sprite or tpage parameters are incorrect.
 	//
-	// 		Note: Sprites returned by this function WILL be rendered at the end of the tick. 
+	// 		Note: Sprites returned by this function WILL be rendered at the end of the tick. If 
+	//		you don't want, don't ask ;)
 	Sprite_t* NewSprite(const GLuint iTextureID, const uint16 iSprIndex);
 
 	// ResetSpriteCount()
 	// 		Called by the framework at the start of each tick, moves the "active sprite" to the
 	//   	bottom of the "sprite settings" arrays, in effect clearing (without zeroing memory)
-	//		all sprites from the next VBO that will be sent to the GPU
+	//		all sprites. (VBOS are only built and sent to the GPU if there's an active sprite)
 	void ResetSpriteCount();
 
 	// DrawSprites()
@@ -92,16 +91,54 @@ namespace Neutrino
 	//		this frame. 
 	void DrawSprites();
 
-	// GetSpriteCount()
-	// 		Return the number of active sprites this tick
-	uint16 GetSpriteCount();
-
-	// GetBasePointers()
-	// 		Returns a Sprite_t structure that points to the start of all the sprite arrays
-	Sprite_t* GetBasePointers();
 
 	// TestSprite()
 	// 		Simple functoin to draw a sprite to the centre of the screen and verify Sprite_t
 	//   	data is working correctly in the VBO
 	void TestSprite();
+
+
+
+
+
+#if defined DEBUG
+	// In debug modes, where editor modes are compiled in, untextured sprites are used by several of the editors to show
+	// bounds, grids and other information. 
+	typedef struct UntexturedSpriteArraySet_t
+	{
+		float* 		_afHalfWidth;
+		float* 		_afHalfHeight;
+		float* 		_afSpriteRotDegrees;
+		float* 		_afSpriteScale;
+		glm::vec4* 	_avSprColours;
+		glm::vec3* 	_avSprPositions;
+	} UntexturedSpriteArraySet_t;
+
+	typedef struct UntexturedSprite_t
+	{
+		float*		_fHalfWidth;
+		float* 		_fHalfHeight;
+		float*		_fRotDegrees;
+		float*		_fScale;
+		glm::vec4*	_vColour;
+		glm::vec3* 	_vPosition;
+	} UntexturedSprite_t;
+
+	typedef struct UntexturedSpriteRenderInfo_t
+	{
+		uint16 	_iActiveSpriteCount;
+		UntexturedSprite_t* _SpriteBasePointers;
+		UntexturedSpriteArraySet_t 	_SprArrayBase;
+	} UntexturedTextureSpriteArrayInfo_t;
+
+
+	// AllocateUntexturedSpriteArrays
+	// 		Called by the framework in DEBUG builds to create storage for untextured sprites. 
+	void AllocateUntexturedSpriteArrays();
+
+	// DeallocateUntexturedSpriteArrays
+	//		Deallocate storage assigned for the debug sprites. 
+	void DeallocateUntexturedSpriteArrays();
+#endif 
+
 }

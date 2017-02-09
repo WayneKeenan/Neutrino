@@ -210,12 +210,17 @@ namespace Neutrino
 		// Load all the textures defined in GameCofig.txt
 		// There's a current assumption that we can probably load all our textures on init 
 		// as there'll never be too many of them. Not likely to fill VRAM with these games...
-		//  
 		if(!LoadTexturesFromConfigFile())
 		{
 			LOG_ERROR("Framework was unable to load all textures, exiting...");
 			return false;
 		}
+
+#if defined DEBUG
+		// If we're a DEBUG build, allocate some sprite arrays for untextured sprites. The 
+		// editor modes will use these. 
+		AllocateUntexturedSpriteArrays();
+#endif
 
 		// Parse through the list of levels and store the meta-data so we can transition 
 		// to new levels during game state transition. 
@@ -276,12 +281,7 @@ namespace Neutrino
 #if defined DEBUG
 		// Output the debug mode overlay
 		DebugOverlayUpdate();
-#endif
 
-		// Let SDL do its magic...
-		SDLPresent();
-
-#if defined DEBUG
 		// If we're to enter an editor mode FORCEKILL current state, and innit the editor mode. 
 		// Note: not all states will let themselves be forcekilled so this attempt may fail. 
 
@@ -298,6 +298,9 @@ namespace Neutrino
 		if(s_iEditorModeFlag & _MAP_ED)
 			EnterEditorMode();
 #endif
+
+		// Let SDL do its magic...
+		SDLPresent();
 
 		return s_bRunningStatus;
 	}
@@ -327,8 +330,10 @@ namespace Neutrino
 		}
 
 		InputKill();
+
 #if defined DEBUG
 		DebugOverlayKill();
+		DeallocateUntexturedSpriteArrays();
 #endif
 		GameStateKill();
 		SDLKill();

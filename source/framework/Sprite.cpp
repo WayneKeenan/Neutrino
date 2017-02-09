@@ -19,6 +19,7 @@ namespace Neutrino
 	// Static allocated arrays for the sprite settings
 	// 
 	static SpriteRenderInfo_t* s_aSpriteRenderInfo[iMAX_TEXTURES];
+	static UntexturedSpriteRenderInfo_t* s_aUntexturedSpriteRenderInfo = NULL;	// Only used in DEBUG builds
 	static uint8 s_iAllocatedSets = 0;
 
 
@@ -143,6 +144,9 @@ namespace Neutrino
 		{
 			s_aSpriteRenderInfo[i]->_iActiveSpriteCount = 0;
 		}
+	#if defined DEBUG
+		s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount = 0;
+	#endif
 	}
 
 
@@ -279,4 +283,47 @@ namespace Neutrino
 		*(mySprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
 		*(mySprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
 	}
+
+
+#if defined DEBUG
+	void AllocateUntexturedSpriteArrays()
+	{
+		ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
+		s_aUntexturedSpriteRenderInfo = NEWX(UntexturedSpriteRenderInfo_t);
+		s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount = 0;
+
+		{
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers = NEWX UntexturedSprite_t[iMAX_SPRITES];
+		}
+
+		for (int i = 0; i < iMAX_SPRITES; i++)
+		{
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fHalfWidth = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth[i];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fHalfHeight = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight[i];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fRotDegrees = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees[i];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fScale = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteScale[i];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._vColour = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprColours[i];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._vPosition = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprPositions[i];
+		}
+	}
+
+
+	void DeallocateUntexturedSpriteArrays()
+	{
+		DELETEX s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth;
+		DELETEX s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight;
+		DELETEX s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteScale;
+		DELETEX s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees;
+		DELETEX s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprColours;
+		DELETEX s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprPositions;
+		DELETEX s_aUntexturedSpriteRenderInfo->_SpriteBasePointers;
+		LOG_INFO("Untextured Sprite Arrays deallocated.");
+	}
+#endif
 }

@@ -365,26 +365,29 @@ namespace Neutrino {
 			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ASSERT_GL_ERROR;
 
-			glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
-			ASSERT_GL_ERROR;
+			if (iSpriteCount != 0)
+			{
+				glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+				ASSERT_GL_ERROR;
 
-			glEnableVertexAttribArray(ATTRIB_VERTEX);
-			ASSERT_GL_ERROR;
+				glEnableVertexAttribArray(ATTRIB_VERTEX);
+				ASSERT_GL_ERROR;
 
-			glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
-			ASSERT_GL_ERROR;
+				glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+				ASSERT_GL_ERROR;
 
-			glEnableVertexAttribArray(ATTRIB_COLOR);
-			ASSERT_GL_ERROR;
+				glEnableVertexAttribArray(ATTRIB_COLOR);
+				ASSERT_GL_ERROR;
 
-			glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
-			ASSERT_GL_ERROR;
+				glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+				ASSERT_GL_ERROR;
 
-			glEnableVertexAttribArray(ATTRIB_TEXTURE);
-			ASSERT_GL_ERROR;
+				glEnableVertexAttribArray(ATTRIB_TEXTURE);
+				ASSERT_GL_ERROR;
 
-			glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
-			ASSERT_GL_ERROR;            
+				glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
+				ASSERT_GL_ERROR;            
+			}
 
 			s_pVBOArrays[iVBOSet]->_iVBOCounter++;
 			if ( s_pVBOArrays[iVBOSet]->_iVBOCounter == 3) s_pVBOArrays[iVBOSet]->_iVBOCounter = 0;

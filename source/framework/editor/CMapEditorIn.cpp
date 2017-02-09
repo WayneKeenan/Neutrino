@@ -103,7 +103,7 @@ void CMapEditorIn::Update()
 	ImGui::Begin("Tilemap Editor");
 	ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
 	ImGui::Text(" Camera Offset: [%.1f, %.1f]\n", pCamerCoords->x, pCamerCoords->y);
-	ImGui::Text("");
+	ImGui::Spacing(); 
 
 	// Define the settings for this level
 	static char s_FilenameBuf[s_iFilenameLength] = "\0";
@@ -136,7 +136,7 @@ void CMapEditorIn::Update()
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::Checkbox("Snap To Grid", &s_bSnapToGrid); 
-		ImGui::Text("");
+		ImGui::Spacing(); 
 	}
 
 	// Build a string of Texture Identifiers for a drop down list
@@ -149,7 +149,7 @@ void CMapEditorIn::Update()
 			sBuff += " Texture: " + std::to_string(i) + " \0";
 
 		ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
-		ImGui::Text("");
+		ImGui::Spacing(); 
 	}
 
 	// Display selected texture info
@@ -224,8 +224,8 @@ void CMapEditorIn::Update()
 		if (s_bSnapToGrid)
 		{
 			float fGridSize = (float)pow(2, s_iSelectedGridSize+1);	// Plus one as the grid starts at 2x2
-			s_pSelectedTile->_vPosition->x -= ((int)(pMouseCoords->x) % (int)fGridSize);
-			s_pSelectedTile->_vPosition->y -= ((int)(pMouseCoords->y) % (int)fGridSize);
+			s_pSelectedTile->_vPosition->x -= (float)((int)(pMouseCoords->x) % (int)fGridSize);
+			s_pSelectedTile->_vPosition->y -= (float)((int)(pMouseCoords->y) % (int)fGridSize);
 			s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
 			s_pSelectedTile->_vPosition->y += fGridSize * 0.5f;
 		}

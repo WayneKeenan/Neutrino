@@ -362,6 +362,7 @@ namespace Neutrino
 			return NULL;
 
 		// Populate defaults
+		// TODO: Delete this after you've tested it. '
 		{
 			*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			*(pSprite->_vPosition) = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);

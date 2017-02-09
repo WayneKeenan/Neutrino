@@ -152,6 +152,7 @@ namespace Neutrino
 
 	void DrawSprites()
 	{
+		// Render the main VBOs if we have any active sprites in any of the sets allocated per texture
 		for( int i = 0; i < s_iAllocatedSets; i++)
 		{
 			if( s_aSpriteRenderInfo[i]->_iActiveSpriteCount > 0 )
@@ -178,8 +179,15 @@ namespace Neutrino
 					s_aSpriteRenderInfo[i]->_iActiveSpriteCount, 
 					s_aSpriteRenderInfo[i]->_iTextureID,
 					i );
-
 		}
+
+#if defined DEBUG 
+		// If there are Untextured DEBUG sprites, then pass this on to GLUtils and Render the DEBUG VBO
+		if( s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount > 0)
+		{
+			// TODO 
+		}
+#endif
 	}
 
 	// Temp vars

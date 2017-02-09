@@ -55,27 +55,39 @@ namespace Neutrino
 
 		// CreateVBOs
 		//		Generates 3 VBO arrays which we iterate over each frame. 
-		//  	Bit of fluff logic here, as I'm second guessing what the driver is going to do, but
-		//   	avoiding the case where we're doing a data map&copy into a VBO the driver might still 
-		//    	be using by trple-buffering. Can be pretty sure we're only copying data into a buffer
-		//      that the driver has already freed. 
-		//      
-		//      None of this is user facing, Render* functions have to get active VBO which is always
-		//      one that was used two frames ago...
-		//      
-		//      Called by LoadTexturesFromConfigFile()
-		//      
+		//		Bit of fluff logic here, as I'm second guessing what the driver is going to do, but
+		//		avoiding the case where we're doing a data map&copy into a VBO the driver might still 
+		//		be using by trple-buffering. Can be pretty sure we're only copying data into a buffer
+		//		that the driver has already freed. 
+		//
+		//		None of this is user facing, Render* functions have to get active VBO which is always
+		//		one that was used two frames ago...
+		//
+		//		Called by LoadTexturesFromConfigFile()
 		void CreateVBOs();
 
+		// DeleteVBO
+		// 		Safely cleans up any created VBOs, with error checking.
+		void DeallocateVBOs();
+
+#if defined DEBUG
+		// CreateDebugVBOs()
+		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
+		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
+		// 		buffered in the same way the main render path is. 
+		//
+		//		This will be called by the Framework Init
+		void CreateDebugVBOs();
+
+		// DeleteDebugVBO
+		// 		Safely cleans up any created VBOs, with error checking.
+		void DeallocateDebugVBOs();
+#endif
 
 		// GetCameraMatrix
 		// 		Returns address of the camera matrix for current viewport
 		float* GetCameraMatrix();
 
-
-		// DeleteVBO
-		// 		Safely cleans up any created VBOs, with error checking.
-		void DeallocateVBOs();
 
 
 		// GetMaxSpriteCount
@@ -97,12 +109,10 @@ namespace Neutrino
                             const int iCount, 
                             const int iVBOSet	);
 
-
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
 		//   	TO_DO: If there's not a lot of shader changes, merge this and Populate VBO above...
 		void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet);
-
 
 		// SetClearColour
 		// 		Changes the glClearColor parameter. This will remain the background colour every tick until 

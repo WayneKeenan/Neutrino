@@ -333,5 +333,47 @@ namespace Neutrino
 		DELETEX s_aUntexturedSpriteRenderInfo->_SpriteBasePointers;
 		LOG_INFO("Untextured Sprite Arrays deallocated.");
 	}
+
+
+	UntexturedSprite_t* GetActiveDebugSprite()
+	{
+		UntexturedSprite_t* pRet = NULL;
+
+		if ( s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES)
+		{
+			pRet = &s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[ s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount ]; 
+			s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount++;
+		}
+		else
+		{
+			LOG_ERROR("GetActiveDebugSprite iMAX_SPRITES limit reached");
+		}
+
+		if(NULL == pRet) LOG_ERROR("GetActiveDebugSprite was unable to find the TextureID %d, or sprite limit reached");
+		return pRet;		
+	}
+		
+
+	UntexturedSprite_t* NewDebugSprite()
+	{
+		// Try and get the next available sprite or bail out
+		UntexturedSprite_t* pSprite = GetActiveDebugSprite();
+		if( NULL == pSprite)
+			return NULL;
+
+		// Populate defaults
+		{
+			*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			*(pSprite->_vPosition) = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			*(pSprite->_fHalfWidth) = 32.0f;
+			*(pSprite->_fHalfHeight) = 32.0f;
+			*(pSprite->_fScale) = 1.0f;
+			*(pSprite->_fRotDegrees) = 0.0f;		
+		}
+
+		return pSprite;
+	}
 #endif
+
+
 }

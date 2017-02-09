@@ -139,6 +139,10 @@ namespace Neutrino
 	// DeallocateUntexturedSpriteArrays
 	//		Deallocate storage assigned for the debug sprites. 
 	void DeallocateUntexturedSpriteArrays();
+
+	// NewDebugSprite
+	// 		Grab a new untextured debug sprite. This sprite WILL be rendered on the next tick. 
+	UntexturedSprite_t* NewDebugSprite();
 #endif 
 
 }

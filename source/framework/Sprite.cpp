@@ -92,7 +92,7 @@ namespace Neutrino
 	Sprite_t* GetActiveSprite(const GLuint iTextureID)
 	{
 		Sprite_t* pRet = NULL;
-
+		ASSERT(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES, "GetActiveSprite iMAX_SPRITES limit reached");
 		for( int i = 0; i < s_iAllocatedSets; i++)
 		{
 			if ( s_aSpriteRenderInfo[i]->_iTextureID == iTextureID)
@@ -101,10 +101,6 @@ namespace Neutrino
 				{
 					pRet = &s_aSpriteRenderInfo[i]->_SpriteBasePointers[ s_aSpriteRenderInfo[i]->_iActiveSpriteCount ]; 
 					s_aSpriteRenderInfo[i]->_iActiveSpriteCount++;
-				}
-				else
-				{
-					LOG_ERROR("iMAX_SPRITES limit reached for texture: %d", iTextureID);
 				}
 			}
 		}
@@ -330,15 +326,11 @@ namespace Neutrino
 	UntexturedSprite_t* GetActiveDebugSprite()
 	{
 		UntexturedSprite_t* pRet = NULL;
-
+		ASSERT(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES, "GetActiveDebugSprite iMAX_SPRITES limit reached");
 		if ( s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES)
 		{
 			pRet = &s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[ s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount ]; 
 			s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount++;
-		}
-		else
-		{
-			LOG_ERROR("GetActiveDebugSprite iMAX_SPRITES limit reached");
 		}
 
 		if(NULL == pRet) LOG_ERROR("GetActiveDebugSprite was unable to find the TextureID %d, or sprite limit reached");

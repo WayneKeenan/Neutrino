@@ -40,7 +40,7 @@ namespace Neutrino {
 		ASSERT(true, "GetTextureSet: unable to find a loaded texture with this id: %d", iTextureID);
 		return 0;
 	}
-
+		
 	
 	uint8 GetLoadedTextureCount()
 	{

@@ -143,6 +143,10 @@ namespace Neutrino
 	// NewDebugSprite
 	// 		Grab a new untextured debug sprite. This sprite WILL be rendered on the next tick. 
 	UntexturedSprite_t* NewDebugSprite();
+
+	// DrawDebugSprites()
+	// 		Passes all the untextured sprites to OGL for rendering. 
+	void DrawDebugSprites();
 #endif 
 
 }

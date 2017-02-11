@@ -180,14 +180,6 @@ namespace Neutrino
 					s_aSpriteRenderInfo[i]->_iTextureID,
 					i );
 		}
-
-#if defined DEBUG 
-		// If there are Untextured DEBUG sprites, then pass this on to GLUtils and Render the DEBUG VBO
-		if( s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount > 0)
-		{
-			// TODO 
-		}
-#endif
 	}
 
 	// Temp vars
@@ -365,7 +357,7 @@ namespace Neutrino
 		// TODO: Delete this after you've tested it. '
 		{
 			*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-			*(pSprite->_vPosition) = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			*(pSprite->_vPosition) = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 			*(pSprite->_fHalfWidth) = 32.0f;
 			*(pSprite->_fHalfHeight) = 32.0f;
 			*(pSprite->_fScale) = 1.0f;
@@ -373,6 +365,23 @@ namespace Neutrino
 		}
 
 		return pSprite;
+	}
+
+	void DrawDebugSprites()
+	{
+		// If there are Untextured DEBUG sprites, then pass this on to GLUtils and Render the DEBUG VBO
+		if (s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount > 0)
+		{
+			GLUtils::PopulateDebugVBO(s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._fHalfWidth,
+				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._fHalfHeight,
+				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._fRotDegrees,
+				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._fScale,
+				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._vColour,
+				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._vPosition,
+				s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount);
+
+			GLUtils::RenderDebugVBO(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount);
+		}
 	}
 #endif
 

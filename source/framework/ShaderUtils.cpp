@@ -259,8 +259,8 @@ namespace Neutrino {
 		s_pActiveShader = &s_aLoadedShaders[iIndex];
 		GL_ERROR;
 		glUseProgram( s_pActiveShader->_ProgramID );
-  		GL_ERROR;
+  	GL_ERROR;
 		glUniformMatrix4fv( s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());
-  		GL_ERROR;
+  	GL_ERROR;
 	}
 }

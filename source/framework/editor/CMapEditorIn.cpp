@@ -12,6 +12,7 @@
 #include <glm/glm.hpp> 
 #include <vector>
 
+using namespace Neutrino;
 
 #if defined _WIN32
 #define sprintf sprintf_s
@@ -22,7 +23,7 @@ static const float s_iRowPixels = 400.0f;
 static bool s_bSnapToGrid = true;
 static int s_iSelectedTexture = 0;
 static int s_iSelectedGridSize = 4;
-static Neutrino::Sprite_t* s_pSelectedTile;
+static Sprite_t* s_pSelectedTile;
 static uint16 s_iTileIndex = 0;
 static bool s_bSpriteSelected;
 
@@ -31,6 +32,7 @@ static const int s_iFilenameLength = 64;
 static int s_iLevelWidth = 180 / 32;
 static int s_iLevelHeight = 320 / 32;
 static bool s_bCentreLevel = false;
+static bool s_bLevelCreated = false;
 
 
 // Command type enumerates the actions the editor can perform
@@ -65,7 +67,24 @@ static CommandList s_aCommandList;
 
 // This array holds the Tilemap values. Just records the sprite index. 
 // TODO: This needs to be part of a struct that contains the TPage_t info
-static std::vector<uint16> s_aTileMapIndex;
+static std::vector<int16> s_aTileMapIndex;
+
+//-------------------------------------------------------------------------------------------------------------------------------
+
+static void RenderEmptyTile(const int iXPos, const int iYPos)
+{
+	UntexturedSprite_t* pSprite = NewDebugSprite();
+	*pSprite->_fHalfHeight = 4.0f;
+	*pSprite->_fHalfWidth = 1.0f;
+	*(pSprite->_vPosition) = glm::vec3((float)iXPos, (float)iYPos, 1.0f);
+	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 0.65f);
+
+	pSprite = NewDebugSprite();
+	*pSprite->_fHalfHeight = 1.0f;
+	*pSprite->_fHalfWidth = 4.0f;
+	*(pSprite->_vPosition) = glm::vec3((float)iXPos, (float)iYPos, 1.0f);
+	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 0.65f);
+}
 
 //-------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------
@@ -87,15 +106,16 @@ void CMapEditorIn::Init()
 {
 	// Do any cleanup from previous frame here. 
 	// Note: we'll be skipping the Exit state of where-ever we are (MenuExit, LevelExit etc) so this could get hairy...
-	Neutrino::ResetSpriteCount();
-	Neutrino::GLUtils::SetClearColour(0.0f, 0.05f, 0.0f, 1.0f);
+	ResetSpriteCount();
+	GLUtils::SetClearColour(0.0f, 0.05f, 0.0f, 1.0f);
 }
 
 void CMapEditorIn::Update()
 {
-	const glm::vec2* pMouseCoords = Neutrino::GetMouseCoords();
-	const glm::vec3* pCamerCoords = Neutrino::GetFlyCamOffset();
+	const glm::vec2* pMouseCoords = GetMouseCoords();
+	const glm::vec3* pCamerCoords = GetFlyCamOffset();
 	const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
+	float fGridSize = (float)pow(2, s_iSelectedGridSize + 1);	// Plus one as the grid starts at 2x2
 
 	// Draw the window
 	ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
@@ -125,6 +145,11 @@ void CMapEditorIn::Update()
 		{
 			LOG_INFO("Generating new level...");
 			s_aTileMapIndex.clear();
+			for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
+			{
+				s_aTileMapIndex.push_back(-1);
+			}
+			s_bLevelCreated = true;
 		}
 	}
 
@@ -140,7 +165,7 @@ void CMapEditorIn::Update()
 	}
 
 	// Build a string of Texture Identifiers for a drop down list
-	static uint8 iTextureCount = Neutrino::GetLoadedTextureCount();
+	static uint8 iTextureCount = GetLoadedTextureCount();
 	if (ImGui::CollapsingHeader("Editor Texture Settings:", iFlags))
 	{
 		ImGui::Text("Available Textures:"); ImGui::SameLine(165); ImGui::Text("%d", iTextureCount);		
@@ -153,7 +178,7 @@ void CMapEditorIn::Update()
 	}
 
 	// Display selected texture info
-	static const Neutrino::TPage_t* pTpage = Neutrino::GetTPage((uint8)s_iSelectedTexture);	
+	static const TPage_t* pTpage = GetTPage((uint8)s_iSelectedTexture);	
 	if(ImGui::CollapsingHeader("Available Tiles", iFlags))
 	{
 		ImVec2* vDim = NEWX ImVec2(0.0f, 0.0f);
@@ -213,9 +238,9 @@ void CMapEditorIn::Update()
 	if (s_bSpriteSelected && !bMouseOverWindow)
 	{
 		// ESC key will turn off the sprite selection next Tick
-		s_bSpriteSelected = !Neutrino::GetKeyState(Neutrino::eKeyboard_EditorInputs::_ESC);
+		s_bSpriteSelected = !GetKeyState(eKeyboard_EditorInputs::_ESC);
 
-		s_pSelectedTile = Neutrino::NewSprite(pTpage->_iTextureID, s_iTileIndex);
+		s_pSelectedTile = NewSprite(pTpage->_iTextureID, s_iTileIndex);
 		ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
 		s_pSelectedTile->_vPosition->x = pMouseCoords->x;
 		s_pSelectedTile->_vPosition->y = pMouseCoords->y;
@@ -223,7 +248,6 @@ void CMapEditorIn::Update()
 		// Update for the grid setting
 		if (s_bSnapToGrid)
 		{
-			float fGridSize = (float)pow(2, s_iSelectedGridSize+1);	// Plus one as the grid starts at 2x2
 			s_pSelectedTile->_vPosition->x -= (float)((int)(pMouseCoords->x) % (int)fGridSize);
 			s_pSelectedTile->_vPosition->y -= (float)((int)(pMouseCoords->y) % (int)fGridSize);
 			s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
@@ -231,6 +255,23 @@ void CMapEditorIn::Update()
 		}
 	}
 
+
+	// If we have an active level to edit render out the existing tiles
+	if (s_bLevelCreated)
+	{
+		int iXPos = 0, iYPos = 0;
+		int iHalfGridSize = (int)(fGridSize*0.5f);
+		for (int i = 0; i < s_iLevelHeight; ++i)
+		{
+			for (int j = 0; j < s_iLevelWidth; ++j)
+			{
+				if (s_aTileMapIndex[i*j] == -1) RenderEmptyTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize);
+				iXPos += (int)fGridSize;
+			}
+			iXPos = 0;
+			iYPos += (int)fGridSize;
+		}
+	}
 
 	ImGui::End();
 }

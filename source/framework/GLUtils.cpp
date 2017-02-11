@@ -217,19 +217,19 @@ namespace Neutrino {
 			glm::vec4 vTransTR = glm::vec4();
 			glm::vec3* vPos = NEWX glm::vec3();
 
-			// Get the position of the first vertex in the VBO
-			GLuint iVBO_ID = s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter];
 
+			GLuint iVBO_ID = s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter];
 			glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
 			ASSERT_GL_ERROR;
 			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 			// Traverse the sprite arrays
+			// TODO: Split this into 4 and spread across threads
 			{
 				glm::mat4 mScale = glm::mat4(1.0f);
 				glm::mat4 mRotation = glm::mat4(1.0f);;
-				glm::mat4 mTranslate;
-				glm::mat4 mTransform;
+				glm::mat4 mTranslate = glm::mat4(1.0f);;
+				glm::mat4 mTransform = glm::mat4(1.0f);;
 				float fScaledWidth;
 				float fScaledHeight;
 				uint32 iColour;
@@ -238,14 +238,23 @@ namespace Neutrino {
 				for(int i=0; i<iCount; i++)
 				{
 					// Build the transform matrix for this sprite
-					if( *pScales > 1.0f || *pScales < 1.0f) mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
-					if (*pRots > 0.0f) mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
+					mScale[0].x = *pScales;
+					mScale[1].y = *pScales;
+
+					mRotation[0].x = cos(*pRots);
+					mRotation[0].y = -sin(*pRots);
+					mRotation[1].x = sin(*pRots);
+					mRotation[1].y = cos(*pRots);
 
 					vPos->x = pPos->x * s_fScaledWidth;
 					vPos->y = pPos->y * s_fScaledHeight;
 					vPos->z = pPos->z;
 
-					mTranslate = glm::translate(*vPos);
+					mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
+
+					// This is the slowest line in here. 
+					// TODO: Possible to get a speed gain by removing the operator* ? Would remove the vec4 constructors
+					// glm::operator*<float,0>	Neutrino	e:\bitbucket\neutrino\external_dependencies\glm\glm\detail\type_mat4x4.inl	Line: 608	
 					mTransform = mTranslate * mRotation * mScale;
 
 
@@ -482,8 +491,8 @@ namespace Neutrino {
 				{
 					glm::mat4 mScale = glm::mat4(1.0f);
 					glm::mat4 mRotation = glm::mat4(1.0f);
-					glm::mat4 mTranslate;
-					glm::mat4 mTransform;
+					glm::mat4 mTranslate = glm::mat4(1.0f);
+					glm::mat4 mTransform = glm::mat4(1.0f);
 					float fScaledWidth;
 					float fScaledHeight;
 					uint32 iColour;
@@ -492,14 +501,23 @@ namespace Neutrino {
 					for(int i=0; i<iCount; i++)
 					{
 						// Build the transform matrix for this sprite
-						if (*pScales > 1.0f || *pScales < 1.0f) mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
-						if (*pRots > 0.0f) mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
+						mScale[0].x = *pScales;
+						mScale[1].y = *pScales;
+
+						mRotation[0].x = cos(*pRots);
+						mRotation[0].y = -sin(*pRots);
+						mRotation[1].x = sin(*pRots);
+						mRotation[1].y = cos(*pRots);
 
 						vPos->x = pPos->x * s_fScaledWidth;
 						vPos->y = pPos->y * s_fScaledHeight;
 						vPos->z = pPos->z;
 
-						mTranslate = glm::translate(*vPos);
+						mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
+
+						// This is the slowest line in here. 
+						// TODO: Possible to get a speed gain by removing the operator* ? Would remove the vec4 constructors
+						// glm::operator*<float,0>	Neutrino	e:\bitbucket\neutrino\external_dependencies\glm\glm\detail\type_mat4x4.inl	Line: 608	
 						mTransform = mTranslate * mRotation * mScale;
 
 

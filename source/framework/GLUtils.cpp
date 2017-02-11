@@ -82,6 +82,10 @@ namespace Neutrino {
 
 		}
 
+		const glm::vec2 GetViewportDimensions()
+		{
+			return glm::vec2(s_fViewportWidth, s_fViewportHeight);
+		}
 
 		void GenerateMVCMatrices(glm::vec3* vPos)
 		{
@@ -222,25 +226,33 @@ namespace Neutrino {
 
 			// Traverse the sprite arrays
 			{
+				glm::mat4 mScale = glm::mat4(1.0f);
+				glm::mat4 mRotation = glm::mat4(1.0f);;
+				glm::mat4 mTranslate;
+				glm::mat4 mTransform;
+				float fScaledWidth;
+				float fScaledHeight;
+				uint32 iColour;
+
 				// For each sprite up to iCount
 				for(int i=0; i<iCount; i++)
 				{
 					// Build the transform matrix for this sprite
-					glm::mat4 mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
-					glm::mat4 mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
+					if( *pScales > 1.0f || *pScales < 1.0f) mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
+					if (*pRots > 0.0f) mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
 
 					vPos->x = pPos->x * s_fScaledWidth;
 					vPos->y = pPos->y * s_fScaledHeight;
 					vPos->z = pPos->z;
 
-					glm::mat4 mTranslate = glm::translate(*vPos);
-					glm::mat4 mTransform = mTranslate * mRotation * mScale;
+					mTranslate = glm::translate(*vPos);
+					mTransform = mTranslate * mRotation * mScale;
 
 
 					// Build the vertex positions
 					{
-						float fScaledWidth = (*pHWidths * s_fScaledWidth);
-						float fScaledHeight = (*pHHeights * s_fScaledHeight);
+						fScaledWidth = (*pHWidths * s_fScaledWidth);
+						fScaledHeight = (*pHHeights * s_fScaledHeight);
 
 						vQuadTL_Pos->x = 0.0f - fScaledWidth;
 						vQuadTL_Pos->y = 0.0f + fScaledHeight;
@@ -271,7 +283,7 @@ namespace Neutrino {
 					vTransTR = mTransform * *vQuadTR_Pos;
 
 					// Get the packed colour
-					uint32 iColour = GetPackedColourV4(pColours);
+					iColour = GetPackedColourV4(pColours);
 
 					// Populate the VBO vertex corners
 					pVertex->_colour = iColour;
@@ -468,25 +480,33 @@ namespace Neutrino {
 
 				// Traverse the sprite arrays
 				{
+					glm::mat4 mScale = glm::mat4(1.0f);
+					glm::mat4 mRotation = glm::mat4(1.0f);
+					glm::mat4 mTranslate;
+					glm::mat4 mTransform;
+					float fScaledWidth;
+					float fScaledHeight;
+					uint32 iColour;
+
 					// For each sprite up to iCount
 					for(int i=0; i<iCount; i++)
 					{
 						// Build the transform matrix for this sprite
-						glm::mat4 mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
-						glm::mat4 mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
+						if (*pScales > 1.0f || *pScales < 1.0f) mScale = glm::scale(glm::vec3(*pScales, *pScales, 1.0f));
+						if (*pRots > 0.0f) mRotation = glm::rotate(*pRots, glm::vec3(0.0f, 0.0f, 1.0f));
 
 						vPos->x = pPos->x * s_fScaledWidth;
 						vPos->y = pPos->y * s_fScaledHeight;
 						vPos->z = pPos->z;
 
-						glm::mat4 mTranslate = glm::translate(*vPos);
-						glm::mat4 mTransform = mTranslate * mRotation * mScale;
+						mTranslate = glm::translate(*vPos);
+						mTransform = mTranslate * mRotation * mScale;
 
 
 						// Build the vertex positions
 						{
-							float fScaledWidth = (*pHWidths * s_fScaledWidth);
-							float fScaledHeight = (*pHHeights * s_fScaledHeight);
+							fScaledWidth = (*pHWidths * s_fScaledWidth);
+							fScaledHeight = (*pHHeights * s_fScaledHeight);
 
 							vQuadTL_Pos->x = 0.0f - fScaledWidth;
 							vQuadTL_Pos->y = 0.0f + fScaledHeight;
@@ -517,7 +537,7 @@ namespace Neutrino {
 						vTransTR = mTransform * *vQuadTR_Pos;
 
 						// Get the packed colour
-						uint32 iColour = GetPackedColourV4(pColours);
+						iColour = GetPackedColourV4(pColours);
 
 						// Populate the VBO vertex corners
 						pVertex->_colour = iColour;

@@ -44,6 +44,10 @@ namespace Neutrino
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
 		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight);
 
+		// GetViewportDimensions
+		//		Returns a vector2 for the width and height of the active viewport
+		const glm::vec2 GetViewportDimensions();
+
 		// GenerateMatrices
 		// 		Create the new ModelView and Camera Matrices for this tick
 		void GenerateMVCMatrices(glm::vec3* vPos);
@@ -74,9 +78,6 @@ namespace Neutrino
 		// 		Returns address of the camera matrix for current viewport
 		float* GetCameraMatrix();
 
-		// GetMaxSpriteCount
-		// 		Return maximum number of sprites per VBO
-		uint16 GetMaxSpriteCount();
 
 		// PopulateVBO
 		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame

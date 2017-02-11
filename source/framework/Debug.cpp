@@ -1,6 +1,8 @@
 #include "Debug.h"
 #include "Time.h"
 #include "Memory.h"
+#include "Sprite.h"
+#include "GLUtils.h"
 #include <string.h>
 #include <glm/glm.hpp> 
 #include "Input.h"
@@ -84,14 +86,16 @@ namespace Neutrino
 
 			// Update performance counters
 			snprintf(sFPS_Text, 32,   "FPS: %.2f [%.2f]", s_FPSSampler.GetAverageFrameRate(), s_FPSSampler.GetLatestFrameRate() );
-			snprintf(sDELTA_Text, 32, "DELTA: [%.2f]", s_FPSSampler.GetAverageDeltaTime());
+			snprintf(sDELTA_Text, 32, "DELTA: [%.3f]", s_FPSSampler.GetAverageDeltaTime());
 
 			ImGui::SetNextWindowPos(*s_pOverlayPosition, ImGuiSetCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiSetCond_FirstUseEver);
 			ImGui::Begin("Neutrino Debug", &s_bDebugOverlayActive);
 			ImGui::LabelText("", "Performance:");
-			ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 0.16f, ImVec2(150,32));
-			ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 30.0f, 60.0f, ImVec2(150,32));
+			ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 1.0f/120.0f, 1.0f/24.0f, ImVec2(150,32));
+			ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 120.0f, ImVec2(150,32));
+			ImGui::Text("Sprites Count: [%d--%d]", GetSpriteCount(), GetDebugSpriteCount());
+			ImGui::Text("VBO sizes: [%dk--%dk]", (GetSpriteCount() * sizeof(GLUtils::Vertex_t)) /1024, (GetDebugSpriteCount() * sizeof(GLUtils::Vertex_t)) /1024);
 
 			// Output camera position
 			ImGui::Separator();

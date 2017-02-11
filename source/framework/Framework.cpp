@@ -283,6 +283,11 @@ namespace Neutrino
 		// Output the debug mode overlay
 		DebugOverlayUpdate();
 
+		SetActiveShader(DEFAULT_UNTEXTURED);
+
+		// Draw everything
+		DrawDebugSprites();
+
 		// If we're to enter an editor mode FORCEKILL current state, and innit the editor mode. 
 		// Note: not all states will let themselves be forcekilled so this attempt may fail. 
 
@@ -299,6 +304,8 @@ namespace Neutrino
 		if(s_iEditorModeFlag & _MAP_ED)
 			EnterEditorMode();
 #endif
+
+
 
 		// Let SDL do its magic...
 		SDLPresent();

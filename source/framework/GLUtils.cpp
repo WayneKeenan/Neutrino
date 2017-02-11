@@ -592,9 +592,7 @@ namespace Neutrino {
 			void RenderDebugVBO(const int iSpriteCount)
 			{
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glClearColor( s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
 				glBindBuffer ( GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[s_pDebugVBOs->_iVBOCounter]);
-				glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				ASSERT_GL_ERROR;
 
 				if (iSpriteCount != 0)
@@ -611,11 +609,11 @@ namespace Neutrino {
 					glEnableVertexAttribArray(ATTRIB_COLOR);
 					ASSERT_GL_ERROR;
 
-					// glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
-					// ASSERT_GL_ERROR;
+					glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+					ASSERT_GL_ERROR;
 
-					// glEnableVertexAttribArray(ATTRIB_TEXTURE);
-					// ASSERT_GL_ERROR;
+					glEnableVertexAttribArray(ATTRIB_TEXTURE);
+					ASSERT_GL_ERROR;
 
 					glDrawArrays(GL_TRIANGLES, 0, iSpriteCount * 6);
 					ASSERT_GL_ERROR;            

@@ -109,6 +109,7 @@ namespace Neutrino
 		return pRet;		
 	}
 
+
 	Sprite_t* NewSprite(const GLuint iTextureID, const uint16 iSprIndex)
 	{
 		// Try and get the next available sprite or bail out
@@ -145,6 +146,22 @@ namespace Neutrino
 	#endif
 	}
 
+
+	int GetSpriteCount()
+	{
+		int iRet = 0;
+		for (int i = 0; i < s_iAllocatedSets; ++i)
+		{
+			iRet += s_aSpriteRenderInfo[i]->_iActiveSpriteCount;
+		}
+
+		return iRet;
+	}
+
+	int GetDebugSpriteCount()
+	{
+		return s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount;
+	}
 
 	void DrawSprites()
 	{

@@ -98,7 +98,10 @@ namespace Neutrino
 	void TestSprite();
 
 
+	int GetSpriteCount();
 
+
+	int GetDebugSpriteCount();
 
 
 #if defined DEBUG

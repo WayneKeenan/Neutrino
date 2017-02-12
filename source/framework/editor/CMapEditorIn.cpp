@@ -36,7 +36,7 @@ static int s_iLevelWidth = s_iScreenWidth / 32;
 static int s_iLevelHeight = s_iScreenHeight / 32;
 static bool s_bCentreLevel = true;
 static bool s_bLevelCreated = false;
-
+static char s_FilenameBuf[s_iFilenameLength] = "\0";
 
 // Command type enumerates the actions the editor can perform
 enum eCommandType
@@ -171,54 +171,61 @@ void CMapEditorIn::Update()
 
 
 	// Define the settings for this level
-	static char s_FilenameBuf[s_iFilenameLength] = "\0";
-	if (ImGui::CollapsingHeader("Level Details:", iFlags))
 	{
-		ImGui::InputText("Level Name", s_FilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank|ImGuiInputTextFlags_AutoSelectAll);
-		ImGui::InputInt("Screen Width", &s_iScreenWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel width of the screen for the final output");
-		ImGui::InputInt("Screen Height", &s_iScreenHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel height of the screen for the final output");
-		ImGui::InputInt("Screens Wide", &s_iScreensWide, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("How many screens long is this level?");
-		bool bWidthChanged = ImGui::InputInt("Level Width", &s_iLevelWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Width of the level, in tiles");
-		bool bHeightChanged = ImGui::InputInt("Level Height", &s_iLevelHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Height of the level, in tiles"); 
-		if (bWidthChanged || bHeightChanged) ResizeTilemap();
-	}
-
-
-	// Respond to "New Level" button being pressed
-	if (ImGui::Button("Create") )
-	{
-		if (s_FilenameBuf[0] == '\0') 
-			LOG_ERROR("Filename buffer is empty, unable to generate a new level without a filename being set");
-		else
+		if (ImGui::CollapsingHeader("Level Details:", iFlags))
 		{
-			LOG_INFO("Generating new level...");
-			s_aTileMapIndex.clear();
-			for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
-			{
-				s_aTileMapIndex.push_back(-1);
-			}
-			s_bLevelCreated = true;
+			ImGui::InputText("Level Name", s_FilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+			ImGui::InputInt("Screen Width", &s_iScreenWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel width of the screen for the final output");
+			ImGui::InputInt("Screen Height", &s_iScreenHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel height of the screen for the final output");
+			ImGui::InputInt("Screens Wide", &s_iScreensWide, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("How many screens long is this level?");
+			bool bWidthChanged = ImGui::InputInt("Level Width", &s_iLevelWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Width of the level, in tiles");
+			bool bHeightChanged = ImGui::InputInt("Level Height", &s_iLevelHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Height of the level, in tiles");
+			if (bWidthChanged || bHeightChanged) ResizeTilemap();
 		}
 	}
 
 
-	ImGui::SameLine();
-	// Respond to "Clear Level" button being pressed
-	if (ImGui::Button("Clear"))
+	// Respond to "New Level" button being pressed
 	{
-		s_aTileMapIndex.clear();
-		s_bLevelCreated = false;
+		if (ImGui::Button("Create"))
+		{
+			if (s_FilenameBuf[0] == '\0')
+				LOG_ERROR("Filename buffer is empty, unable to generate a new level without a filename being set");
+			else
+			{
+				LOG_INFO("Generating new level...");
+				s_aTileMapIndex.clear();
+				for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
+				{
+					s_aTileMapIndex.push_back(-1);
+				}
+				s_bLevelCreated = true;
+			}
+		}
+	}
+
+
+	// Respond to "Clear Level" button being pressed
+	{
+		ImGui::SameLine();
+		if (ImGui::Button("Clear"))
+		{
+			s_aTileMapIndex.clear();
+			s_bLevelCreated = false;
+		}
 	}
 
 
 	// Respond to "Calc Dimensions" button
-	ImGui::SameLine();
-	if (ImGui::Button("Calc") && !s_bLevelCreated)
 	{
-		s_iLevelHeight = s_iScreenHeight / (int)fGridSize;
-		s_iLevelWidth = (s_iScreenWidth*s_iScreensWide) / (int)fGridSize;
-		if (s_iScreenHeight % (int)fGridSize > 0) LOG_WARNING("Level Height dimensions are %d pixels short", s_iScreenHeight % (int)fGridSize);
-		if ((s_iScreenWidth*s_iScreensWide) % (int)fGridSize > 0) LOG_WARNING("Level Width dimensions are %d pixels short", s_iScreenHeight % (int)fGridSize);
+		ImGui::SameLine();
+		if (ImGui::Button("Calc") && !s_bLevelCreated)
+		{
+			s_iLevelHeight = s_iScreenHeight / (int)fGridSize;
+			s_iLevelWidth = (s_iScreenWidth*s_iScreensWide) / (int)fGridSize;
+			if (s_iScreenHeight % (int)fGridSize > 0) LOG_WARNING("Level Height dimensions are %d pixels short", s_iScreenHeight % (int)fGridSize);
+			if ((s_iScreenWidth*s_iScreensWide) % (int)fGridSize > 0) LOG_WARNING("Level Width dimensions are %d pixels short", s_iScreenHeight % (int)fGridSize);
+		}
 	}
 
 
@@ -228,71 +235,77 @@ void CMapEditorIn::Update()
 
 
 	// Display Grid Settings 
-	if (ImGui::CollapsingHeader("Editor Grid Settings:", iFlags))
 	{
-		ImGui::PushItemWidth(150);
-		ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0 128x128 \0", -1); 
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-		ImGui::Checkbox("Snap To Grid", &s_bSnapToGrid); 
-		ImGui::Spacing(); 
+		if (ImGui::CollapsingHeader("Editor Grid Settings:", iFlags))
+		{
+			ImGui::PushItemWidth(150);
+			ImGui::Combo("Grid Size", &s_iSelectedGridSize, " 2x2 \0 4x4 \0 8x8 \0 16x16 \0 32x32 \0 64x64 \0 128x128 \0", -1);
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			ImGui::Checkbox("Snap To Grid", &s_bSnapToGrid);
+			ImGui::Spacing();
+		}
 	}
 
 
 	// Build a string of Texture Identifiers for a drop down list
-	uint8 iTextureCount = GetLoadedTextureCount();
-	if (ImGui::CollapsingHeader("Editor Texture Settings:", iFlags))
 	{
-		ImGui::Text("Available Textures:"); ImGui::SameLine(165); ImGui::Text("%d", iTextureCount);		
-		std::string sBuff;
-		for (int i = 0; i < iTextureCount; ++i)
-			sBuff += " Texture: " + std::to_string(i) + " \0";
+		uint8 iTextureCount = GetLoadedTextureCount();
+		if (ImGui::CollapsingHeader("Editor Texture Settings:", iFlags))
+		{
+			ImGui::Text("Available Textures:"); ImGui::SameLine(165); ImGui::Text("%d", iTextureCount);
+			std::string sBuff;
+			for (int i = 0; i < iTextureCount; ++i)
+				sBuff += " Texture: " + std::to_string(i) + " \0";
 
-		ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
-		ImGui::Spacing(); 
+			ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
+			ImGui::Spacing();
+		}
 	}
 
 
 	// Display selected texture info
 	const TPage_t* pTpage = GetTPage((uint8)s_iSelectedTexture);	
-	if(ImGui::CollapsingHeader("Available Tiles", iFlags))
 	{
-		ImVec2* vDim = NEWX ImVec2(0.0f, 0.0f);
-		ImVec2* vUV0 = NEWX ImVec2(0.0f, 0.0f);
-		ImVec2* vUV1 = NEWX ImVec2(0.0f, 0.0f);
-
-		float iPixelsUsed = 0.0f;
-		for (uint16 i = 0; i < pTpage->_iMaxSprites; ++i)
+		if (ImGui::CollapsingHeader("Available Tiles", iFlags))
 		{
-			// Set params ImageButton needs
-			vDim->x = pTpage->aSprintInfo[i]._fHalfWidth*2.0f;
-			vDim->y = pTpage->aSprintInfo[i]._fHalfHeight*2.0f;
-			vUV0->x = pTpage->aSprintInfo[i]._fX_S;
-			vUV0->y = pTpage->aSprintInfo[i]._fY_T;
-			vUV1->x = pTpage->aSprintInfo[i]._fX_SnS;
-			vUV1->y = pTpage->aSprintInfo[i]._fY_TnT;
+			ImVec2* vDim = NEWX ImVec2(0.0f, 0.0f);
+			ImVec2* vUV0 = NEWX ImVec2(0.0f, 0.0f);
+			ImVec2* vUV1 = NEWX ImVec2(0.0f, 0.0f);
 
-			// Update horizontal distance traversed, sp we can check for a new line
-			iPixelsUsed += vDim->x;
-
-			// Note to future Gareth: GCC warns about casting to pointer from int of different size here.
-			// The intptr_t cast removes that, but this was the first time that you saw that warning. 
-			// Step through with a debugger to see where this goes, and read a book. 
-			ImGui::PushID(i);
-			if( ImGui::ImageButton((void*)(intptr_t)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1) )
+			float iPixelsUsed = 0.0f;
+			for (uint16 i = 0; i < pTpage->_iMaxSprites; ++i)
 			{
+				// Set params ImageButton needs
+				vDim->x = pTpage->aSprintInfo[i]._fHalfWidth*2.0f;
+				vDim->y = pTpage->aSprintInfo[i]._fHalfHeight*2.0f;
+				vUV0->x = pTpage->aSprintInfo[i]._fX_S;
+				vUV0->y = pTpage->aSprintInfo[i]._fY_T;
+				vUV1->x = pTpage->aSprintInfo[i]._fX_SnS;
+				vUV1->y = pTpage->aSprintInfo[i]._fY_TnT;
+
+				// Update horizontal distance traversed, sp we can check for a new line
+				iPixelsUsed += vDim->x;
+
+				// Note to future Gareth: GCC warns about casting to pointer from int of different size here.
+				// The intptr_t cast removes that, but this was the first time that you saw that warning. 
+				// Step through with a debugger to see where this goes, and read a book. 
+				ImGui::PushID(i);
+				if (ImGui::ImageButton((void*)(intptr_t)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1))
+				{
 					s_bSpriteSelected = true;
 					s_iTileIndex = i;
-			}
-			ImGui::PopID();	// Note: PushID required for image buttons to work
+				}
+				ImGui::PopID();	// Note: PushID required for image buttons to work
 
-			// New line?
-			if (iPixelsUsed < s_iRowPixels) ImGui::SameLine(); else iPixelsUsed = 0;
+												// New line?
+				if (iPixelsUsed < s_iRowPixels) ImGui::SameLine(); else iPixelsUsed = 0;
+			}
+
+			DELETEX vDim;
+			DELETEX vUV0;
+			DELETEX vUV1;
 		}
-		
-		DELETEX vDim;
-		DELETEX vUV0;
-		DELETEX vUV1;
 	}
 
 
@@ -301,70 +314,76 @@ void CMapEditorIn::Update()
 	{
 		ImVec2 s_pWindowDim = ImGui::GetWindowSize();
 		ImVec2 s_pWindowPos = ImGui::GetWindowPos();
-// 		ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
-// 		ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
 
 		if ((pMouseCoords->x >= s_pWindowPos.x) && (pMouseCoords->y >= s_pWindowPos.y) &&
-			(pMouseCoords->x <= (s_pWindowPos.x + s_pWindowDim.x)) && (pMouseCoords->y <= (s_pWindowPos.y + s_pWindowDim.y)))
+			  (pMouseCoords->x <= (s_pWindowPos.x + s_pWindowDim.x)) && (pMouseCoords->y <= (s_pWindowPos.y + s_pWindowDim.y))) 
 			bMouseOverWindow = true;
+
+		ImGui::End();
 	}
 
 
 	// Set Sprite correct location, nearest the mouse pointer 
-	if (s_bSpriteSelected && !bMouseOverWindow)
 	{
-		// ESC key will turn off the sprite selection next Tick
-		s_bSpriteSelected = !GetKeyState(eKeyboard_EditorInputs::_ESC);
-
-		s_pSelectedTile = NewSprite(pTpage->_iTextureID, s_iTileIndex);
-		ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
-
-		s_pSelectedTile->_vPosition->x = vMouseWorldPosition->x;
-		s_pSelectedTile->_vPosition->y = vMouseWorldPosition->y;
-
-		// Update for the grid setting
-		if (s_bSnapToGrid)
+		if (s_bSpriteSelected && !bMouseOverWindow)
 		{
-			s_pSelectedTile->_vPosition->x -= (float)((int)(vMouseWorldPosition->x) % (int)fGridSize);
-			s_pSelectedTile->_vPosition->y -= (float)((int)(vMouseWorldPosition->y) % (int)fGridSize);
-			s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
-			s_pSelectedTile->_vPosition->y += fGridSize * 0.5f;
-		}
-	}
+			// ESC key will turn off the sprite selection next Tick
+			s_bSpriteSelected = !GetKeyState(eKeyboard_EditorInputs::_ESC);
 
+			s_pSelectedTile = NewSprite(pTpage->_iTextureID, s_iTileIndex);
+			ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
 
-	// If we have an active level to edit, iterate over tile positions, render a sprite, and check for mouse input
-	if (s_bLevelCreated)
-	{
-		int iXPos = 0, iYPos = 0;
-		int iHalfGridSize = (int)(fGridSize*0.5f);
+			s_pSelectedTile->_vPosition->x = vMouseWorldPosition->x;
+			s_pSelectedTile->_vPosition->y = vMouseWorldPosition->y;
 
-		if (s_bCentreLevel) iYPos = (int)((GLUtils::GetViewportDimensions().y * 0.5f) - ((float)(s_iLevelHeight/2) * fGridSize));
-
-		for (uint16 i = 0; i < s_iLevelHeight; ++i)
-		{
-			for (uint16 j = 0; j < s_iLevelWidth; ++j)
+			// Update for the grid setting
+			if (s_bSnapToGrid)
 			{
-				// Render the tile
-				ASSERT((uint32)(i*j) < (uint32)s_aTileMapIndex.size(), "s_aTilemapArray hasn't been resized for current dimensions");
-				if (s_aTileMapIndex[i*j] == -1) 
-					RenderEmptyTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize);
-				else
-					RenderTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
-				
-// 				// Respond to Mouse Down event and Add/Remove a tile to the map....
-// 				if (s_bSpriteSelected && GetMouseLB())
-// 				{
-// 					LOG_INFO("Mouse pos: %f, %f", pMouseCoords->x, pMouseCoords->y);
-// 				}
-				
-				iXPos += (int)fGridSize;
+				s_pSelectedTile->_vPosition->x -= (float)((int)(vMouseWorldPosition->x) % (int)fGridSize);
+				s_pSelectedTile->_vPosition->y -= (float)((int)(vMouseWorldPosition->y) % (int)fGridSize);
+				s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
+				s_pSelectedTile->_vPosition->y += fGridSize * 0.5f;
 			}
-			iXPos = 0;
-			iYPos += (int)fGridSize;
 		}
 	}
-	ImGui::End();
+
+
+	// If we have an active level to edit, iterate over tile positions and render either the tile or the empty tile indicator
+	{
+		if (s_bLevelCreated)
+		{
+			int iXPos = 0, iYPos = 0;
+			int iHalfGridSize = (int)(fGridSize*0.5f);
+
+			if (s_bCentreLevel) iYPos = (int)((GLUtils::GetViewportDimensions().y * 0.5f) - ((float)(s_iLevelHeight / 2) * fGridSize));
+
+			for (uint16 i = 0; i < s_iLevelHeight; ++i)
+			{
+				for (uint16 j = 0; j < s_iLevelWidth; ++j)
+				{
+					// Render the tile
+					ASSERT((uint32)(i*j) < (uint32)s_aTileMapIndex.size(), "s_aTilemapArray hasn't been resized for current dimensions");
+					if (s_aTileMapIndex[i*j] == -1)
+						RenderEmptyTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize);
+					else
+						RenderTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
+					iXPos += (int)fGridSize;
+				}
+				iXPos = 0;
+				iYPos += (int)fGridSize;
+			}
+		}
+	}
+
+
+	// Respond to Mouse Down event and Add/Remove a tile to the map....
+	{
+		if (s_bSpriteSelected && GetMouseLB())
+		{
+			int i = 0;
+			LOG_INFO("Foo");
+		}
+	}
 
 	DELETEX vMouseWorldPosition;
 }

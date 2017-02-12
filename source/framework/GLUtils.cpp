@@ -111,21 +111,21 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[0]); 
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW  );
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW  );
 			ASSERT_GL_ERROR;
 
 			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[1]); 
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[1]); 
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL,  GL_DYNAMIC_DRAW  );
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
 			ASSERT_GL_ERROR;
 
 			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[2]); 
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[2]); 
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW  );
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
 			ASSERT_GL_ERROR;
 
 			s_iAllocatedSets++;
@@ -191,7 +191,6 @@ namespace Neutrino {
 			return bReturnVal;
 		}
 
-
 		void PopulateVBO( const float* pX_S,
 											const float* pY_T,
 											const float* pX_SnS,
@@ -227,16 +226,20 @@ namespace Neutrino {
 			// TODO: Split this into 4 and spread across threads
 			{
 				glm::mat4 mScale = glm::mat4(1.0f);
-				glm::mat4 mRotation = glm::mat4(1.0f);;
-				glm::mat4 mTranslate = glm::mat4(1.0f);;
-				glm::mat4 mTransform = glm::mat4(1.0f);;
+				glm::mat4 mRotation = glm::mat4(1.0f);
+				glm::mat4 mTranslate = glm::mat4(1.0f);
+				glm::mat4 mTransform = glm::mat4(1.0f);
+				glm::mat4 mTransform2 = glm::mat4(1.0f);
+				glm::mat4 mTransform3 = glm::mat4(1.0f);
 				float fScaledWidth;
 				float fScaledHeight;
 				uint32 iColour;
 
 				// For each sprite up to iCount
-				for(int i=0; i<iCount; i++)
+				for (int i = 0; i < iCount; i++)
 				{
+					// TODO: Ignore sprites outside the frustrum
+
 					// Build the transform matrix for this sprite
 					mScale[0].x = *pScales;
 					mScale[1].y = *pScales;
@@ -253,10 +256,8 @@ namespace Neutrino {
 					mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
 
 					// This is the slowest line in here. 
-					// TODO: Possible to get a speed gain by removing the operator* ? Would remove the vec4 constructors
-					// glm::operator*<float,0>	Neutrino	e:\bitbucket\neutrino\external_dependencies\glm\glm\detail\type_mat4x4.inl	Line: 608	
+					// TODO: Move this into the Vertex Shader
 					mTransform = mTranslate * mRotation * mScale;
-
 
 					// Build the vertex positions
 					{
@@ -286,6 +287,7 @@ namespace Neutrino {
 
 
 					// Transform the vertex positions
+					// TODO: Move this into the Vertex Shader
 					vTransBL = mTransform * *vQuadBL_Pos;
 					vTransBR = mTransform * *vQuadBR_Pos;
 					vTransTL = mTransform * *vQuadTL_Pos;

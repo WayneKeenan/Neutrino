@@ -28,8 +28,8 @@ namespace Neutrino
 	typedef struct DebugOverlay_t
 	{
 		glm::vec3*	_pvCameraOffset;
-		bool 		_bFlyCameraMode = false;
-		float 		_fFlyCamSpeed = 0.1f;
+		bool _bFlyCameraMode = false;
+		float _fFlyCamSpeed = 0.5f;
 	} DebugOverlay_t;
 
 	static DebugOverlay_t* s_pOverlayParams;
@@ -72,6 +72,7 @@ namespace Neutrino
 
 	void DebugOverlayUpdate()
 	{
+		const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
 		//float fFPS = (float)floorf( 1.0f / (float)fmax(fEPSILON, (float)fAvgFPS )+0.5f );
 		s_FPSSampler.Tick(GetMSDelta());
 	
@@ -81,6 +82,8 @@ namespace Neutrino
 			if (s_pOverlayParams->_bFlyCameraMode)
 			{
 				glm::vec3* vTraj = GetInputAxisGameDeltaScaled(1);
+				vTraj->x = -vTraj->x;
+				vTraj->y = -vTraj->y;
 				*s_pOverlayParams->_pvCameraOffset += *vTraj * s_pOverlayParams->_fFlyCamSpeed;
 			}
 
@@ -91,19 +94,29 @@ namespace Neutrino
 			ImGui::SetNextWindowPos(*s_pOverlayPosition, ImGuiSetCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiSetCond_FirstUseEver);
 			ImGui::Begin("Neutrino Debug", &s_bDebugOverlayActive);
-			ImGui::LabelText("", "Performance:");
-			ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 1.0f/120.0f, 1.0f/24.0f, ImVec2(150,32));
-			ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 120.0f, ImVec2(150,32));
-			ImGui::Text("Sprites Count: [%d--%d]", GetSpriteCount(), GetDebugSpriteCount());
-			ImGui::Text("VBO sizes: [%dk--%dk]", (GetSpriteCount() * sizeof(GLUtils::Vertex_t)) /1024, (GetDebugSpriteCount() * sizeof(GLUtils::Vertex_t)) /1024);
+			if (ImGui::CollapsingHeader("Performance Counters:", iFlags))
+			{
+				ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 1.0f / 120.0f, 1.0f / 24.0f, ImVec2(150, 32));
+				ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 120.0f, ImVec2(150, 32));
+				ImGui::Text("T Sprites: %d", GetSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO0: %dk", (GetSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
+				ImGui::Text("U Sprites: %d", GetDebugSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO1: %dk", (GetDebugSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
+			}
 
 			// Output camera position
-			ImGui::Separator();
-			ImGui::LabelText("", "Camera:");
-			ImGui::Checkbox("Fly Cam", &s_pOverlayParams->_bFlyCameraMode);
-			ImGui::SameLine(95);
-			ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
-			ImGui::Text("Fly Cam Offset: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z );
+			if (ImGui::CollapsingHeader("Camera:", iFlags))
+			{
+				ImGui::Text("Camera Position: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z);
+				ImGui::Checkbox("Fly Cam", &s_pOverlayParams->_bFlyCameraMode);
+				ImGui::SameLine(95);
+				ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
+				if (ImGui::Button("Reset Fly Cam", ImVec2(292, 18)))
+				{
+					DELETEX s_pOverlayParams->_pvCameraOffset;
+					s_pOverlayParams->_pvCameraOffset = NEWX glm::vec3(0.0f, 0.0f, 0.0f);
+					s_pOverlayParams->_bFlyCameraMode = false;
+				}
+			}
+
 			ImGui::End();
 
 			// Draw the log window

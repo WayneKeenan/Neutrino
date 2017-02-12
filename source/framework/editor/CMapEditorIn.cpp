@@ -149,6 +149,7 @@ void CMapEditorIn::Update()
 	const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
 	float fGridSize = (float)pow(2, s_iSelectedGridSize + 1);	// Plus one as the grid starts at 2x2
 
+
 	// Draw the window
 	ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 250.0f), ImGuiSetCond_FirstUseEver);
@@ -156,6 +157,7 @@ void CMapEditorIn::Update()
 	ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
 	ImGui::Text(" Camera Offset: [%.1f, %.1f]\n", pCamerCoords->x, pCamerCoords->y);
 	ImGui::Spacing(); 
+
 
 	// Define the settings for this level
 	static char s_FilenameBuf[s_iFilenameLength] = "\0";
@@ -169,6 +171,7 @@ void CMapEditorIn::Update()
 		bool bHeightChanged = ImGui::InputInt("Level Height", &s_iLevelHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Height of the level, in tiles"); 
 		if (bWidthChanged || bHeightChanged) ResizeTilemap();
 	}
+
 
 	// Respond to "New Level" button being pressed
 	if (ImGui::Button("Create") )
@@ -187,6 +190,7 @@ void CMapEditorIn::Update()
 		}
 	}
 
+
 	ImGui::SameLine();
 	// Respond to "Clear Level" button being pressed
 	if (ImGui::Button("Clear"))
@@ -194,6 +198,7 @@ void CMapEditorIn::Update()
 		s_aTileMapIndex.clear();
 		s_bLevelCreated = false;
 	}
+
 
 	// Respond to "Calc Dimensions" button
 	ImGui::SameLine();
@@ -205,9 +210,11 @@ void CMapEditorIn::Update()
 		if ((s_iScreenWidth*s_iScreensWide) % (int)fGridSize > 0) LOG_WARNING("Level Width dimensions are %d pixels short", s_iScreenHeight % (int)fGridSize);
 	}
 
+
 	// Flag to centre the level when it's drawn
 	ImGui::SameLine();
 	ImGui::Checkbox("Centre Level", &s_bCentreLevel);
+
 
 	// Display Grid Settings 
 	if (ImGui::CollapsingHeader("Editor Grid Settings:", iFlags))
@@ -219,6 +226,7 @@ void CMapEditorIn::Update()
 		ImGui::Checkbox("Snap To Grid", &s_bSnapToGrid); 
 		ImGui::Spacing(); 
 	}
+
 
 	// Build a string of Texture Identifiers for a drop down list
 	uint8 iTextureCount = GetLoadedTextureCount();
@@ -232,6 +240,7 @@ void CMapEditorIn::Update()
 		ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
 		ImGui::Spacing(); 
 	}
+
 
 	// Display selected texture info
 	const TPage_t* pTpage = GetTPage((uint8)s_iSelectedTexture);	
@@ -281,8 +290,8 @@ void CMapEditorIn::Update()
 	{
 		ImVec2 s_pWindowDim = ImGui::GetWindowSize();
 		ImVec2 s_pWindowPos = ImGui::GetWindowPos();
-		ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
-		ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
+// 		ImGui::Text("[%.1f, %.1f]", s_pWindowDim.x, s_pWindowDim.y);
+// 		ImGui::Text("[%.1f, %.1f]", s_pWindowPos.x, s_pWindowPos.y);
 
 		if ((pMouseCoords->x >= s_pWindowPos.x) && (pMouseCoords->y >= s_pWindowPos.y) &&
 			(pMouseCoords->x <= (s_pWindowPos.x + s_pWindowDim.x)) && (pMouseCoords->y <= (s_pWindowPos.y + s_pWindowDim.y)))
@@ -312,7 +321,7 @@ void CMapEditorIn::Update()
 	}
 
 
-	// If we have an active level to edit render out the existing tiles
+	// If we have an active level to edit, iterate over tile positions, render a sprite, and check for mouse input
 	if (s_bLevelCreated)
 	{
 		int iXPos = 0, iYPos = 0;
@@ -324,18 +333,26 @@ void CMapEditorIn::Update()
 		{
 			for (uint16 j = 0; j < s_iLevelWidth; ++j)
 			{
+				// Render the tile
 				ASSERT((uint32)(i*j) < (uint32)s_aTileMapIndex.size(), "s_aTilemapArray hasn't been resized for current dimensions");
 				if (s_aTileMapIndex[i*j] == -1) 
 					RenderEmptyTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize);
 				else
 					RenderTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
+				
+				
+				// Respond to Mouse Down event and Add/Remove a tile to the map....
+				if (s_bSpriteSelected && GetMouseLB())
+				{
+					LOG_INFO("Mouse pos: %f, %f", pMouseCoords->x, pMouseCoords->y);
+				}
+				
 				iXPos += (int)fGridSize;
 			}
 			iXPos = 0;
 			iYPos += (int)fGridSize;
 		}
 	}
-
 	ImGui::End();
 }
 

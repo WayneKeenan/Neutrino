@@ -134,6 +134,7 @@ CMapEditorIn::~CMapEditorIn()
 
 }
 
+
 void CMapEditorIn::Init()
 {
 	// Do any cleanup from previous frame here. 
@@ -142,6 +143,7 @@ void CMapEditorIn::Init()
 	GLUtils::SetClearColour(0.0f, 0.05f, 0.0f, 1.0f);
 }
 
+
 void CMapEditorIn::Update()
 {
 	const glm::vec2* pMouseCoords = GetMouseCoords();
@@ -149,14 +151,23 @@ void CMapEditorIn::Update()
 	const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
 	float fGridSize = (float)pow(2, s_iSelectedGridSize + 1);	// Plus one as the grid starts at 2x2
 
+	// calculate the mouse position in world space
+	glm::vec2* vMouseWorldPosition = NEWX glm::vec2(0.0f, 0.0f);
+	const glm::vec2 vPixelScale = GLUtils::GetViewportPixelScale();
+	vMouseWorldPosition->x = pMouseCoords->x - (pCamerCoords->x / vPixelScale.x);
+	vMouseWorldPosition->y = pMouseCoords->y - (pCamerCoords->y / vPixelScale.y);
 
-	// Draw the window
-	ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 250.0f), ImGuiSetCond_FirstUseEver);
-	ImGui::Begin("Tilemap Editor");
-	ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
-	ImGui::Text(" Camera Offset: [%.1f, %.1f]\n", pCamerCoords->x, pCamerCoords->y);
-	ImGui::Spacing(); 
+
+	// Window Heading
+	{
+		ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 250.0f), ImGuiSetCond_FirstUseEver);
+		ImGui::Begin("Tilemap Editor");
+		ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
+		ImGui::Text(" Camera Offset: [%.1f, %.1f]", pCamerCoords->x, pCamerCoords->y);
+		ImGui::Text("World Position: [%.1f, %.1f]", vMouseWorldPosition->x, vMouseWorldPosition->y);
+		ImGui::Spacing();
+	}
 
 
 	// Define the settings for this level
@@ -307,14 +318,15 @@ void CMapEditorIn::Update()
 
 		s_pSelectedTile = NewSprite(pTpage->_iTextureID, s_iTileIndex);
 		ASSERT(NULL != s_pSelectedTile, "NewSprite returned null for tile: %d on texture: %d", s_iTileIndex, pTpage->_iTextureID);
-		s_pSelectedTile->_vPosition->x = pMouseCoords->x;
-		s_pSelectedTile->_vPosition->y = pMouseCoords->y;
+
+		s_pSelectedTile->_vPosition->x = vMouseWorldPosition->x;
+		s_pSelectedTile->_vPosition->y = vMouseWorldPosition->y;
 
 		// Update for the grid setting
 		if (s_bSnapToGrid)
 		{
-			s_pSelectedTile->_vPosition->x -= (float)((int)(pMouseCoords->x) % (int)fGridSize);
-			s_pSelectedTile->_vPosition->y -= (float)((int)(pMouseCoords->y) % (int)fGridSize);
+			s_pSelectedTile->_vPosition->x -= (float)((int)(vMouseWorldPosition->x) % (int)fGridSize);
+			s_pSelectedTile->_vPosition->y -= (float)((int)(vMouseWorldPosition->y) % (int)fGridSize);
 			s_pSelectedTile->_vPosition->x += fGridSize * 0.5f;
 			s_pSelectedTile->_vPosition->y += fGridSize * 0.5f;
 		}
@@ -340,12 +352,11 @@ void CMapEditorIn::Update()
 				else
 					RenderTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
 				
-				
-				// Respond to Mouse Down event and Add/Remove a tile to the map....
-				if (s_bSpriteSelected && GetMouseLB())
-				{
-					LOG_INFO("Mouse pos: %f, %f", pMouseCoords->x, pMouseCoords->y);
-				}
+// 				// Respond to Mouse Down event and Add/Remove a tile to the map....
+// 				if (s_bSpriteSelected && GetMouseLB())
+// 				{
+// 					LOG_INFO("Mouse pos: %f, %f", pMouseCoords->x, pMouseCoords->y);
+// 				}
 				
 				iXPos += (int)fGridSize;
 			}
@@ -354,6 +365,8 @@ void CMapEditorIn::Update()
 		}
 	}
 	ImGui::End();
+
+	DELETEX vMouseWorldPosition;
 }
 
 

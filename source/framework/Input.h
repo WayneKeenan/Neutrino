@@ -129,6 +129,14 @@ namespace Neutrino
 	// 		Returns the button state for a given player's joypad. The uint8 should be one of the #defines at the top of this header 
 	bool GetButton(const uint8 iInput, const uint8 iPlayerIndex = 0);
 
+	// GetMouseLB()
+	// 		Return mouse left button state
+	bool GetMouseLB();
+
+	// GetMouseRB()
+	// 		Return mouse right button state
+	bool GetMouseRB();
+
 	// GetDpadDir()
 	// 		Return the state of a given dpad direction for a given player's joypad
 	bool GetDPadDir(const uint8 iInput, const uint8 iPlayerIndex = 0);

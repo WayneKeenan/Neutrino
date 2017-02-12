@@ -316,4 +316,14 @@ namespace Neutrino
 		ASSERT(s_pMouseInput);
 		return &(s_pMouseInput->_MOUSE_COORDS);
 	}
+
+	bool GetMouseLB()
+	{
+		return s_pMouseInput->_LEFT_BUTTON;
+	}
+
+	bool GetMouseRB()
+	{
+		return s_pMouseInput->_RIGHT_BUTTON;
+	}
 }

@@ -21,12 +21,13 @@ namespace Neutrino
 		if(!s_pSysLog)
 		{
 			s_pSysLog = NEWX Log("Neutrino.log");
+#if defined DEBUG
+			// Init params needed for debug overlay
+			s_pDebugLog = DebugOverlayInit();
+#endif
 		}
 
-#if defined DEBUG
-		// Init params needed for debug overlay
-		s_pDebugLog = DebugOverlayInit();
-#endif
+
 		return s_pSysLog;
 	}
 

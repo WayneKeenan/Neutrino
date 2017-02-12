@@ -16,15 +16,20 @@ namespace Neutrino {
 		static glm::mat4 s_mProjectionMatrix;
 		static glm::vec4 s_vClearColour = glm::vec4(0.25f, 0.25f, 0.0f, 1.0f);
 
-		static float s_fOGL_X_RATIO;
-		static float s_fOGL_Y_RATIO;
+		static float s_fOGL_X_RANGE;
+		static float s_fOGL_Y_RANGE;
 
 		static float s_fViewportWidth;
 		static float s_fViewportHeight;
 
-		// Internal coords
-		static float s_fScaledWidth;
-		static float s_fScaledHeight;
+		// Pixel scaler for low res render output 
+		static float s_fScaledPixelWidth;
+		static float s_fScaledPixelHeight;
+
+		// Pixel scaler for editor modes
+		static float s_fUnscaledPixelWidth;
+		static float s_fUnscaledPixelHeight;
+
 
 		static const int s_iSizeOfSprite = 6*sizeof(Vertex_t);
 		static const int s_iSizeOfVertex = sizeof(Vertex_t);
@@ -70,21 +75,29 @@ namespace Neutrino {
 				s_fViewportWidth = (float)iViewportWidth;
 				s_fViewportHeight = (float)iViewportHeight;
 
-				s_fOGL_X_RATIO = s_fViewportWidth / s_fViewportHeight;
-				s_fOGL_Y_RATIO = 1.0f;
+				s_fOGL_X_RANGE = s_fViewportWidth / s_fViewportHeight;
+				s_fOGL_Y_RANGE = 1.0f;
 
-				s_fScaledWidth = s_fOGL_X_RATIO / (float)iInternalWidth;
-				s_fScaledHeight = s_fOGL_Y_RATIO / (float)iInternalHeight;
+				s_fScaledPixelWidth = s_fOGL_X_RANGE / (float)iInternalWidth;
+				s_fScaledPixelHeight = s_fOGL_Y_RANGE / (float)iInternalHeight;
+
+				s_fUnscaledPixelWidth = s_fOGL_X_RANGE /(float)iViewportWidth;
+				s_fUnscaledPixelHeight = s_fOGL_Y_RANGE / (float)iViewportHeight;
 			}
 
 			// Set the projection matrix for this viewport. 0,0 at TOP LEFT.
-			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RATIO, s_fOGL_Y_RATIO,  0.0f,  1.0f, -1.0f );
+			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RANGE, s_fOGL_Y_RANGE,  0.0f,  1.0f, -1.0f );
 
 		}
 
 		const glm::vec2 GetViewportDimensions()
 		{
 			return glm::vec2(s_fViewportWidth, s_fViewportHeight);
+		}
+
+		const glm::vec2 GetViewportPixelScale()
+		{
+			return glm::vec2(s_fUnscaledPixelWidth, s_fUnscaledPixelHeight);
 		}
 
 		void GenerateMVCMatrices(glm::vec3* vPos)
@@ -191,6 +204,8 @@ namespace Neutrino {
 			return bReturnVal;
 		}
 
+
+
 		void PopulateVBO( const float* pX_S,
 											const float* pY_T,
 											const float* pX_SnS,
@@ -249,8 +264,8 @@ namespace Neutrino {
 					mRotation[1].x = sin(*pRots);
 					mRotation[1].y = cos(*pRots);
 
-					vPos->x = pPos->x * s_fScaledWidth;
-					vPos->y = pPos->y * s_fScaledHeight;
+					vPos->x = pPos->x * s_fScaledPixelWidth;
+					vPos->y = pPos->y * s_fScaledPixelHeight;
 					vPos->z = pPos->z;
 
 					mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
@@ -261,8 +276,8 @@ namespace Neutrino {
 
 					// Build the vertex positions
 					{
-						fScaledWidth = (*pHWidths * s_fScaledWidth);
-						fScaledHeight = (*pHHeights * s_fScaledHeight);
+						fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
+						fScaledHeight = (*pHHeights * s_fScaledPixelHeight);
 
 						vQuadTL_Pos->x = 0.0f - fScaledWidth;
 						vQuadTL_Pos->y = 0.0f + fScaledHeight;
@@ -511,8 +526,8 @@ namespace Neutrino {
 						mRotation[1].x = sin(*pRots);
 						mRotation[1].y = cos(*pRots);
 
-						vPos->x = pPos->x * s_fScaledWidth;
-						vPos->y = pPos->y * s_fScaledHeight;
+						vPos->x = pPos->x * s_fScaledPixelWidth;
+						vPos->y = pPos->y * s_fScaledPixelHeight;
 						vPos->z = pPos->z;
 
 						mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
@@ -525,8 +540,8 @@ namespace Neutrino {
 
 						// Build the vertex positions
 						{
-							fScaledWidth = (*pHWidths * s_fScaledWidth);
-							fScaledHeight = (*pHHeights * s_fScaledHeight);
+							fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
+							fScaledHeight = (*pHHeights * s_fScaledPixelHeight);
 
 							vQuadTL_Pos->x = 0.0f - fScaledWidth;
 							vQuadTL_Pos->y = 0.0f + fScaledHeight;

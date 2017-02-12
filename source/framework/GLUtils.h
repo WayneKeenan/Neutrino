@@ -48,6 +48,10 @@ namespace Neutrino
 		//		Returns a vector2 for the width and height of the active viewport
 		const glm::vec2 GetViewportDimensions();
 
+		// GetPixelScale
+		//		Returns a vector containing the OGL range of a single pixel
+		const glm::vec2 GetViewportPixelScale();
+
 		// GenerateMatrices
 		// 		Create the new ModelView and Camera Matrices for this tick
 		void GenerateMVCMatrices(glm::vec3* vPos);

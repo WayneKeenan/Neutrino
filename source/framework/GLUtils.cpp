@@ -244,8 +244,6 @@ namespace Neutrino {
 				glm::mat4 mRotation = glm::mat4(1.0f);
 				glm::mat4 mTranslate = glm::mat4(1.0f);
 				glm::mat4 mTransform = glm::mat4(1.0f);
-				glm::mat4 mTransform2 = glm::mat4(1.0f);
-				glm::mat4 mTransform3 = glm::mat4(1.0f);
 				float fScaledWidth;
 				float fScaledHeight;
 				uint32 iColour;
@@ -259,14 +257,14 @@ namespace Neutrino {
 					mScale[0].x = *pScales;
 					mScale[1].y = *pScales;
 
-					mRotation[0].x = cos(*pRots);
-					mRotation[0].y = -sin(*pRots);
-					mRotation[1].x = sin(*pRots);
-					mRotation[1].y = cos(*pRots);
+					mRotation[0].x = (float)cos(*pRots);
+					mRotation[0].y = (float)-sin(*pRots);
+					mRotation[1].x = (float)sin(*pRots);
+					mRotation[1].y = (float)cos(*pRots);
 
-					vPos->x = pPos->x * s_fScaledPixelWidth;
-					vPos->y = pPos->y * s_fScaledPixelHeight;
-					vPos->z = pPos->z;
+					vPos->x = (float)pPos->x * s_fScaledPixelWidth;
+					vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+					vPos->z = (float)pPos->z;
 
 					mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
 
@@ -521,14 +519,14 @@ namespace Neutrino {
 						mScale[0].x = *pScales;
 						mScale[1].y = *pScales;
 
-						mRotation[0].x = cos(*pRots);
-						mRotation[0].y = -sin(*pRots);
-						mRotation[1].x = sin(*pRots);
-						mRotation[1].y = cos(*pRots);
+						mRotation[0].x = (float)cos(*pRots);
+						mRotation[0].y = (float)-sin(*pRots);
+						mRotation[1].x = (float)sin(*pRots);
+						mRotation[1].y = (float)cos(*pRots);
 
-						vPos->x = pPos->x * s_fScaledPixelWidth;
-						vPos->y = pPos->y * s_fScaledPixelHeight;
-						vPos->z = pPos->z;
+						vPos->x = (float)pPos->x * s_fScaledPixelWidth;
+						vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+						vPos->z = (float)pPos->z;
 
 						mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
 

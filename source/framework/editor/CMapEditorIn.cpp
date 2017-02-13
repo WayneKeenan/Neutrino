@@ -380,7 +380,6 @@ void CMapEditorIn::Update()
 	{
 		if (s_bSpriteSelected && GetMouseLB())
 		{
-			int i = 0;
 			LOG_INFO("Foo");
 		}
 	}

@@ -98,8 +98,8 @@ namespace Neutrino
 			{
 				ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 1.0f / 120.0f, 1.0f / 24.0f, ImVec2(150, 32));
 				ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 120.0f, ImVec2(150, 32));
-				ImGui::Text("T Sprites: %d", GetSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO0: %dk", (GetSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
-				ImGui::Text("U Sprites: %d", GetDebugSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO1: %dk", (GetDebugSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
+				ImGui::Text("T Sprites: %d", GetSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO0: %dk", (int) (GetSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
+				ImGui::Text("U Sprites: %d", GetDebugSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO1: %dk", (int) (GetDebugSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
 			}
 
 			// Output camera position

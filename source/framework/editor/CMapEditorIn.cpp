@@ -381,7 +381,6 @@ void CMapEditorIn::Update()
 	{
 		if (s_bSpriteSelected && GetMouseLB() && s_bSnapToGrid)
 		{
-			int i = 0;
 			LOG_INFO("Foo");
 		}
 	}

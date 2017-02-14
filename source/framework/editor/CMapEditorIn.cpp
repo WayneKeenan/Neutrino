@@ -288,8 +288,7 @@ void CMapEditorIn::Update()
 				iPixelsUsed += vDim->x;
 
 				// Note to future Gareth: GCC warns about casting to pointer from int of different size here.
-				// The intptr_t cast removes that, but this was the first time that you saw that warning. 
-				// Step through with a debugger to see where this goes, and read a book. 
+				// The intptr_t cast removes the warning. 
 				ImGui::PushID(i);
 				if (ImGui::ImageButton((void*)(intptr_t)pTpage->_iTextureID, *vDim, *vUV0, *vUV1, 1))
 				{
@@ -323,7 +322,8 @@ void CMapEditorIn::Update()
 	}
 
 
-	// Set Sprite correct location, nearest the mouse pointer 
+	// Set Sprite Location, to nearest grid if set
+	// NOTE: Currently we only save tiles if Snap To Grid is set ;D
 	{
 		if (s_bSpriteSelected && !bMouseOverWindow)
 		{
@@ -377,8 +377,9 @@ void CMapEditorIn::Update()
 
 
 	// Respond to Mouse Down event and Add/Remove a tile to the map....
+	// NOTE: See above, we're only saving tiles in grid mode. 
 	{
-		if (s_bSpriteSelected && GetMouseLB())
+		if (s_bSpriteSelected && GetMouseLB() && s_bSnapToGrid)
 		{
 			int i = 0;
 			LOG_INFO("Foo");

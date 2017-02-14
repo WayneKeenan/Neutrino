@@ -18,7 +18,7 @@ using namespace Neutrino;
 #define sprintf sprintf_s
 #endif
 
-static const ImVec2* s_pWindowPosition = NEWX ImVec2(1300.0f, 50.0f);
+static const ImVec2* s_pWindowPosition = NEWX ImVec2(1450.0f, 50.0f);
 static const float s_iRowPixels = 400.0f;
 static bool s_bSnapToGrid = true;
 static int s_iSelectedTexture = 0;
@@ -74,7 +74,7 @@ static std::vector<int16> s_aTileMapIndex;
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
-static void RenderEmptyTile(const int iXPos, const int iYPos)
+static void RenderEmptyTile(const float iXPos, const float iYPos)
 {
 	UntexturedSprite_t* pSprite = NewDebugSprite();
 	*pSprite->_fHalfHeight = 4.0f;
@@ -89,18 +89,18 @@ static void RenderEmptyTile(const int iXPos, const int iYPos)
 	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
 }
 
-static void RenderTile(const int iXPos, const int iYPos, const GLuint iTextureID, const uint16 iSprIndex)
+static void RenderTile(const float fXPos, const float fYPos, const GLuint iTextureID, const uint16 iSprIndex)
 {
 	Sprite_t * pSprite = NewSprite(iTextureID, iSprIndex);
 	*pSprite->_fHalfHeight = 4.0f;
 	*pSprite->_fHalfWidth = 1.0f;
-	*(pSprite->_vPosition) = glm::vec3((float)iXPos, (float)iYPos, 1.0f);
+	*(pSprite->_vPosition) = glm::vec3(fXPos, fYPos, 1.0f);
 	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
 
 	pSprite = NewSprite(iTextureID, iSprIndex);
 	*pSprite->_fHalfHeight = 1.0f;
 	*pSprite->_fHalfWidth = 4.0f;
-	*(pSprite->_vPosition) = glm::vec3((float)iXPos, (float)iYPos, 1.0f);
+	*(pSprite->_vPosition) = glm::vec3(fXPos, fYPos, 1.0f);
 	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
 }
 
@@ -161,7 +161,7 @@ void CMapEditorIn::Update()
 	// Window Heading
 	{
 		ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 250.0f), ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 450.0f), ImGuiSetCond_FirstUseEver);
 		ImGui::Begin("Tilemap Editor");
 		ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
 		ImGui::Text(" Camera Offset: [%.1f, %.1f]", pCamerCoords->x, pCamerCoords->y);
@@ -352,10 +352,17 @@ void CMapEditorIn::Update()
 	{
 		if (s_bLevelCreated)
 		{
-			int iXPos = 0, iYPos = 0;
-			int iHalfGridSize = (int)(fGridSize*0.5f);
-
-			if (s_bCentreLevel) iYPos = (int)((GLUtils::GetViewportDimensions().y * 0.5f) - ((float)(s_iLevelHeight / 2) * fGridSize));
+			float fXPos = 0.0f;
+			float fYPos = 0.0f;
+			float fHalfGridSize = fGridSize*0.5f;
+			float fHalfMapHeight = ((float)(s_iLevelHeight/2) * fGridSize); // The cast outside the bracket keeps the tiles 
+																																			// snapped to the grid when there are an odd number 
+																																			// of rows
+			if (s_bCentreLevel)
+			{
+				fYPos = GLUtils::GetViewportDimensions().y * 0.5f;
+				fYPos -= fHalfMapHeight;
+			}
 
 			for (uint16 i = 0; i < s_iLevelHeight; ++i)
 			{
@@ -364,13 +371,13 @@ void CMapEditorIn::Update()
 					// Render the tile
 					ASSERT((uint32)(i*j) < (uint32)s_aTileMapIndex.size(), "s_aTilemapArray hasn't been resized for current dimensions");
 					if (s_aTileMapIndex[i*j] == -1)
-						RenderEmptyTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize);
+						RenderEmptyTile(fXPos + fHalfGridSize, fYPos + fHalfGridSize);
 					else
-						RenderTile(iXPos + iHalfGridSize, iYPos + iHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
-					iXPos += (int)fGridSize;
+						RenderTile(fXPos + fHalfGridSize, fYPos + fHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
+					fXPos += fGridSize;
 				}
-				iXPos = 0;
-				iYPos += (int)fGridSize;
+				fXPos = 0;
+				fYPos += fGridSize;
 			}
 		}
 	}
@@ -378,12 +385,35 @@ void CMapEditorIn::Update()
 
 	// Respond to Mouse Down event and Add/Remove a tile to the map....
 	// NOTE: See above, we're only saving tiles in grid mode. 
+	static bool bDebounceMouse = false;
+	if( GetMouseLB() && !bMouseOverWindow && !bDebounceMouse)
 	{
-		if (s_bSpriteSelected && GetMouseLB() && s_bSnapToGrid)
+		// TODO: Convert this into a state machine
+		if (s_bSpriteSelected && s_bSnapToGrid )
 		{
-			LOG_INFO("Foo");
+			float fTileStartY = 0.0f;
+			// TODO: this needs to be fixed for odd number of rows...
+			float fHalfMapHeight = ((float)(s_iLevelHeight/2) * fGridSize);
+	
+			if(s_bCentreLevel) 
+				fTileStartY += (GLUtils::GetViewportDimensions().y * 0.5f);
+
+				// TODO: this isn't checking the whole height of a tile, see int bug above:s
+			if( (vMouseWorldPosition->x >= 0 && vMouseWorldPosition->x <=  ((float)s_iLevelWidth * fGridSize)) &&
+					(vMouseWorldPosition->y >= fTileStartY - fHalfMapHeight && vMouseWorldPosition->y <= fTileStartY + fHalfMapHeight))
+			{
+				LOG_INFO("Mouse in Bounds");
+				bDebounceMouse = true;
+			}
+			else
+			{
+				LOG_INFO("0.0f-%f / %f-%f", ((float)s_iLevelWidth * fGridSize), fTileStartY - fHalfMapHeight, fTileStartY + fHalfMapHeight);
+			}
 		}
 	}
+
+	// Clear bDebounceMouse
+	if( bDebounceMouse && !GetMouseLB() ) bDebounceMouse = false;
 
 	DELETEX vMouseWorldPosition;
 }

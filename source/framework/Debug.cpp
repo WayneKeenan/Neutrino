@@ -79,7 +79,7 @@ namespace Neutrino
 		if (s_bDebugOverlayActive)
 		{
 			// If fly cam is enabled, grab player 2's input and move the camera.
-			if (s_pOverlayParams->_bFlyCameraMode)
+				if (s_pOverlayParams->_bFlyCameraMode)
 			{
 				glm::vec3* vTraj = GetInputAxisGameDeltaScaled(1);
 				vTraj->x = -vTraj->x;

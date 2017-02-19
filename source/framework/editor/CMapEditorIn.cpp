@@ -29,14 +29,19 @@ static bool s_bSpriteSelected;
 
 // Level Details statics
 static const int s_iFilenameLength = 64;
+static const int s_iFilepathLength = 1024;
 static int s_iScreenWidth = 480;
 static int s_iScreenHeight = 270;
 static int s_iScreensWide = 8;
 static int s_iLevelWidth = s_iScreenWidth / 32;
 static int s_iLevelHeight = s_iScreenHeight / 32;
-static bool s_bCentreLevel = true;
 static bool s_bLevelCreated = false;
 static char s_FilenameBuf[s_iFilenameLength] = "\0";
+#if defined _WIN32
+	static char s_FilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\tilemaps\\\0";
+#else
+	static char s_FilenameBuf[s_iFilepathLength] = "~/Development/Neutrino/resources/tilemaps/\0";
+#endif 
 
 // Command type enumerates the actions the editor can perform
 enum eCommandType
@@ -56,8 +61,8 @@ enum eCommandType
 typedef struct Command_t
 {
 	uint16 _iTilemapIndex;
-	uint16 _iPrevContent;
-	uint16 _iNewContent;
+	int16 _iPrevContent;
+	int16 _iNewContent;
 	eCommandType _iAction;
 }Command_t;
 typedef std::vector<Command_t*> CommandList;
@@ -66,11 +71,12 @@ typedef std::vector<Command_t*> CommandList;
 // To replay / undo editor actions...
 // 
 static CommandList s_aCommandList;
+static int s_iCommandListIndex = 0;
 
 
 // This array holds the Tilemap values. Just records the sprite index. 
 // TODO: This needs to be part of a struct that contains the TPage_t info
-static std::vector<int16> s_aTileMapIndex;
+static std::vector<int16> s_aTileMap;
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
@@ -92,29 +98,24 @@ static void RenderEmptyTile(const float iXPos, const float iYPos)
 static void RenderTile(const float fXPos, const float fYPos, const GLuint iTextureID, const uint16 iSprIndex)
 {
 	Sprite_t * pSprite = NewSprite(iTextureID, iSprIndex);
-	*pSprite->_fHalfHeight = 4.0f;
-	*pSprite->_fHalfWidth = 1.0f;
 	*(pSprite->_vPosition) = glm::vec3(fXPos, fYPos, 1.0f);
 	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
 
 	pSprite = NewSprite(iTextureID, iSprIndex);
-	*pSprite->_fHalfHeight = 1.0f;
-	*pSprite->_fHalfWidth = 4.0f;
 	*(pSprite->_vPosition) = glm::vec3(fXPos, fYPos, 1.0f);
 	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
 }
 
 static void ResizeTilemap()
 {
-	uint32 iSize = (uint32)s_aTileMapIndex.size();
-	s_aTileMapIndex.resize(s_iLevelHeight*s_iLevelWidth);
-	if (s_aTileMapIndex.size() > iSize)
+	uint32 iSize = (uint32)s_aTileMap.size();
+	s_aTileMap.resize(s_iLevelHeight*s_iLevelWidth);
+	if (s_aTileMap.size() > iSize)
 	{
 		for (int i = iSize; i < s_iLevelHeight * s_iLevelWidth; ++i)
 		{
-			s_aTileMapIndex[i] = -1;
+			s_aTileMap[i] = -1;
 		}
-		LOG_INFO("Tilemap inceased by %d tiles", s_aTileMapIndex.size() - iSize);
 	}
 }
 
@@ -174,6 +175,7 @@ void CMapEditorIn::Update()
 	{
 		if (ImGui::CollapsingHeader("Level Details:", iFlags))
 		{
+			ImGui::InputText("Filepath", s_FilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 			ImGui::InputText("Level Name", s_FilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 			ImGui::InputInt("Screen Width", &s_iScreenWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel width of the screen for the final output");
 			ImGui::InputInt("Screen Height", &s_iScreenHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel height of the screen for the final output");
@@ -194,10 +196,10 @@ void CMapEditorIn::Update()
 			else
 			{
 				LOG_INFO("Generating new level...");
-				s_aTileMapIndex.clear();
+				s_aTileMap.clear();
 				for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
 				{
-					s_aTileMapIndex.push_back(-1);
+					s_aTileMap.push_back(-1);
 				}
 				s_bLevelCreated = true;
 			}
@@ -210,7 +212,7 @@ void CMapEditorIn::Update()
 		ImGui::SameLine();
 		if (ImGui::Button("Clear"))
 		{
-			s_aTileMapIndex.clear();
+			s_aTileMap.clear();
 			s_bLevelCreated = false;
 		}
 	}
@@ -227,11 +229,6 @@ void CMapEditorIn::Update()
 			if ((s_iScreenWidth*s_iScreensWide) % (int)fGridSize > 0) LOG_WARNING("Level Width dimensions are %d pixels short", s_iScreenHeight % (int)fGridSize);
 		}
 	}
-
-
-	// Flag to centre the level when it's drawn
-	ImGui::SameLine();
-	ImGui::Checkbox("Centre Level", &s_bCentreLevel);
 
 
 	// Display Grid Settings 
@@ -358,22 +355,16 @@ void CMapEditorIn::Update()
 			float fHalfMapHeight = ((float)(s_iLevelHeight/2) * fGridSize); // The cast outside the bracket keeps the tiles 
 																																			// snapped to the grid when there are an odd number 
 																																			// of rows
-			if (s_bCentreLevel)
-			{
-				fYPos = GLUtils::GetViewportDimensions().y * 0.5f;
-				fYPos -= fHalfMapHeight;
-			}
-
 			for (uint16 i = 0; i < s_iLevelHeight; ++i)
 			{
 				for (uint16 j = 0; j < s_iLevelWidth; ++j)
 				{
 					// Render the tile
-					ASSERT((uint32)(i*j) < (uint32)s_aTileMapIndex.size(), "s_aTilemapArray hasn't been resized for current dimensions");
-					if (s_aTileMapIndex[i*j] == -1)
+					ASSERT((uint32)(i*j) < (uint32)s_aTileMap.size(), "s_aTilemapArray hasn't been resized for current dimensions");
+					if (s_aTileMap[(i*s_iLevelWidth)+j] == -1)
 						RenderEmptyTile(fXPos + fHalfGridSize, fYPos + fHalfGridSize);
 					else
-						RenderTile(fXPos + fHalfGridSize, fYPos + fHalfGridSize, pTpage->_iTextureID, s_aTileMapIndex[i*j]);
+						RenderTile(fXPos + fHalfGridSize, fYPos + fHalfGridSize, pTpage->_iTextureID, s_aTileMap[(i*s_iLevelWidth)+j]);
 					fXPos += fGridSize;
 				}
 				fXPos = 0;
@@ -386,34 +377,51 @@ void CMapEditorIn::Update()
 	// Respond to Mouse Down event and Add/Remove a tile to the map....
 	// NOTE: See above, we're only saving tiles in grid mode. 
 	static bool bDebounceMouse = false;
-	if( GetMouseLB() && !bMouseOverWindow && !bDebounceMouse)
+	if (!bMouseOverWindow && !bDebounceMouse)
 	{
-		// TODO: Convert this into a state machine
-		if (s_bSpriteSelected && s_bSnapToGrid )
-		{
-			float fTileStartY = 0.0f;
-			// TODO: this needs to be fixed for odd number of rows...
-			float fHalfMapHeight = ((float)(s_iLevelHeight/2) * fGridSize);
-	
-			if(s_bCentreLevel) 
-				fTileStartY += (GLUtils::GetViewportDimensions().y * 0.5f);
+		int iTilesX = (int)(vMouseWorldPosition->x / fGridSize);
+		int iTilesY = (int)(vMouseWorldPosition->y / fGridSize);
+		int iIndex = (iTilesY * s_iLevelWidth) + iTilesX;
+		bool bMouseOverMapArea = (vMouseWorldPosition->x >= 0.0f && vMouseWorldPosition->x <= ((float)s_iLevelWidth * fGridSize)) &&
+			                       (vMouseWorldPosition->y >= 0.0f && vMouseWorldPosition->y <= ((float)s_iLevelHeight * fGridSize));
 
-				// TODO: this isn't checking the whole height of a tile, see int bug above:s
-			if( (vMouseWorldPosition->x >= 0 && vMouseWorldPosition->x <=  ((float)s_iLevelWidth * fGridSize)) &&
-					(vMouseWorldPosition->y >= fTileStartY - fHalfMapHeight && vMouseWorldPosition->y <= fTileStartY + fHalfMapHeight))
+		// Insert a tile...
+		if (GetMouseLB())
+		{
+			if (bMouseOverMapArea && s_bSpriteSelected && s_bSnapToGrid)
 			{
-				LOG_INFO("Mouse in Bounds");
-				bDebounceMouse = true;
+			  bDebounceMouse = true;
+				Command_t* pNewCommand = NEWX(Command_t);
+				pNewCommand->_iAction = eCommandType::_TileAdd;
+				pNewCommand->_iNewContent = s_iTileIndex;
+				pNewCommand->_iPrevContent = s_aTileMap[iIndex];
+				pNewCommand->_iTilemapIndex = s_iTileIndex;
+				s_aCommandList.push_back(pNewCommand);
+				++s_iCommandListIndex;
+				s_aTileMap[iIndex] = s_iTileIndex;
 			}
-			else
+		}
+
+		// Remove a Tile
+		if (GetMouseRB())
+		{
+			if (bMouseOverMapArea && s_bSnapToGrid && s_aTileMap[iIndex] != -1)
 			{
-				LOG_INFO("0.0f-%f / %f-%f", ((float)s_iLevelWidth * fGridSize), fTileStartY - fHalfMapHeight, fTileStartY + fHalfMapHeight);
+				bDebounceMouse = true;
+				Command_t* pNewCommand = NEWX(Command_t);
+				pNewCommand->_iAction = eCommandType::_TileRem;
+				pNewCommand->_iNewContent = -1;
+				pNewCommand->_iPrevContent = s_aTileMap[iIndex];
+				pNewCommand->_iTilemapIndex = s_iTileIndex;
+				s_aCommandList.push_back(pNewCommand);
+				++s_iCommandListIndex;
+				s_aTileMap[iIndex] = -1;
 			}
 		}
 	}
 
 	// Clear bDebounceMouse
-	if( bDebounceMouse && !GetMouseLB() ) bDebounceMouse = false;
+	if( bDebounceMouse && !GetMouseLB() && !GetMouseRB() ) bDebounceMouse = false;
 
 	DELETEX vMouseWorldPosition;
 }

@@ -41,6 +41,9 @@ namespace Neutrino {
 		// Counters
 		static uint8 s_iAllocatedSets = 0;
 
+		static GLfloat s_mTransformationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
+		static GLfloat s_mScaleMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
+		static GLfloat s_mRotationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
 
 		float* GetCameraMatrix()
 		{
@@ -216,7 +219,7 @@ namespace Neutrino {
 											const float* pScales, 
 											glm::vec4* pColours, 
 											glm::vec3* pPos, 
-											const int iCount, 
+											const uint32 iCount, 
 											const int iVBOSet   )
 		{
 			ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
@@ -240,20 +243,23 @@ namespace Neutrino {
 			// Traverse the sprite arrays
 			// TODO: Split this into 4 and spread across threads
 			{
+#if defined GLM_MATRIX
 				glm::mat4 mScale = glm::mat4(1.0f);
 				glm::mat4 mRotation = glm::mat4(1.0f);
 				glm::mat4 mTranslate = glm::mat4(1.0f);
 				glm::mat4 mTransform = glm::mat4(1.0f);
+#endif
 				float fScaledWidth;
 				float fScaledHeight;
 				uint32 iColour;
 
 				// For each sprite up to iCount
-				for (int i = 0; i < iCount; i++)
+				for (uint32 i = 0; i < iCount; i++)
 				{
 					// TODO: Ignore sprites outside the frustrum
 
 					// Build the transform matrix for this sprite
+#if defined GLM_MATRIX
 					mScale[0].x = *pScales;
 					mScale[1].y = *pScales;
 
@@ -261,16 +267,31 @@ namespace Neutrino {
 					mRotation[0].y = (float)-sin(*pRots);
 					mRotation[1].x = (float)sin(*pRots);
 					mRotation[1].y = (float)cos(*pRots);
-
-					vPos->x = (float)pPos->x * s_fScaledPixelWidth;
-					vPos->y = (float)pPos->y * s_fScaledPixelHeight;
-					vPos->z = (float)pPos->z;
-
+					
 					mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
-
 					// This is the slowest line in here. 
 					// TODO: Move this into the Vertex Shader
 					mTransform = mTranslate * mRotation * mScale;
+#else
+					s_mRotationMatrix[0] = (float)cos(*pRots);
+					s_mRotationMatrix[1] = (float)sin(*pRots);
+					s_mRotationMatrix[3] = (float)-sin(*pRots);
+					s_mRotationMatrix[4] = (float)cos(*pRots);
+					s_mRotationMatrix[8] = 1.0f;
+
+					s_mScaleMatrix[0] = *pScales;
+					s_mScaleMatrix[4] = *pScales;
+					s_mScaleMatrix[8] = 1.0f;
+
+					s_mTransformationMatrix[0] = (s_mRotationMatrix[0] * s_mScaleMatrix[0]);
+					s_mTransformationMatrix[1] = (s_mRotationMatrix[1] * s_mScaleMatrix[4]);
+					s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
+					s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
+					s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
+#endif
+					vPos->x = (float)pPos->x * s_fScaledPixelWidth;
+					vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+					vPos->z = (float)pPos->z;
 
 					// Build the vertex positions
 					{
@@ -279,37 +300,59 @@ namespace Neutrino {
 
 						vQuadTL_Pos->x = 0.0f - fScaledWidth;
 						vQuadTL_Pos->y = 0.0f + fScaledHeight;
+#if defined GLM_MATRIX
 						vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 						vQuadTL_Pos->w = 1.0f;   
-
+#endif
 						vQuadTR_Pos->x = 0.0f + fScaledWidth;
 						vQuadTR_Pos->y = 0.0f + fScaledHeight;
-						vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
+#if defined GLM_MATRIX
+ 						vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 						vQuadTR_Pos->w = 1.0f;   
-
+#endif
 						vQuadBL_Pos->x = 0.0f - fScaledWidth;
 						vQuadBL_Pos->y = 0.0f - fScaledHeight;
+#if defined GLM_MATRIX
 						vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 						vQuadBL_Pos->w = 1.0f;   
-
+#endif
 						vQuadBR_Pos->x = 0.0f + fScaledWidth;
 						vQuadBR_Pos->y = 0.0f - fScaledHeight;
+#if defined GLM_MATRIX
 						vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
 						vQuadBR_Pos->w = 1.0f;   
-					}
+#endif
 
+				}
 
+#if defined GLM_MATRIX
 					// Transform the vertex positions
 					// TODO: Move this into the Vertex Shader
 					vTransBL = mTransform * *vQuadBL_Pos;
 					vTransBR = mTransform * *vQuadBR_Pos;
 					vTransTL = mTransform * *vQuadTL_Pos;
 					vTransTR = mTransform * *vQuadTR_Pos;
+#else
+					
+					vTransBL.x = (vQuadBL_Pos->x * s_mTransformationMatrix[0]) + (vQuadBL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransBL.y = (vQuadBL_Pos->y * s_mTransformationMatrix[3]) + (vQuadBL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransBL.z = vPos->z;
 
-					// Get the packed colour
-					iColour = GetPackedColourV4(pColours);
+					vTransBR.x = (vQuadBR_Pos->x * s_mTransformationMatrix[0]) + (vQuadBR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransBR.y = (vQuadBR_Pos->x * s_mTransformationMatrix[3]) + (vQuadBR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransBR.z = vPos->z;
+
+					vTransTL.x = (vQuadTL_Pos->x * s_mTransformationMatrix[0]) + (vQuadTL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransTL.y = (vQuadTL_Pos->x * s_mTransformationMatrix[3]) + (vQuadTL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransTL.z = vPos->z;
+
+					vTransTR.x = (vQuadTR_Pos->x * s_mTransformationMatrix[0]) + (vQuadTR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransTR.y = (vQuadTR_Pos->x * s_mTransformationMatrix[3]) + (vQuadTR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransTR.z = vPos->z;
+#endif
 
 					// Populate the VBO vertex corners
+					iColour = GetPackedColourV4(pColours);
 					pVertex->_colour = iColour;
 					pVertex->_uv[0] = *pX_S;
 					pVertex->_uv[1] = *pY_TnT;
@@ -383,7 +426,7 @@ namespace Neutrino {
 		}
 
 
-		void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet)
+		void RenderVBO(const uint32 iSpriteCount, GLuint iID, const int iVBOSet)
 		{
 			// TO_DO: 
 			//      Blend Func should be a parameter of the texture page. 
@@ -481,7 +524,7 @@ namespace Neutrino {
 														const float* pScales, 
 														glm::vec4* pColours, 
 														glm::vec3* pPos, 
-														const int iCount)
+														const uint32 iCount)
 			{
 				ASSERT(iCount < iMAX_SPRITES, "PopulateDebugVBO: Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
@@ -513,8 +556,9 @@ namespace Neutrino {
 					uint32 iColour;
 
 					// For each sprite up to iCount
-					for(int i=0; i<iCount; i++)
+					for(uint32 i=0; i<iCount; i++)
 					{
+#if defined GLM_MATRIX
 						// Build the transform matrix for this sprite
 						mScale[0].x = *pScales;
 						mScale[1].y = *pScales;
@@ -523,19 +567,32 @@ namespace Neutrino {
 						mRotation[0].y = (float)-sin(*pRots);
 						mRotation[1].x = (float)sin(*pRots);
 						mRotation[1].y = (float)cos(*pRots);
-
-						vPos->x = (float)pPos->x * s_fScaledPixelWidth;
-						vPos->y = (float)pPos->y * s_fScaledPixelHeight;
-						vPos->z = (float)pPos->z;
-
 						mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
 
 						// This is the slowest line in here. 
 						// TODO: Possible to get a speed gain by removing the operator* ? Would remove the vec4 constructors
 						// glm::operator*<float,0>	Neutrino	e:\bitbucket\neutrino\external_dependencies\glm\glm\detail\type_mat4x4.inl	Line: 608	
 						mTransform = mTranslate * mRotation * mScale;
+#else
+						s_mRotationMatrix[0] = (float)cos(*pRots);
+						s_mRotationMatrix[1] = (float)sin(*pRots);
+						s_mRotationMatrix[3] = (float)-sin(*pRots);
+						s_mRotationMatrix[4] = (float)cos(*pRots);
+						s_mRotationMatrix[8] = 1.0f;
 
+						s_mScaleMatrix[0] = *pScales;
+						s_mScaleMatrix[4] = *pScales;
+						s_mScaleMatrix[8] = 1.0f;
 
+						s_mTransformationMatrix[0] = (s_mRotationMatrix[0] * s_mScaleMatrix[0]);
+						s_mTransformationMatrix[1] = (s_mRotationMatrix[1] * s_mScaleMatrix[4]);
+						s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
+						s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
+						s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
+#endif
+						vPos->x = (float)pPos->x * s_fScaledPixelWidth;
+						vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+						vPos->z = (float)pPos->z;
 						// Build the vertex positions
 						{
 							fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
@@ -543,79 +600,88 @@ namespace Neutrino {
 
 							vQuadTL_Pos->x = 0.0f - fScaledWidth;
 							vQuadTL_Pos->y = 0.0f + fScaledHeight;
+#if defined GLM_MATRIX
 							vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 							vQuadTL_Pos->w = 1.0f;   
-
+#endif
 							vQuadTR_Pos->x = 0.0f + fScaledWidth;
 							vQuadTR_Pos->y = 0.0f + fScaledHeight;
+#if defined GLM_MATRIX							
 							vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 							vQuadTR_Pos->w = 1.0f;   
-
+#endif
 							vQuadBL_Pos->x = 0.0f - fScaledWidth;
 							vQuadBL_Pos->y = 0.0f - fScaledHeight;
+#if defined GLM_MATRIX							
 							vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 							vQuadBL_Pos->w = 1.0f;   
-
+#endif
 							vQuadBR_Pos->x = 0.0f + fScaledWidth;
 							vQuadBR_Pos->y = 0.0f - fScaledHeight;
+#if defined GLM_MATRIX							
 							vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
 							vQuadBR_Pos->w = 1.0f;   
+#endif
 						}
 
-
+#if defined GLM_MATRIX
 						// Transform the vertex positions
 						vTransBL = mTransform * *vQuadBL_Pos;
 						vTransBR = mTransform * *vQuadBR_Pos;
 						vTransTL = mTransform * *vQuadTL_Pos;
 						vTransTR = mTransform * *vQuadTR_Pos;
+#else
+						vTransBL.x = (vQuadBL_Pos->x * s_mTransformationMatrix[0]) + (vQuadBL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+						vTransBL.y = (vQuadBL_Pos->y * s_mTransformationMatrix[3]) + (vQuadBL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+						vTransBL.z = vPos->z;
 
+						vTransBR.x = (vQuadBR_Pos->x * s_mTransformationMatrix[0]) + (vQuadBR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+						vTransBR.y = (vQuadBR_Pos->x * s_mTransformationMatrix[3]) + (vQuadBR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+						vTransBR.z = vPos->z;
+
+						vTransTL.x = (vQuadTL_Pos->x * s_mTransformationMatrix[0]) + (vQuadTL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+						vTransTL.y = (vQuadTL_Pos->x * s_mTransformationMatrix[3]) + (vQuadTL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+						vTransTL.z = vPos->z;
+
+						vTransTR.x = (vQuadTR_Pos->x * s_mTransformationMatrix[0]) + (vQuadTR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+						vTransTR.y = (vQuadTR_Pos->x * s_mTransformationMatrix[3]) + (vQuadTR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+						vTransTR.z = vPos->z;
+#endif
 						// Get the packed colour
 						iColour = GetPackedColourV4(pColours);
 
 						// Populate the VBO vertex corners
 						pVertex->_colour = iColour;
-						// pVertex->_uv[0] = 0;
-						// pVertex->_uv[1] = 1;
 						pVertex->_position[0] = vTransBL.x;
 						pVertex->_position[1] = vTransBL.y;
 						pVertex->_position[2] = vTransBL.z;
 						pVertex++;
 
 						pVertex->_colour = iColour;
-						// pVertex->_uv[0] = 1;
-						// pVertex->_uv[1] = 1;
 						pVertex->_position[0] = vTransBR.x;
 						pVertex->_position[1] = vTransBR.y;
 						pVertex->_position[2] = vTransBR.z;
 						pVertex++;
 
 						pVertex->_colour = iColour;
-						// pVertex->_uv[0] = 0;
-						// pVertex->_uv[1] = 0;
 						pVertex->_position[0] = vTransTL.x;
 						pVertex->_position[1] = vTransTL.y;
 						pVertex->_position[2] = vTransTL.z;
 						pVertex++;
 
 						pVertex->_colour = iColour;
-						// pVertex->_uv[0] = 1;
-						// pVertex->_uv[1] = 1;
 						pVertex->_position[0] = vTransBR.x;
 						pVertex->_position[1] = vTransBR.y;
 						pVertex->_position[2] = vTransBR.z;
 						pVertex++;
 
 						pVertex->_colour = iColour;
-						// pVertex->_uv[0] = 1;
-						// pVertex->_uv[1] = 0;
 						pVertex->_position[0] = vTransTR.x;
 						pVertex->_position[1] = vTransTR.y;
 						pVertex->_position[2] = vTransTR.z;
 						pVertex++;
 
 						pVertex->_colour = iColour;
-						// pVertex->_uv[0] = 0;
-						// pVertex->_uv[1] = 0;
 						pVertex->_position[0] = vTransTL.x;
 						pVertex->_position[1] = vTransTL.y;
 						pVertex->_position[2] = vTransTL.z;
@@ -642,7 +708,7 @@ namespace Neutrino {
 			}
 
 
-			void RenderDebugVBO(const int iSpriteCount)
+			void RenderDebugVBO(const uint32 iSpriteCount)
 			{
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glBindBuffer ( GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[s_pDebugVBOs->_iVBOCounter]);

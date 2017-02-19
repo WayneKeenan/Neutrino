@@ -96,13 +96,13 @@ namespace Neutrino
                       const float* pScales, 
                       glm::vec4* pColours, 
                       glm::vec3* pPos, 
-                      const int iCount, 
+                      const uint32 iCount, 
                       const int iVBOSet	);
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
 		//   	TO_DO: If there's not a lot of shader changes, merge this and Populate VBO above...
-		void RenderVBO(const int iSpriteCount, GLuint iID, const int iVBOSet);
+		void RenderVBO(const uint32 iSpriteCount, GLuint iID, const int iVBOSet);
 
 		// SetClearColour
 		// 		Changes the glClearColor parameter. This will remain the background colour every tick until 
@@ -131,11 +131,11 @@ namespace Neutrino
 													const float* pScales, 
 													glm::vec4* pColours, 
 													glm::vec3* pPos, 
-													const int iCount);
+													const uint32 iCount);
 
 		// RenderVBO
 		// 		Bind the DEBUG VBO and render it. 
-		void RenderDebugVBO(const int iSpriteCount);
+		void RenderDebugVBO(const uint32 iSpriteCount);
 #endif
 	};
 }

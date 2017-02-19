@@ -147,9 +147,9 @@ namespace Neutrino
 	}
 
 
-	int GetSpriteCount()
+	uint32 GetSpriteCount()
 	{
-		int iRet = 0;
+		uint32 iRet = 0;
 		for (int i = 0; i < s_iAllocatedSets; ++i)
 		{
 			iRet += s_aSpriteRenderInfo[i]->_iActiveSpriteCount;
@@ -158,7 +158,7 @@ namespace Neutrino
 		return iRet;
 	}
 
-	int GetDebugSpriteCount()
+	uint32 GetDebugSpriteCount()
 	{
 		return s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount;
 	}

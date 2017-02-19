@@ -56,8 +56,8 @@ namespace Neutrino
 	// populate and render VBOs for a given texture's sprites during this frame.  
 	typedef struct SpriteRenderInfo_t
 	{
-		uint16 	_iActiveSpriteCount;
-		GLuint 	_iTextureID;
+		uint32 _iActiveSpriteCount;
+		GLuint _iTextureID;
 		Sprite_t* _SpriteBasePointers;
 		SpriteArraySet_t 	_SprArrayBase;
 	} TextureSpriteArrayInfo_t;
@@ -98,10 +98,10 @@ namespace Neutrino
 	void TestSprite();
 
 
-	int GetSpriteCount();
+	uint32 GetSpriteCount();
 
 
-	int GetDebugSpriteCount();
+	uint32 GetDebugSpriteCount();
 
 
 #if defined DEBUG
@@ -129,7 +129,7 @@ namespace Neutrino
 
 	typedef struct UntexturedSpriteRenderInfo_t
 	{
-		uint16 	_iActiveSpriteCount;
+		uint32 _iActiveSpriteCount;
 		UntexturedSprite_t* _SpriteBasePointers;
 		UntexturedSpriteArraySet_t 	_SprArrayBase;
 	} UntexturedTextureSpriteArrayInfo_t;

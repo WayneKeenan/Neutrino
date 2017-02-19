@@ -294,6 +294,8 @@ namespace Neutrino
 		switch (iKey)
 		{
 			case eKeyboard_EditorInputs::_ESC: return s_pKeyState[SDLK_ESCAPE & ~SDLK_SCANCODE_MASK] == 1; break;
+			case eKeyboard_EditorInputs::_UNDO: return s_pKeyState[SDLK_u & ~SDLK_SCANCODE_MASK] == 1; break;
+			case eKeyboard_EditorInputs::_REDO: return s_pKeyState[SDLK_r & ~SDLK_SCANCODE_MASK] == 1; break;
 			default: break;
 		}
 		return false;

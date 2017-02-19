@@ -52,6 +52,8 @@ namespace Neutrino
 	enum eKeyboard_EditorInputs
 	{
 		_ESC,
+		_UNDO,
+		_REDO,
 	};
 
 	// Array of possible keyboard inputs we want to track that map to the lower level event processing (SDL atm)

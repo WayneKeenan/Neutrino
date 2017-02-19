@@ -19,7 +19,7 @@ static const float fHALF_PI = fPI / 2.0f;
 static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
 static const int iMAX_TEXTURES = 4;
-static const int iMAX_SPRITES = 1024*16;
+static const uint32 iMAX_SPRITES = 1024*128;
 
 static const int iDEFAULT_VIEWPORT_WIDTH = 1920;
 static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;

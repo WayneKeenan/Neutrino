@@ -354,12 +354,12 @@ namespace Neutrino
 			JoypadInput_t* pJoypad = s_aJoypads[iIndex];
 			switch (event.axis)
 			{
-			case SDL_CONTROLLER_AXIS_LEFTX:			pJoypad->_LEFT_STICK.x = (float)event.value / 32768.0f; break;
-			case SDL_CONTROLLER_AXIS_LEFTY:			pJoypad->_LEFT_STICK.y = (float)event.value / 32768.0f; break;
-			case SDL_CONTROLLER_AXIS_RIGHTX:		pJoypad->_RIGHT_STICK.x = (float)event.value / 32768.0f; break;
-			case SDL_CONTROLLER_AXIS_RIGHTY:		pJoypad->_RIGHT_STICK.y = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_LEFTX:	pJoypad->_LEFT_STICK.x = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_LEFTY:	pJoypad->_LEFT_STICK.y = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_RIGHTX: pJoypad->_RIGHT_STICK.x = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_RIGHTY: pJoypad->_RIGHT_STICK.y = (float)event.value / 32768.0f; break;
 			case SDL_CONTROLLER_AXIS_TRIGGERLEFT:	pJoypad->_ACTION_TRIGGER_1 = (float)event.value / 32768.0f; break;
-			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:	pJoypad->_ACTION_TRIGGER_2 = (float)event.value / 32768.0f; break;
+			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: pJoypad->_ACTION_TRIGGER_2 = (float)event.value / 32768.0f; break;
 			default:	break;
 			}
 		}
@@ -376,8 +376,8 @@ namespace Neutrino
 		uint32 iButtonMask = SDL_GetMouseState(&x, &y);
 		s_pMouseInput->_MOUSE_COORDS.x = (float)x;
 		s_pMouseInput->_MOUSE_COORDS.y = (float)y;
-		(iButtonMask & SDL_BUTTON(SDL_BUTTON_LEFT)) == 1 ? s_pMouseInput->_LEFT_BUTTON = true : s_pMouseInput->_LEFT_BUTTON = false;
-		(iButtonMask & SDL_BUTTON(SDL_BUTTON_RIGHT)) == 1 ? s_pMouseInput->_RIGHT_BUTTON = true : s_pMouseInput->_RIGHT_BUTTON = false;
+		(iButtonMask & SDL_BUTTON_LMASK) != 0 ? s_pMouseInput->_LEFT_BUTTON = true : s_pMouseInput->_LEFT_BUTTON = false;
+		(iButtonMask & SDL_BUTTON_RMASK) != 0 ? s_pMouseInput->_RIGHT_BUTTON = true : s_pMouseInput->_RIGHT_BUTTON = false;
 	}
 
 
@@ -402,19 +402,19 @@ namespace Neutrino
 			JoypadInput_t* pJoypad = s_aJoypads[iIndex];
 			switch (event.button)
 			{
-			case SDL_CONTROLLER_BUTTON_A:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_A; break;
-			case SDL_CONTROLLER_BUTTON_B:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_B; break;
-			case SDL_CONTROLLER_BUTTON_X:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_X; break;
-			case SDL_CONTROLLER_BUTTON_Y:				pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_Y; break;
+			case SDL_CONTROLLER_BUTTON_A:	pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_A; break;
+			case SDL_CONTROLLER_BUTTON_B:	pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_B; break;
+			case SDL_CONTROLLER_BUTTON_X:	pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_X; break;
+			case SDL_CONTROLLER_BUTTON_Y:	pJoypad->_FACE_BUTTONS ^= 1 << _ACTIONBUTTON_Y; break;
 			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:	pJoypad->_FACE_BUTTONS ^= 1 << _SHOULDER_LEFT; break;
 			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:	pJoypad->_FACE_BUTTONS ^= 1 << _SHOULDER_RIGHT; break;
-			case SDL_CONTROLLER_BUTTON_START:			pJoypad->_META_BUTTONS ^= 1 << _META_START; break;
-			case SDL_CONTROLLER_BUTTON_BACK:			pJoypad->_META_BUTTONS ^= 1 << _META_BACK; break;
-			case SDL_CONTROLLER_BUTTON_GUIDE:			pJoypad->_META_BUTTONS ^= 1 << _META_GUIDE; break;
-			case SDL_CONTROLLER_BUTTON_DPAD_UP:			pJoypad->_DPAD ^= 1 << _DPAD_UP; break;
-			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:		pJoypad->_DPAD ^= 1 << _DPAD_DOWN; break;
-			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:		pJoypad->_DPAD ^= 1 << _DPAD_LEFT; break;
-			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:		pJoypad->_DPAD ^= 1 << _DPAD_RIGHT; break;
+			case SDL_CONTROLLER_BUTTON_START: pJoypad->_META_BUTTONS ^= 1 << _META_START; break;
+			case SDL_CONTROLLER_BUTTON_BACK: pJoypad->_META_BUTTONS ^= 1 << _META_BACK; break;
+			case SDL_CONTROLLER_BUTTON_GUIDE: pJoypad->_META_BUTTONS ^= 1 << _META_GUIDE; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:	pJoypad->_DPAD ^= 1 << _DPAD_UP; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:	pJoypad->_DPAD ^= 1 << _DPAD_DOWN; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:	pJoypad->_DPAD ^= 1 << _DPAD_LEFT; break;
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: pJoypad->_DPAD ^= 1 << _DPAD_RIGHT; break;
 			}
 		}
 		else

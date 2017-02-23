@@ -14,6 +14,7 @@ namespace Neutrino
 
 	static const ImVec2* s_pOverlayPosition = NEWX ImVec2(50.0f, 50.0f);
 	static const ImVec2* s_pLogPosition = NEWX ImVec2(1100.0f, 850.0f);
+	static const ImVec2* s_pOverlayDimensions = NEWX ImVec2(285,270);
 
 	static CFrameRate s_FPSSampler;
 	static DebugLog* s_pDebugLog;
@@ -92,7 +93,7 @@ namespace Neutrino
 			snprintf(sDELTA_Text, 32, "DELTA: [%.3f]", s_FPSSampler.GetAverageDeltaTime());
 
 			ImGui::SetNextWindowPos(*s_pOverlayPosition, ImGuiSetCond_FirstUseEver);
-			ImGui::SetNextWindowSize(ImVec2(300,200), ImGuiSetCond_FirstUseEver);
+			ImGui::SetNextWindowSize(*s_pOverlayDimensions, ImGuiSetCond_FirstUseEver);
 			ImGui::Begin("Neutrino Debug", &s_bDebugOverlayActive);
 			if (ImGui::CollapsingHeader("Performance Counters:", iFlags))
 			{

@@ -37,10 +37,11 @@ static int s_iLevelWidth = s_iScreenWidth / 32;
 static int s_iLevelHeight = s_iScreenHeight / 32;
 static bool s_bLevelCreated = false;
 static char s_FilenameBuf[s_iFilenameLength] = "\0";
-#if defined _WIN32
-	static char s_FilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\tilemaps\\\0";
+
+#if defined _WIN32 
+static char s_FilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\tilemaps\\\0";
 #else
-	static char s_FilenameBuf[s_iFilepathLength] = "~/Development/Neutrino/resources/tilemaps/\0";
+static char s_FilepathBuf[s_iFilepathLength] = "~/Development/Neutrino/resources/tilemaps/\0";
 #endif 
 
 // Command type enumerates the actions the editor can perform
@@ -162,7 +163,7 @@ void CMapEditorIn::Update()
 	// Window Heading
 	{
 		ImGui::SetNextWindowPos(*s_pWindowPosition, ImGuiSetCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 450.0f), ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(s_iRowPixels, 750.0f), ImGuiSetCond_FirstUseEver);
 		ImGui::Begin("Tilemap Editor");
 		ImGui::Text("Mouse Position: [%.1f, %.1f]", pMouseCoords->x, pMouseCoords->y);
 		ImGui::Text(" Camera Offset: [%.1f, %.1f]", pCamerCoords->x, pCamerCoords->y);
@@ -352,9 +353,7 @@ void CMapEditorIn::Update()
 			float fXPos = 0.0f;
 			float fYPos = 0.0f;
 			float fHalfGridSize = fGridSize*0.5f;
-			float fHalfMapHeight = ((float)(s_iLevelHeight/2) * fGridSize); // The cast outside the bracket keeps the tiles 
-																																			// snapped to the grid when there are an odd number 
-																																			// of rows
+
 			for (uint16 i = 0; i < s_iLevelHeight; ++i)
 			{
 				for (uint16 j = 0; j < s_iLevelWidth; ++j)

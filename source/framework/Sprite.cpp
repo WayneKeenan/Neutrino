@@ -51,7 +51,7 @@ namespace Neutrino
 		// Setup the pointers in the sprite_t to the correct locations in the arrays. 
 		// TO DO: Is this actually useful through the framework? Could easily remove this...
 		// 
-		for(int i = 0; i < iMAX_SPRITES; i ++)
+		for(uint i = 0; i < iMAX_SPRITES; i ++)
 		{
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fX_S = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_S[i];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fY_T = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T[i];
@@ -315,7 +315,7 @@ namespace Neutrino
 			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers = NEWX UntexturedSprite_t[iMAX_SPRITES];
 		}
 
-		for (int i = 0; i < iMAX_SPRITES; i++)
+		for (uint i = 0; i < iMAX_SPRITES; i++)
 		{
 			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fHalfWidth = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth[i];
 			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fHalfHeight = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight[i];

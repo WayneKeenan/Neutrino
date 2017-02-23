@@ -243,7 +243,7 @@ namespace Neutrino {
 			// Traverse the sprite arrays
 			// TODO: Split this into 4 and spread across threads
 			{
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 				glm::mat4 mScale = glm::mat4(1.0f);
 				glm::mat4 mRotation = glm::mat4(1.0f);
 				glm::mat4 mTranslate = glm::mat4(1.0f);
@@ -259,7 +259,7 @@ namespace Neutrino {
 					// TODO: Ignore sprites outside the frustrum
 
 					// Build the transform matrix for this sprite
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 					mScale[0].x = *pScales;
 					mScale[1].y = *pScales;
 
@@ -300,32 +300,32 @@ namespace Neutrino {
 
 						vQuadTL_Pos->x = 0.0f - fScaledWidth;
 						vQuadTL_Pos->y = 0.0f + fScaledHeight;
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 						vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 						vQuadTL_Pos->w = 1.0f;   
 #endif
 						vQuadTR_Pos->x = 0.0f + fScaledWidth;
 						vQuadTR_Pos->y = 0.0f + fScaledHeight;
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
  						vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 						vQuadTR_Pos->w = 1.0f;   
 #endif
 						vQuadBL_Pos->x = 0.0f - fScaledWidth;
 						vQuadBL_Pos->y = 0.0f - fScaledHeight;
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 						vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 						vQuadBL_Pos->w = 1.0f;   
 #endif
 						vQuadBR_Pos->x = 0.0f + fScaledWidth;
 						vQuadBR_Pos->y = 0.0f - fScaledHeight;
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 						vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
 						vQuadBR_Pos->w = 1.0f;   
 #endif
 
 				}
 
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 					// Transform the vertex positions
 					// TODO: Move this into the Vertex Shader
 					vTransBL = mTransform * *vQuadBL_Pos;
@@ -472,7 +472,7 @@ namespace Neutrino {
 			if ( s_pVBOArrays[iVBOSet]->_iVBOCounter == 3) s_pVBOArrays[iVBOSet]->_iVBOCounter = 0;
 		}
 
-#if defined DEBUG 
+#ifdef DEBUG 
 		void CreateDebugVBOs()
 		{
 				s_pDebugVBOs = NEWX(VBO_t);
@@ -547,10 +547,12 @@ namespace Neutrino {
 
 				// Traverse the sprite arrays
 				{
+#ifdef GLM_MATRIX
 					glm::mat4 mScale = glm::mat4(1.0f);
 					glm::mat4 mRotation = glm::mat4(1.0f);
 					glm::mat4 mTranslate = glm::mat4(1.0f);
 					glm::mat4 mTransform = glm::mat4(1.0f);
+#endif
 					float fScaledWidth;
 					float fScaledHeight;
 					uint32 iColour;
@@ -558,7 +560,7 @@ namespace Neutrino {
 					// For each sprite up to iCount
 					for(uint32 i=0; i<iCount; i++)
 					{
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 						// Build the transform matrix for this sprite
 						mScale[0].x = *pScales;
 						mScale[1].y = *pScales;
@@ -600,31 +602,31 @@ namespace Neutrino {
 
 							vQuadTL_Pos->x = 0.0f - fScaledWidth;
 							vQuadTL_Pos->y = 0.0f + fScaledHeight;
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 							vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 							vQuadTL_Pos->w = 1.0f;   
 #endif
 							vQuadTR_Pos->x = 0.0f + fScaledWidth;
 							vQuadTR_Pos->y = 0.0f + fScaledHeight;
-#if defined GLM_MATRIX							
+#ifdef GLM_MATRIX							
 							vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 							vQuadTR_Pos->w = 1.0f;   
 #endif
 							vQuadBL_Pos->x = 0.0f - fScaledWidth;
 							vQuadBL_Pos->y = 0.0f - fScaledHeight;
-#if defined GLM_MATRIX							
+#ifdef GLM_MATRIX							
 							vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
 							vQuadBL_Pos->w = 1.0f;   
 #endif
 							vQuadBR_Pos->x = 0.0f + fScaledWidth;
 							vQuadBR_Pos->y = 0.0f - fScaledHeight;
-#if defined GLM_MATRIX							
+#ifdef GLM_MATRIX							
 							vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
 							vQuadBR_Pos->w = 1.0f;   
 #endif
 						}
 
-#if defined GLM_MATRIX
+#ifdef GLM_MATRIX
 						// Transform the vertex positions
 						vTransBL = mTransform * *vQuadBL_Pos;
 						vTransBR = mTransform * *vQuadBR_Pos;

@@ -11,6 +11,7 @@
 #include <math.h>
 #include <glm/glm.hpp> 
 #include <vector>
+#include "../tinydir/tinydir.h"
 
 using namespace Neutrino;
 
@@ -36,12 +37,14 @@ static int s_iScreensWide = 8;
 static int s_iLevelWidth = s_iScreenWidth / 32;
 static int s_iLevelHeight = s_iScreenHeight / 32;
 static bool s_bLevelCreated = false;
-static char s_FilenameBuf[s_iFilenameLength] = "\0";
+static bool s_bFilepathValid = false;
+static char s_pFilenameBuf[s_iFilenameLength] = "\0";
+static std::string s_sFileList;
 
 #if defined _WIN32 
-static char s_FilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\tilemaps\\\0";
+static char s_pFilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\tilemaps\\\0";
 #else
-static char s_FilepathBuf[s_iFilepathLength] = "~/Development/Neutrino/resources/tilemaps/\0";
+static char s_pFilepathBuf[s_iFilepathLength] = "/home/kor/Development/Neutrino/resources/tilemaps\0";
 #endif 
 
 // Command type enumerates the actions the editor can perform
@@ -120,6 +123,38 @@ static void ResizeTilemap()
 	}
 }
 
+static void CheckFilepath()
+{
+	tinydir_dir dir;
+	if (tinydir_open_sorted(&dir, s_pFilepathBuf) == -1)
+	{
+		LOG_ERROR("Filepath invalid: %s", s_pFilepathBuf);
+		s_bFilepathValid = false;
+	}
+	else
+	{
+		LOG_INFO("Filepath is valid: %s", s_pFilepathBuf);
+		LOG_INFO("Directory contains %d files...", dir.n_files);
+
+		s_sFileList = "";
+		for(uint i = 0; i < dir.n_files; ++i)
+		{
+			tinydir_file file;
+			if (tinydir_readfile_n(&dir, &file, i) == -1)
+			{
+				LOG_ERROR("Error getting file...");
+			}
+			else if(strcmp(file.name,".") != 0  && strcmp(file.name, "..") != 0) 
+			{
+				// TODO: this needs to be fixed to a C_str array, rather than standard string...
+				std::string sName(file.name); 
+				s_sFileList += sName + "\0 ";
+			}
+		}
+		s_bFilepathValid = true;
+	}
+}
+
 //-------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------- 
@@ -128,6 +163,7 @@ CMapEditorIn::CMapEditorIn()
 {
 	m_pStateName = "Map Editor In";
 	LOG_INFO(">>>> %s", this->m_pStateName);
+	CheckFilepath();
 }
 
 
@@ -159,6 +195,25 @@ void CMapEditorIn::Update()
 	vMouseWorldPosition->x = pMouseCoords->x - (pCamerCoords->x / vPixelScale.x);
 	vMouseWorldPosition->y = pMouseCoords->y - (pCamerCoords->y / vPixelScale.y);
 
+	// Alert user if the filepath is invalid
+	if (!s_bFilepathValid)
+	{
+		ImGui::OpenPopup("File Path");
+		if (ImGui::BeginPopupModal("File Path", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("The file path for saving / loading tile maps is invalid!\n\n\"%s\"\n\nPlease enter a valid path below:\n\n", s_pFilepathBuf);
+			ImGui::PushItemWidth(340); 
+			ImGui::InputText("Filepath", s_pFilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+
+			if (ImGui::Button("OK", ImVec2(400,0))) 
+			{ 
+				CheckFilepath();
+				ImGui::CloseCurrentPopup(); 
+			}
+			ImGui::PopItemWidth();
+			ImGui::EndPopup();
+		}
+	}
 
 	// Window Heading
 	{
@@ -176,8 +231,9 @@ void CMapEditorIn::Update()
 	{
 		if (ImGui::CollapsingHeader("Level Details:", iFlags))
 		{
-			ImGui::InputText("Filepath", s_FilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
-			ImGui::InputText("Level Name", s_FilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+			ImGui::InputText("Filepath", s_pFilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+			ImGui::InputText("New Level Name", s_pFilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+			ImGui::Combo("Existing Level", &s_iSelectedTexture, s_sFileList.c_str(), 5);
 			ImGui::InputInt("Screen Width", &s_iScreenWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel width of the screen for the final output");
 			ImGui::InputInt("Screen Height", &s_iScreenHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel height of the screen for the final output");
 			ImGui::InputInt("Screens Wide", &s_iScreensWide, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("How many screens long is this level?");
@@ -192,7 +248,7 @@ void CMapEditorIn::Update()
 	{
 		if (ImGui::Button("Create"))
 		{
-			if (s_FilenameBuf[0] == '\0')
+			if (s_pFilenameBuf[0] == '\0')
 				LOG_ERROR("Filename buffer is empty, unable to generate a new level without a filename being set");
 			else
 			{
@@ -304,6 +360,8 @@ void CMapEditorIn::Update()
 			DELETEX vUV1;
 		}
 	}
+
+	
 
 
 	// Bounds check mouse to this window. We'll hide the sprite while we're over the window. 

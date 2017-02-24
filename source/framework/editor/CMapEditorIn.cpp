@@ -23,11 +23,12 @@ static const ImVec2* s_pWindowPosition = NEWX ImVec2(1450.0f, 50.0f);
 static const float s_iRowPixels = 400.0f;
 static bool s_bSnapToGrid = true;
 static int s_iSelectedTexture = 0;
+static int s_iSelectedFile = 0;
 static int s_iSelectedGridSize = 4;
 static Sprite_t* s_pSelectedTile;
 static uint16 s_iTileIndex = 0;
 static bool s_bSpriteSelected;
-
+static bool s_bLevelNameEmpty = true;
 // Level Details statics
 static const int s_iFilenameLength = 64;
 static const int s_iFilepathLength = 1024;
@@ -39,7 +40,7 @@ static int s_iLevelHeight = s_iScreenHeight / 32;
 static bool s_bLevelCreated = false;
 static bool s_bFilepathValid = false;
 static char s_pFilenameBuf[s_iFilenameLength] = "\0";
-static std::string s_sFileList;
+static std::vector<std::string> s_aFileList;
 
 #if defined _WIN32 
 static char s_pFilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\tilemaps\\\0";
@@ -136,7 +137,7 @@ static void CheckFilepath()
 		LOG_INFO("Filepath is valid: %s", s_pFilepathBuf);
 		LOG_INFO("Directory contains %d files...", dir.n_files);
 
-		s_sFileList = "";
+		s_aFileList.clear();
 		for(uint i = 0; i < dir.n_files; ++i)
 		{
 			tinydir_file file;
@@ -144,16 +145,19 @@ static void CheckFilepath()
 			{
 				LOG_ERROR("Error getting file...");
 			}
-			else if(strcmp(file.name,".") != 0  && strcmp(file.name, "..") != 0) 
+			else if(strcmp(file.name,".") != 0  && strcmp(file.name, "..") != 0 && strcmp(file.extension, ".ltdi")) 
 			{
 				// TODO: this needs to be fixed to a C_str array, rather than standard string...
 				std::string sName(file.name); 
-				s_sFileList += sName + "\0 ";
+				sName.push_back('\0');
+				s_aFileList.push_back(sName);
 			}
 		}
 		s_bFilepathValid = true;
+		LOG_INFO("%d of those files have the .ltdi file extension and have been added to the drop down list.", s_aFileList.size());
 	}
 }
+
 
 //-------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------
@@ -198,8 +202,8 @@ void CMapEditorIn::Update()
 	// Alert user if the filepath is invalid
 	if (!s_bFilepathValid)
 	{
-		ImGui::OpenPopup("File Path");
-		if (ImGui::BeginPopupModal("File Path", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		ImGui::OpenPopup("filepath");
+		if (ImGui::BeginPopupModal("filepath", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::Text("The file path for saving / loading tile maps is invalid!\n\n\"%s\"\n\nPlease enter a valid path below:\n\n", s_pFilepathBuf);
 			ImGui::PushItemWidth(340); 
@@ -233,7 +237,10 @@ void CMapEditorIn::Update()
 		{
 			ImGui::InputText("Filepath", s_pFilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 			ImGui::InputText("New Level Name", s_pFilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
-			ImGui::Combo("Existing Level", &s_iSelectedTexture, s_sFileList.c_str(), 5);
+			std::string sBuff;
+			for(uint i = 0; i < s_aFileList.size(); ++i)
+				sBuff += s_aFileList[i];
+			ImGui::Combo("Existing Level", &s_iSelectedFile, sBuff.c_str(), (int)s_aFileList.size());
 			ImGui::InputInt("Screen Width", &s_iScreenWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel width of the screen for the final output");
 			ImGui::InputInt("Screen Height", &s_iScreenHeight, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel height of the screen for the final output");
 			ImGui::InputInt("Screens Wide", &s_iScreensWide, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("How many screens long is this level?");
@@ -249,9 +256,12 @@ void CMapEditorIn::Update()
 		if (ImGui::Button("Create"))
 		{
 			if (s_pFilenameBuf[0] == '\0')
-				LOG_ERROR("Filename buffer is empty, unable to generate a new level without a filename being set");
+			{
+				ImGui::OpenPopup("levelname");
+			}
 			else
 			{
+				s_bLevelNameEmpty = false;
 				LOG_INFO("Generating new level...");
 				s_aTileMap.clear();
 				for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
@@ -260,6 +270,16 @@ void CMapEditorIn::Update()
 				}
 				s_bLevelCreated = true;
 			}
+		}
+
+		if (ImGui::BeginPopupModal("levelname", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("You must enter a name for the new level in the properties window!");
+			if (ImGui::Button("OK", ImVec2(460,0))) 
+			{ 
+				ImGui::CloseCurrentPopup(); 
+			}
+			ImGui::EndPopup();
 		}
 	}
 
@@ -376,7 +396,6 @@ void CMapEditorIn::Update()
 
 		ImGui::End();
 	}
-
 
 	// Set Sprite Location, to nearest grid if set
 	// NOTE: Currently we only save tiles if Snap To Grid is set ;D

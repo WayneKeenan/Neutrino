@@ -103,6 +103,15 @@ namespace Neutrino
 				ImGui::Text("U Sprites: %d", GetDebugSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO1: %dk", (int) (GetDebugSpriteCount() * sizeof(GLUtils::Vertex_t)) / 1024);
 			}
 
+			// Check for the flycam keyboard input
+			static bool bDebounceKey = false;
+			if( GetKeyState(eKeyboard_EditorInputs::_FLYCAM) && !bDebounceKey)
+			{
+				bDebounceKey = true;
+				s_pOverlayParams->_bFlyCameraMode = !s_pOverlayParams->_bFlyCameraMode;
+			}
+			if(!GetKeyState(eKeyboard_EditorInputs::_FLYCAM) && bDebounceKey) bDebounceKey = false;
+
 			// Output camera position
 			if (ImGui::CollapsingHeader("Camera:", iFlags))
 			{

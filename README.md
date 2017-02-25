@@ -67,12 +67,20 @@ compile. (Release config has had no work done on it so far, so there will be com
 On first run Visual Studio will most likely have ALL_BUILD set as the start-up project. Right click on "Neutrino" and choose "Set as StartUp project" and you'll be able to run 
 and debug from within VS.
 
+##Status And licensing
+
+TBD
+
 ##Documentation
 
-More to come.
+###Tilemap editor
+
+You can activate the tilemap editor by pressing F3 in Debug builds. 
+
 
 ##Key Commands
 
 In DEBUG builds, the framework has the following shortcuts:
 - F1: Toggle performance panel
 - F3: Enter tile map editor (Current WIP)
+- F: Toggle Fly cam when the Performance Panel / Debug Overlay is visible

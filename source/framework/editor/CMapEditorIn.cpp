@@ -105,10 +105,6 @@ static void RenderTile(const float fXPos, const float fYPos, const GLuint iTextu
 	Sprite_t * pSprite = NewSprite(iTextureID, iSprIndex);
 	*(pSprite->_vPosition) = glm::vec3(fXPos, fYPos, 1.0f);
 	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
-
-	pSprite = NewSprite(iTextureID, iSprIndex);
-	*(pSprite->_vPosition) = glm::vec3(fXPos, fYPos, 1.0f);
-	*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1);
 }
 
 static void ResizeTilemap()
@@ -308,6 +304,26 @@ void CMapEditorIn::Update()
 	}
 
 
+	// Add a button for loading a file from the drop down 
+	{
+		ImGui::SameLine(200);
+		if (ImGui::Button("Load"))
+		{
+		}
+	}
+
+
+
+	// Add a button for saving the current level 
+	{
+		ImGui::SameLine();
+		if (ImGui::Button("Save") && s_bLevelCreated)
+		{
+		}
+	}
+
+
+
 	// Display Grid Settings 
 	{
 		if (ImGui::CollapsingHeader("Editor Grid Settings:", iFlags))
@@ -467,12 +483,23 @@ void CMapEditorIn::Update()
 			if (bMouseOverMapArea && s_bSpriteSelected && s_bSnapToGrid)
 			{
 			  bDebounceMouse = true;
-				Command_t* pNewCommand = NEWX(Command_t);
+				Command_t* pNewCommand = NULL;
+				if( s_iCommandListIndex == (int)s_aCommandList.size())
+				{
+					pNewCommand = NEWX(Command_t);
+					s_aCommandList.push_back(pNewCommand);
+				}
+				else
+				{
+					pNewCommand = s_aCommandList[s_iCommandListIndex];
+					for(uint i = s_iCommandListIndex+1; i < s_aCommandList.size(); ++i)
+						DELETEX(s_aCommandList[i]);
+					s_aCommandList.resize(s_iCommandListIndex+1);
+				}
 				pNewCommand->_iAction = eCommandType::_TileAdd;
 				pNewCommand->_iNewContent = s_iTileIndex;
 				pNewCommand->_iPrevContent = s_aTileMap[iIndex];
-				pNewCommand->_iTilemapIndex = s_iTileIndex;
-				s_aCommandList.push_back(pNewCommand);
+				pNewCommand->_iTilemapIndex = (uint16)iIndex;
 				++s_iCommandListIndex;
 				s_aTileMap[iIndex] = s_iTileIndex;
 			}
@@ -484,12 +511,23 @@ void CMapEditorIn::Update()
 			if (bMouseOverMapArea && s_bSnapToGrid && s_aTileMap[iIndex] != -1)
 			{
 				bDebounceMouse = true;
-				Command_t* pNewCommand = NEWX(Command_t);
+				Command_t* pNewCommand = NULL;
+				if( s_iCommandListIndex == (int)s_aCommandList.size())
+				{
+					pNewCommand = NEWX(Command_t);
+					s_aCommandList.push_back(pNewCommand);
+				}
+				else
+				{
+					pNewCommand = s_aCommandList[s_iCommandListIndex];
+					for(uint i = s_iCommandListIndex+1; i < s_aCommandList.size(); ++i)
+						DELETEX(s_aCommandList[i]);
+					s_aCommandList.resize(s_iCommandListIndex+1);
+				}
 				pNewCommand->_iAction = eCommandType::_TileRem;
 				pNewCommand->_iNewContent = -1;
 				pNewCommand->_iPrevContent = s_aTileMap[iIndex];
-				pNewCommand->_iTilemapIndex = s_iTileIndex;
-				s_aCommandList.push_back(pNewCommand);
+				pNewCommand->_iTilemapIndex = (uint16)iIndex;
 				++s_iCommandListIndex;
 				s_aTileMap[iIndex] = -1;
 			}
@@ -498,6 +536,32 @@ void CMapEditorIn::Update()
 
 	// Clear bDebounceMouse
 	if( bDebounceMouse && !GetMouseLB() && !GetMouseRB() ) bDebounceMouse = false;
+
+
+	// Respond to Undo / Redo
+	static bool bDebounceKey= false;
+	{
+		if( !bDebounceKey )
+		{
+			if(GetKeyState(eKeyboard_EditorInputs::_UNDO) && s_iCommandListIndex > 0 )
+			{
+				Command_t* pCmd = s_aCommandList[s_iCommandListIndex-1];
+				s_aTileMap[pCmd->_iTilemapIndex] = pCmd->_iPrevContent; 
+				--s_iCommandListIndex;
+				bDebounceKey = true;
+			}
+
+			if(GetKeyState(eKeyboard_EditorInputs::_REDO) && s_iCommandListIndex < (int)s_aCommandList.size())
+			{
+				Command_t* pCmd = s_aCommandList[s_iCommandListIndex];
+				s_aTileMap[pCmd->_iTilemapIndex] = pCmd->_iNewContent; 
+				++s_iCommandListIndex;
+				bDebounceKey=true;
+			}
+		}
+	}
+
+	if( bDebounceKey && !GetKeyState(eKeyboard_EditorInputs::_UNDO) && !GetKeyState(eKeyboard_EditorInputs::_REDO) ) bDebounceKey = false;
 
 	DELETEX vMouseWorldPosition;
 }

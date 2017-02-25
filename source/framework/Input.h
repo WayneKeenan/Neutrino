@@ -54,6 +54,7 @@ namespace Neutrino
 		_ESC,
 		_UNDO,
 		_REDO,
+		_FLYCAM,
 	};
 
 	// Array of possible keyboard inputs we want to track that map to the lower level event processing (SDL atm)

@@ -39,6 +39,7 @@ static int s_iLevelWidth = s_iScreenWidth / 32;
 static int s_iLevelHeight = s_iScreenHeight / 32;
 static bool s_bLevelCreated = false;
 static bool s_bFilepathValid = false;
+static bool s_bUnsavedChanges = false;
 static char s_pFilenameBuf[s_iFilenameLength] = "\0";
 static std::vector<std::string> s_aFileList;
 
@@ -252,30 +253,43 @@ void CMapEditorIn::Update()
 		if (ImGui::Button("Create"))
 		{
 			if (s_pFilenameBuf[0] == '\0')
-			{
 				ImGui::OpenPopup("levelname");
-			}
+			else if (s_bLevelCreated)
+				ImGui::OpenPopup("leveldestroy");
 			else
 			{
 				s_bLevelNameEmpty = false;
 				LOG_INFO("Generating new level...");
 				s_aTileMap.clear();
 				for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
-				{
 					s_aTileMap.push_back(-1);
-				}
 				s_bLevelCreated = true;
 			}
 		}
 
+		// Modal popup for empty level name
 		if (ImGui::BeginPopupModal("levelname", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::Text("You must enter a name for the new level in the properties window!");
-			if (ImGui::Button("OK", ImVec2(460,0))) 
+			if (ImGui::Button("OK", ImVec2(460,0))) ImGui::CloseCurrentPopup(); 
+			ImGui::EndPopup();
+		}
+
+		// Modal popup for create being called when a level is being edited
+		if (ImGui::BeginPopupModal("leveldestroy", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("An active level exists and will be destroyed if you create a new one. Are you sure?");
+			if (ImGui::Button("Yes", ImVec2(300,0))) 
 			{ 
+				LOG_INFO("Generating new level...");
+				s_aTileMap.clear();
+				for (int i = 0; i < (s_iLevelWidth *s_iLevelHeight); ++i)
+					s_aTileMap.push_back(-1);
+				s_bLevelCreated = true;
+				s_bUnsavedChanges = false;
 				ImGui::CloseCurrentPopup(); 
 			}
-			ImGui::EndPopup();
+			ImGui::SameLine(); if(ImGui::Button("No", ImVec2(300,0))) ImGui::CloseCurrentPopup(); ImGui::EndPopup();
 		}
 	}
 
@@ -283,10 +297,24 @@ void CMapEditorIn::Update()
 	// Respond to "Clear Level" button being pressed
 	{
 		ImGui::SameLine();
-		if (ImGui::Button("Clear"))
+		if (ImGui::Button("Clear") && s_iCommandListIndex > 0)
 		{
-			s_aTileMap.clear();
-			s_bLevelCreated = false;
+			ImGui::OpenPopup("clearconfirm");
+		}
+
+		if (ImGui::BeginPopupModal("clearconfirm", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("This will discard all changes and delete the active level. Are you sure?");
+			if (ImGui::Button("Yes", ImVec2(240,0))) 
+			{ 
+				s_aTileMap.clear();
+				s_aCommandList.clear();
+				s_iCommandListIndex = 0;
+				s_bLevelCreated = false;
+				s_bUnsavedChanges = false;
+				ImGui::CloseCurrentPopup(); 
+			}
+			ImGui::SameLine(); if(ImGui::Button("No", ImVec2(240,0))) ImGui::CloseCurrentPopup(); ImGui::EndPopup();
 		}
 	}
 
@@ -413,6 +441,7 @@ void CMapEditorIn::Update()
 		ImGui::End();
 	}
 
+
 	// Set Sprite Location, to nearest grid if set
 	// NOTE: Currently we only save tiles if Snap To Grid is set ;D
 	{
@@ -483,6 +512,7 @@ void CMapEditorIn::Update()
 			if (bMouseOverMapArea && s_bSpriteSelected && s_bSnapToGrid)
 			{
 			  bDebounceMouse = true;
+				s_bUnsavedChanges = true;
 				Command_t* pNewCommand = NULL;
 				if( s_iCommandListIndex == (int)s_aCommandList.size())
 				{
@@ -511,6 +541,7 @@ void CMapEditorIn::Update()
 			if (bMouseOverMapArea && s_bSnapToGrid && s_aTileMap[iIndex] != -1)
 			{
 				bDebounceMouse = true;
+				s_bUnsavedChanges = true;
 				Command_t* pNewCommand = NULL;
 				if( s_iCommandListIndex == (int)s_aCommandList.size())
 				{
@@ -577,8 +608,8 @@ void CMapEditorIn::Kill()
 
 bool CMapEditorIn::ForceKill()
 {
-	LOG_INFO(">>>> %s, FORCEKILL called!", this->m_pStateName );
-	return true;
+	if( s_bUnsavedChanges) LOG_WARNING("You cannot exit the editor mode as there are unsaved modifcations to the active level");
+	return !s_bUnsavedChanges;
 }
 
 

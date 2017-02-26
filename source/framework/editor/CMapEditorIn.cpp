@@ -347,6 +347,11 @@ void CMapEditorIn::Update()
 		ImGui::SameLine();
 		if (ImGui::Button("Save") && s_bLevelCreated)
 		{
+			// TODO:
+			// - Add delete to File.cpp
+			// - Add a save and load function to File.cpp
+			// - Could take in a struct to the variables from the editor?
+			// - How will Level.cpp use this? Should Level do the save and loading?
 		}
 	}
 

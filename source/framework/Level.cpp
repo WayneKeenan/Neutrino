@@ -8,19 +8,4 @@
 
 namespace Neutrino {
 
-	bool GenerateTileMapFromFile(const char* pFilename)
-	{
-		if (!ResourceFileExists(pFilename)) { LOG_ERROR("GenerateTileMapFromFile: Unable to find %s, exiting...", pFilename); return false; }
-
-		return true;
-	}
-
-
-
-	bool LoadLevelDetailsFromConfigFile()
-	{
-		return true;
-	}
-
-
 }

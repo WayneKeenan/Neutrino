@@ -223,13 +223,6 @@ namespace Neutrino
 		GLUtils::CreateDebugVBOs();
 #endif
 
-		// Parse through the list of levels and store the meta-data so we can transition 
-		// to new levels during game state transition. 
-		//
-		if(!LoadLevelDetailsFromConfigFile())
-		{
-			LOG_ERROR("Framework was unable to load level meta-data, exiting...");
-		}
 
 		// Create any Singletons we need
 		//

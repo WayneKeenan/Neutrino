@@ -135,7 +135,7 @@ static void CheckFilepath()
 		LOG_INFO("Directory contains %d files...", dir.n_files);
 
 		s_aFileList.clear();
-		for(uint i = 0; i < dir.n_files; ++i)
+		for(uint16 i = 0; i < dir.n_files; ++i)
 		{
 			tinydir_file file;
 			if (tinydir_readfile_n(&dir, &file, i) == -1)
@@ -235,7 +235,7 @@ void CMapEditorIn::Update()
 			ImGui::InputText("Filepath", s_pFilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 			ImGui::InputText("New Level Name", s_pFilenameBuf, s_iFilenameLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 			std::string sBuff;
-			for(uint i = 0; i < s_aFileList.size(); ++i)
+			for(uint16 i = 0; i < s_aFileList.size(); ++i)
 				sBuff += s_aFileList[i];
 			ImGui::Combo("Existing Level", &s_iSelectedFile, sBuff.c_str(), (int)s_aFileList.size());
 			ImGui::InputInt("Screen Width", &s_iScreenWidth, 1, 5); if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pixel width of the screen for the final output");
@@ -527,7 +527,7 @@ void CMapEditorIn::Update()
 				else
 				{
 					pNewCommand = s_aCommandList[s_iCommandListIndex];
-					for(uint i = s_iCommandListIndex+1; i < s_aCommandList.size(); ++i)
+					for(uint16 i = s_iCommandListIndex+1; i < s_aCommandList.size(); ++i)
 						DELETEX(s_aCommandList[i]);
 					s_aCommandList.resize(s_iCommandListIndex+1);
 				}
@@ -556,7 +556,7 @@ void CMapEditorIn::Update()
 				else
 				{
 					pNewCommand = s_aCommandList[s_iCommandListIndex];
-					for(uint i = s_iCommandListIndex+1; i < s_aCommandList.size(); ++i)
+					for(uint16 i = s_iCommandListIndex+1; i < s_aCommandList.size(); ++i)
 						DELETEX(s_aCommandList[i]);
 					s_aCommandList.resize(s_iCommandListIndex+1);
 				}

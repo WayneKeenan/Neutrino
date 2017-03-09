@@ -87,15 +87,7 @@ static int s_iCommandListIndex = 0;
 //
 static std::vector<int16> s_aTileMap;
 
-typedef struct TileData_t
-{
-	char* _sFilepathBuf;
-	char* _sFilenameBuf;
 
-	uint16 _LevelWidth;
-	uint16 _LevelHeight;
-
-}TileData_t;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 static void RenderEmptyTile(const float iXPos, const float iYPos)

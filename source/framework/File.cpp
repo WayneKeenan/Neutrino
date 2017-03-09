@@ -14,11 +14,13 @@ namespace Neutrino {
 		return stat(pFilename, &fileBuf) == 0;
 	}
 
+
 	bool ResourceFileExists( const char* pFilename)
 	{
 		int iExists = PHYSFS_exists(pFilename);
 		return (iExists!=0);
 	}
+
 
 	bool MountResources( const char* pFilename )
 	{
@@ -65,7 +67,6 @@ namespace Neutrino {
 
 		return iLength;
 	}
-
 
 
 	const char* CStyleLoadResourceBytes(const char* pFilename)

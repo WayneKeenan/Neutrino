@@ -29,6 +29,8 @@ static Sprite_t* s_pSelectedTile;
 static uint16 s_iTileIndex = 0;
 static bool s_bSpriteSelected;
 static bool s_bLevelNameEmpty = true;
+
+
 // Level Details statics
 static const int s_iFilenameLength = 64;
 static const int s_iFilepathLength = 1024;
@@ -50,6 +52,7 @@ static char s_pFilepathBuf[s_iFilepathLength] = "/home/kor/Development/Neutrino/
 #endif 
 
 // Command type enumerates the actions the editor can perform
+// 
 enum eCommandType
 {
 	_TileAdd,
@@ -81,9 +84,18 @@ static int s_iCommandListIndex = 0;
 
 
 // This array holds the Tilemap values. Just records the sprite index. 
-// TODO: This needs to be part of a struct that contains the TPage_t info
+//
 static std::vector<int16> s_aTileMap;
 
+typedef struct TileData_t
+{
+	char* _sFilepathBuf;
+	char* _sFilenameBuf;
+
+	uint16 _LevelWidth;
+	uint16 _LevelHeight;
+
+}TileData_t;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 static void RenderEmptyTile(const float iXPos, const float iYPos)

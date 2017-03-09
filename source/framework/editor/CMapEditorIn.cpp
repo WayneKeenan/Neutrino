@@ -34,8 +34,8 @@ static bool s_bLevelNameEmpty = true;
 
 
 // Level Details statics
-static const int s_iFilenameLength = 64;
-static const int s_iFilepathLength = 1024;
+static const int s_iFilenameLength = 1024;
+static const int s_iFilepathLength = 4096;
 static int s_iScreenWidth = 480;
 static int s_iScreenHeight = 270;
 static int s_iScreensWide = 8;
@@ -148,7 +148,7 @@ static void CheckFilepath()
 			{
 				LOG_ERROR("Error getting file...");
 			}
-			else if(strcmp(file.name,".") != 0  && strcmp(file.name, "..") != 0 && strcmp(file.extension, ".ltdi")) 
+			else if(strcmp(file.name,".") != 0  && strcmp(file.name, "..") != 0 && strcmp(file.extension, "ltdi")==0) 
 			{
 				// TODO: this needs to be fixed to a C_str array, rather than standard string...
 				std::string sName(file.name); 
@@ -354,9 +354,10 @@ void CMapEditorIn::Update()
 		if (ImGui::Button("Save") && s_bLevelCreated)
 		{
 			TileMapData_t* pData = NEWX(TileMapData_t);
+			pData->_sTextureFilename = GetTPage((uint8)s_iSelectedTexture)->_sTextureFilename;
 			pData->_sFilenameBuf = s_pFilenameBuf;
 			pData->_sFilepathBuf = s_pFilepathBuf;
-			pData->_aTileMap = s_aTileMap;
+			pData->_aTileMap = &s_aTileMap[0];
 			pData->_LevelWidth = (uint16)s_iLevelWidth;
 			pData->_LevelHeight = (uint16)s_iLevelHeight;
 			SaveTileMapData(pData);
@@ -393,6 +394,7 @@ void CMapEditorIn::Update()
 				sBuff += " Texture " + std::to_string(i) + ": " + pTPage->_sTextureFilename + " \0";
 			}
 
+			// TODO: Changing this invliadates the tilemap, we can only save data from one texture. Needs a POPUP
 			ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
 			ImGui::Spacing();
 		}

@@ -18,11 +18,12 @@ namespace Neutrino {
 	typedef struct TileMapData_t
 	{
 		float _fVersion = s_fTMD_Version;
+		char* _sTextureFilename;
 		char* _sFilepathBuf;
 		char* _sFilenameBuf;
 		uint16 _LevelWidth;
 		uint16 _LevelHeight;
-		std::vector<int16> _aTileMap;
+		int16* _aTileMap;
 	}TileMapData_t;
 
 }

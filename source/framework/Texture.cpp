@@ -108,6 +108,14 @@ namespace Neutrino {
 			}
 
 			//
+			// Store the texture and tpage info filenames, so we can double check the tilemap data on load
+			//
+			s_aTexturePages[iCount]._sTextureFilename = NEWX char[strlen(pFilename)+1];
+			s_aTexturePages[iCount]._sTPageFilename = NEWX char[strlen(pTPageFilename)+1];
+			memcpy(s_aTexturePages[iCount]._sTextureFilename, pFilename, strlen(pFilename)+1);
+			memcpy(s_aTexturePages[iCount]._sTPageFilename, pTPageFilename, strlen(pTPageFilename)+1);
+
+			//
 			// Allocate the TPageSpriteInfo array for this texture page and populate with each sprite's info
 			// 
 			int iSprs = config_setting_length(pSprSetting);
@@ -227,8 +235,8 @@ namespace Neutrino {
 					sprintf(sID, "textures.texture%d", i);
 					sprintf(sTP, "textures.tpageinfo%d", i);
 
-					const char* pFilename = GameConfigGetString(sID);
-					const char* pTPageFilename = GameConfigGetString(sTP);
+					const char* pFilename = GameConfigGetString(sID);			 // This is the texture binary
+					const char* pTPageFilename = GameConfigGetString(sTP); // TPage is the text file with sprite info
 
 				  if ( NULL != pFilename && NULL != pTPageFilename )
 					{

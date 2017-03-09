@@ -33,6 +33,8 @@ namespace Neutrino {
 	//  
 	typedef struct TPage_t
 	{
+		char* _sTextureFilename;
+		char* _sTPageFilename;
 		GLuint _iTextureID;
 		uint16 _iWidth;
 		uint16 _iHeight;

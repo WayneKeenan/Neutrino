@@ -391,7 +391,10 @@ void CMapEditorIn::Update()
 			ImGui::Text("Available Textures:"); ImGui::SameLine(165); ImGui::Text("%d", iTextureCount);
 			std::string sBuff;
 			for (int i = 0; i < iTextureCount; ++i)
-				sBuff += " Texture: " + std::to_string(i) + " \0";
+			{
+				const TPage_t* pTPage = GetTPage((uint8)i);
+				sBuff += " Texture " + std::to_string(i) + ": " + pTPage->_sTextureFilename + " \0";
+			}
 
 			ImGui::Combo("Select Texture", &s_iSelectedTexture, sBuff.c_str(), iTextureCount);
 			ImGui::Spacing();

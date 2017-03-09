@@ -120,4 +120,10 @@ namespace Neutrino {
 
 		return pLoadedResource;
 	}
+
+
+	bool SaveTileMapData(const TileMapData_t*)
+	{
+		return true;
+	}
 }

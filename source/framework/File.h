@@ -1,5 +1,6 @@
 #pragma once
 #include "Types.h"
+#include "Level.h"
 
 
 namespace Neutrino {
@@ -33,4 +34,9 @@ namespace Neutrino {
 	//   	Note: no allocation tracking is undertaken by this function. It's the responsibility
 	//    	of the calling function to free memory allocated by this load. 
 	const char* LoadResourceBytes(const char* pFilename);
+
+
+	// SaveTileMapData()
+	// 	Takes a TileMapData_t and writes it to a file at the given path. This is a destructive operation
+	bool SaveTileMapData(const TileMapData_t* pData);
 }

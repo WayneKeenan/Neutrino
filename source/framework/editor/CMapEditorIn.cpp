@@ -7,11 +7,13 @@
 #include "../Memory.h"
 #include "../Input.h"
 #include "../Debug.h"
+#include "../tinydir/tinydir.h"
+#include "../Level.h"
+#include "../File.h"
 #include <string>
 #include <math.h>
 #include <glm/glm.hpp> 
 #include <vector>
-#include "../tinydir/tinydir.h"
 
 using namespace Neutrino;
 
@@ -351,11 +353,14 @@ void CMapEditorIn::Update()
 		ImGui::SameLine();
 		if (ImGui::Button("Save") && s_bLevelCreated)
 		{
-			// TODO:
-			// - Add delete to File.cpp
-			// - Add a save and load function to File.cpp
-			// - Could take in a struct to the variables from the editor?
-			// - How will Level.cpp use this? Should Level do the save and loading?
+			TileMapData_t* pData = NEWX(TileMapData_t);
+			pData->_sFilenameBuf = s_pFilenameBuf;
+			pData->_sFilepathBuf = s_pFilepathBuf;
+			pData->_aTileMap = s_aTileMap;
+			pData->_LevelWidth = (uint16)s_iLevelWidth;
+			pData->_LevelHeight = (uint16)s_iLevelHeight;
+			SaveTileMapData(pData);
+			DELETEX pData;
 		}
 	}
 

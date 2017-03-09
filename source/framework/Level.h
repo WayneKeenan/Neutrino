@@ -24,4 +24,5 @@ namespace Neutrino {
 		uint16 _LevelHeight;
 		std::vector<int16> _aTileMap;
 	}TileMapData_t;
+
 }

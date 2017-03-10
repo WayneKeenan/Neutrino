@@ -360,9 +360,27 @@ void CMapEditorIn::Update()
 			pData->_aTileMap = &s_aTileMap[0];
 			pData->_LevelWidth = (uint16)s_iLevelWidth;
 			pData->_LevelHeight = (uint16)s_iLevelHeight;
-			SaveTileMapData(pData);
+			if(SaveTileMapData(pData)) ImGui::OpenPopup("saveok"); else ImGui::OpenPopup("savefail");
 			DELETEX pData;
 		}
+	}
+
+
+	// Modal popup for save success
+	if (ImGui::BeginPopupModal("saveok", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Level has been saved!");
+		if (ImGui::Button("OK", ImVec2(200,0))) ImGui::CloseCurrentPopup(); 
+		ImGui::EndPopup();
+	}
+
+
+	// Modal popup for save success
+	if (ImGui::BeginPopupModal("savefail", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Level save failed. Er...");
+		if (ImGui::Button("OK", ImVec2(200,0))) ImGui::CloseCurrentPopup(); 
+		ImGui::EndPopup();
 	}
 
 

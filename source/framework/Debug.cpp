@@ -83,7 +83,7 @@ namespace Neutrino
 				if (s_pOverlayParams->_bFlyCameraMode)
 			{
 				glm::vec3* vTraj = GetInputAxisGameDeltaScaled(1);
-				vTraj->x = -vTraj->x;
+				vTraj->x = vTraj->x;
 				vTraj->y = -vTraj->y;
 				*s_pOverlayParams->_pvCameraOffset += *vTraj * s_pOverlayParams->_fFlyCamSpeed;
 			}

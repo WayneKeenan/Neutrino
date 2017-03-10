@@ -122,7 +122,7 @@ namespace Neutrino {
 		return pLoadedResource;
 	}
 
-
+#if defined DEBUG
 	bool SaveTileMapData(const TileMapData_t* pData)
 	{
 		// Check filepath is sane
@@ -144,12 +144,14 @@ namespace Neutrino {
 		strcat(sFile, pData->_sFilenameBuf);
 		strcat(sFile, ".ltdi" );
 
-		// Check if file already exists
+		// Check if file already exists and warn that we're going to clobber it
 		if( FileExists(sFile)) LOG_WARNING("%s already exists, overwriting.", sFile);
 
-		TileMapData_t Data = *pData;
+		const TileMapData_t Data = *pData;
 		int iFilenameLength = (int)strlen(pData->_sTextureFilename);
-
+	
+		// Save the data
+		// 
 		FILE* pFile = fopen(sFile, "w+");
 		if(NULL != pFile)
 		{
@@ -162,13 +164,25 @@ namespace Neutrino {
 		}
 		fclose(pFile);
 
-		// TODO: use LoadTileMapData() to verify the save...
-		return true;
-	}
+		// Check the data saved correctly
+		//
+		const TileMapData_t* pDataCheck = LoadTileMapData(sFile);
+		bool bIntegrityPass = true;
+		if( pDataCheck->_fVersion != Data._fVersion ) bIntegrityPass = false;
+		if( pDataCheck->_sTextureFilename != Data._sTextureFilename ) bIntegrityPass = false;
+		if( pDataCheck->_LevelWidth != Data._LevelWidth ) bIntegrityPass = false;
+		if( pDataCheck->_LevelHeight != Data._LevelHeight ) bIntegrityPass = false;
+		for(int i = 0; i < Data._LevelWidth * Data._LevelHeight; ++i)
+			if(pDataCheck->_aTileMap[i] != Data._aTileMap[i]) bIntegrityPass = false;
 
-	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle = false)
+		// And we're done
+		return bIntegrityPass;
+	}
+#endif
+
+	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle)
 	{
-		// TODO: Check the length of the file. There should be a minimum filesize that'll indicate a broken file...'
+		// TODO: Check the length of the file. There should be a minimum filesize that'll indicate a broken file...?
 		FILE* pFile = fopen(sFilePathAndName, "r");
 		if(NULL == pFile)
 		{
@@ -181,7 +195,8 @@ namespace Neutrino {
 
 		if(bFromResourceBundle)
 		{
-
+			// TODO
+			return NULL;
 		}
 		else
 		{

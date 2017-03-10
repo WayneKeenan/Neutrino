@@ -35,8 +35,15 @@ namespace Neutrino {
 	//    	of the calling function to free memory allocated by this load. 
 	const char* LoadResourceBytes(const char* pFilename);
 
-
+#if defined DEBUG
 	// SaveTileMapData()
-	// 	Takes a TileMapData_t and writes it to a file at the given path. This is a destructive operation
+	// 		Takes a TileMapData_t and writes it to a file at the given path. This is a destructive operation
+	// 		although the saved data is reloaded and a simple comparison done to check the file's integrity. 
+	// 		The function returns the result of that comparison
 	bool SaveTileMapData(const TileMapData_t* pData);
+#endif
+
+	// LoadTileMapData()
+	//		Populates a TileMapData_t struct with data previously written to a file. No integrity checking. 	
+	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle = false);
 }

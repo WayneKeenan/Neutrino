@@ -133,17 +133,22 @@ namespace Neutrino {
 			return false;
 		}		
 
-		// Create the full path
-		char* sFile = (char*) malloc (strlen(pData->_sFilepathBuf)+strlen(pData->_sFilenameBuf)+6); // plus six as we add a trailing slash and file extension
-		strcpy(sFile, pData->_sFilepathBuf);
 	#if defined _WIN32
-	 strcat(sFile, "\\");
+		// Create the full path
+		size_t iSize = strlen(pData->_sFilepathBuf) + strlen(pData->_sFilenameBuf) + 8;
+		char* sFile = (char*)malloc(iSize);
+		strcpy_s(sFile, iSize, pData->_sFilepathBuf);
+		strcat_s(sFile, iSize, "\\");
+		strcat_s(sFile, iSize, pData->_sFilenameBuf);
+		strcat_s(sFile, iSize, ".ltdi" );
 	#else
+		// Create the full path
+		char* sFile = (char*) malloc (strlen(pData->_sFilepathBuf)+strlen(pData->_sFilenameBuf)+7); 
+		strcpy(sFile, pData->_sFilepathBuf);
 		strcat(sFile, "/");
-	#endif
 		strcat(sFile, pData->_sFilenameBuf);
-		strcat(sFile, ".ltdi" );
-
+		strcat(sFile, ".ltdi\0" );
+	#endif
 		// Check if file already exists and warn that we're going to clobber it
 		if( FileExists(sFile)) LOG_WARNING("%s already exists, overwriting.", sFile);
 
@@ -152,7 +157,12 @@ namespace Neutrino {
 	
 		// Save the data
 		// 
+	#if defined _WIN32
+		FILE *pFile;
+		fopen_s(&pFile, sFile, "w+");	
+	#else 
 		FILE* pFile = fopen(sFile, "w+");
+	#endif
 		if(NULL != pFile)
 		{
 			fwrite(&Data._fVersion, sizeof(float), 1, pFile);
@@ -183,7 +193,12 @@ namespace Neutrino {
 	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle)
 	{
 		// TODO: Check the length of the file. There should be a minimum filesize that'll indicate a broken file...?
+	#if defined _WIN32
+		FILE *pFile;
+		fopen_s(&pFile, sFilePathAndName, "r");	
+	#else	
 		FILE* pFile = fopen(sFilePathAndName, "r");
+	#endif
 		if(NULL == pFile)
 		{
 			LOG_ERROR("LoadTileMapData: unable to open %s", sFilePathAndName);

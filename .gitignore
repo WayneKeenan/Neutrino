@@ -61,3 +61,4 @@ build/Win32/
 .vscode/
 build/.vs/Neutrino/v14/.suo
 Clipboard Text.txt
+resources/tilemaps/

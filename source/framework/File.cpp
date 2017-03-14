@@ -142,7 +142,9 @@ namespace Neutrino {
 		strcat(sFile, "/");
 	#endif
 		strcat(sFile, pData->_sFilenameBuf);
+		// TODO: only add this if it's missing
 		strcat(sFile, ".ltdi" );
+
 
 		// Check if file already exists and warn that we're going to clobber it
 		if( FileExists(sFile)) LOG_WARNING("%s already exists, overwriting.", sFile);
@@ -175,6 +177,8 @@ namespace Neutrino {
 		for(int i = 0; i < Data._LevelWidth * Data._LevelHeight; ++i)
 			if(pDataCheck->_aTileMap[i] != Data._aTileMap[i]) bIntegrityPass = false;
 
+
+		free(sFile);
 		// And we're done
 		return bIntegrityPass;
 	}

@@ -31,6 +31,7 @@ static Sprite_t* s_pSelectedTile;
 static uint16 s_iTileIndex = 0;
 static bool s_bSpriteSelected;
 static bool s_bLevelNameEmpty = true;
+static bool s_bRespondingToPopup = false;
 
 
 // Level Details statics
@@ -216,6 +217,7 @@ void CMapEditorIn::Update()
 			{ 
 				CheckFilepath();
 				ImGui::CloseCurrentPopup(); 
+				s_bRespondingToPopup = true;
 			}
 			ImGui::PopItemWidth();
 			ImGui::EndPopup();
@@ -303,7 +305,7 @@ void CMapEditorIn::Update()
 	// Respond to "Clear Level" button being pressed
 	{
 		ImGui::SameLine();
-		if (ImGui::Button("Clear") && s_iCommandListIndex > 0)
+		if (ImGui::Button("Clear"))
 		{
 			ImGui::OpenPopup("clearconfirm");
 		}
@@ -343,6 +345,38 @@ void CMapEditorIn::Update()
 		ImGui::SameLine(200);
 		if (ImGui::Button("Load"))
 		{
+#if defined _WIN32
+			size_t iSize = strlen(s_pFilepathBuf)+strlen(s_aFileList[s_iSelectedFile].c_str())+4; 
+			char* sFile = (char*)malloc(iSize);
+			strcpy_s(sFile, iSize, s_pFilepathBuf);
+			strcat_s(sFile, iSize, "\\");
+			strcat_s(sFile, iSize, s_aFileList[s_iSelectedFile].c_str());
+#else
+			char* sFile = (char*) malloc (strlen(s_pFilepathBuf)+strlen(s_aFileList[s_iSelectedFile].c_str())); 
+			strcat(sFile, "/");
+			strcat(sFile, s_aFileList[s_iSelectedFile].c_str());
+#endif
+
+			const TileMapData_t* pData = LoadTileMapData(sFile);
+			if(NULL != pData)
+			{
+				s_aTileMap.clear();
+				s_aCommandList.clear();
+				s_iCommandListIndex = 0;
+				s_bLevelCreated = true;
+				s_bUnsavedChanges = false;
+				//TODO: Strip off the file extension
+#if defined _WIN32
+				strcpy_s(s_pFilenameBuf, strlen(s_pFilenameBuf), s_aFileList[s_iSelectedFile].c_str());
+#else
+				strcpy(s_pFilenameBuf, s_aFileList[s_iSelectedFile].c_str());
+#endif
+				s_iLevelWidth = pData->_LevelWidth;
+				s_iLevelHeight = pData->_LevelHeight;
+				// TODO: swap to the correct texture!
+				for(int i = 0; i < s_iLevelWidth * s_iLevelHeight; ++i)
+					s_aTileMap.push_back(pData->_aTileMap[i]);
+			}
 		}
 	}
 
@@ -362,6 +396,7 @@ void CMapEditorIn::Update()
 			pData->_LevelHeight = (uint16)s_iLevelHeight;
 			if(SaveTileMapData(pData)) ImGui::OpenPopup("saveok"); else ImGui::OpenPopup("savefail");
 			DELETEX pData;
+			s_bUnsavedChanges = false;
 		}
 	}
 
@@ -370,7 +405,7 @@ void CMapEditorIn::Update()
 	if (ImGui::BeginPopupModal("saveok", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Level has been saved!");
-		if (ImGui::Button("OK", ImVec2(200,0))) ImGui::CloseCurrentPopup(); 
+		if (ImGui::Button("OK", ImVec2(200,0))) {ImGui::CloseCurrentPopup(); s_bRespondingToPopup = true;}
 		ImGui::EndPopup();
 	}
 
@@ -535,7 +570,7 @@ void CMapEditorIn::Update()
 	// Respond to Mouse Down event and Add/Remove a tile to the map....
 	// NOTE: See above, we're only saving tiles in grid mode. 
 	static bool bDebounceMouse = false;
-	if (!bMouseOverWindow && !bDebounceMouse)
+	if (!bMouseOverWindow && !bDebounceMouse && !s_bRespondingToPopup)
 	{
 		int iTilesX = (int)(vMouseWorldPosition->x / fGridSize);
 		int iTilesY = (int)(vMouseWorldPosition->y / fGridSize);
@@ -630,6 +665,7 @@ void CMapEditorIn::Update()
 	}
 
 	if( bDebounceKey && !GetKeyState(eKeyboard_EditorInputs::_UNDO) && !GetKeyState(eKeyboard_EditorInputs::_REDO) ) bDebounceKey = false;
+	s_bRespondingToPopup = false;
 
 	DELETEX vMouseWorldPosition;
 }

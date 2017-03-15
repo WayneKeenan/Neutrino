@@ -57,6 +57,29 @@ namespace Neutrino
 		_FLYCAM,
 	};
 
+	// This enum defines the set of input actions reciognised outside of the directional controls. 
+	// It's limited to 2 player atm as that's all the keyboard is supporting. 
+	//
+	enum eInputActions
+	{
+		_P1_ACTION1,
+		_P1_ACTION2,
+		_P1_ACTION3,
+		_P1_ACTION4,
+		_P1_SHOULDER_LEFT,
+		_P1_SHOULDER_RIGHT,
+		_P1_HOME,
+		_P1_START,
+		_P2_ACTION1,
+		_P2_ACTION2,
+		_P2_ACTION3,
+		_P2_ACTION4,
+		_P2_SHOULDER_LEFT,
+		_P2_SHOULDER_RIGHT,
+		_P2_HOME,
+		_P2_START,
+	};
+
 	// Array of possible keyboard inputs we want to track that map to the lower level event processing (SDL atm)
 	// 
 	typedef struct InputMappings_t
@@ -119,18 +142,48 @@ namespace Neutrino
 	//		been handled. This function will do any input cleaning/setup expected by the rest of the framework. 
 	void ProcessFrameInput();
 
+	// -----------------------------------------------------------------------------------------------------------------------------------
+	// INPUT FUNCTIONS 
+	// -----------------------------------------------------------------------------------------------------------------------------------
+	
+	// Game specific code should use these functions for input
+
+
 	// 	GetInputAxis()
 	//  	Return the raw input axis, created above. If bKeyOverride, this will return keyboard input in preference to joypad axis
 	//  	otherwise joypad axis will always be returned. 
 	glm::vec3* GetInputAxis(const int iPlayer = 0, bool bKeyOverride = false);
 
+	// GetInputAxisGameDeltaScaled()
+	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h) If bKeyOverride, this will return keyboard 
+	// 		input in preference to joypad axis otherwise joypad axis will always be returned. 
+	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride = true);
+
 	// GetMouseCoords()
 	//		Return the current X/Y coordinates of the mouse relative to the window (0,0 is top left)
 	glm::vec2* GetMouseCoords();
 
+	
+	// GetInputAction()
+	//		Returns the current state of an input action across joypad and keyboard for a given player. The result is the boolean OR of 
+	//		the two devices. Action names are generic and assigned a given purpose from game code. 
+	bool GetInputAction(const eInputActions iAction);
+
+
+	// -----------------------------------------------------------------------------------------------------------------------------------
+	// RAW INPUT HELPERS
+	// -----------------------------------------------------------------------------------------------------------------------------------
+
+	// You probably don't want to use these functions directly, the generic ones above will return the combo input for keyboard / joypad
+
+
 	// GetButton()
 	// 		Returns the button state for a given player's joypad. The uint8 should be one of the #defines at the top of this header 
 	bool GetButton(const uint8 iInput, const uint8 iPlayerIndex = 0);
+
+	// GetKey()
+	//		Returns the key state for a given player. 
+	bool GetKey(const eKeyboard_GameInputs iInput);
 
 	// GetMouseLB()
 	// 		Return mouse left button state
@@ -140,11 +193,23 @@ namespace Neutrino
 	// 		Return mouse right button state
 	bool GetMouseRB();
 
+	// GetKeyState()
+	//		Will return the keydown status of the key
+	bool GetKeyState(const eKeyboard_EditorInputs iKey);
+
+	// GetRawKeyState()
+	//		If you desperately want to peek into the keyboard input state directly, this will give you access.
+	//  	iRawKey is: (SDLK_<key> & ~SDLK_SCANCODE_MASK) 
+	bool GetRawKeyState(const int iRawKey);
+
 	// GetDpadDir()
 	// 		Return the state of a given dpad direction for a given player's joypad
 	bool GetDPadDir(const uint8 iInput, const uint8 iPlayerIndex = 0);
 
-	// Shortcut getters for facebuttons
+
+	// -----------------------------------------------------------------------------------------------------------
+	// Shortcut getters for facebuttons - Use the GetAction* functions above in preference to these. 
+	//
 	inline bool GetShoulderL(const uint8 iPlayerIndex = 0) { return GetButton(_SHOULDER_LEFT, iPlayerIndex);}
 	inline bool GetShoulderR(const uint8 iPlayerIndex = 0) { return GetButton(_SHOULDER_RIGHT, iPlayerIndex);}
 	inline bool GetButtonA(const uint8 iPlayerIndex = 0) { return GetButton(_ACTIONBUTTON_A, iPlayerIndex);}
@@ -155,18 +220,4 @@ namespace Neutrino
 	inline bool GetDPadD(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_DOWN, iPlayerIndex);}
 	inline bool GetDPadL(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_LEFT, iPlayerIndex);}
 	inline bool GetDPadR(const uint8 iPlayerIndex = 0) { return GetDPadDir(_DPAD_RIGHT, iPlayerIndex);}
-
-	// GetInputAxisGameDeltaScaled()
-	// 		Return the input axis, scaled to the current frame's GameDeltaMS (See: Time.h) If bKeyOverride, this will return keyboard 
-	// 		input in preference to joypad axis otherwise joypad axis will always be returned. 
-	glm::vec3* GetInputAxisGameDeltaScaled(int iPlayer, bool bKeyOverride = true);
-
-	// GetKeyState()
-	//		Will return the keydown status of the key
-	bool GetKeyState(const eKeyboard_EditorInputs iKey);
-
-	// GetRawKeyState()
-	//		If you desperately want to peek into the keyboard input state directly, this will give you access.
-	//  	iRawKey is: (SDLK_<key> & ~SDLK_SCANCODE_MASK) 
-	bool GetRawKeyState(const int iRawKey);
 }

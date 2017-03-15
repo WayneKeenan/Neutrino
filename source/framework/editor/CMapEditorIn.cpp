@@ -365,14 +365,23 @@ void CMapEditorIn::Update()
 				s_iCommandListIndex = 0;
 				s_bLevelCreated = true;
 				s_bUnsavedChanges = false;
-				//TODO: Strip off the file extension
-#if defined _WIN32
-				strcpy_s(s_pFilenameBuf, strlen(s_pFilenameBuf), s_aFileList[s_iSelectedFile].c_str());
-#else
-				strcpy(s_pFilenameBuf, s_aFileList[s_iSelectedFile].c_str());
-#endif
 				s_iLevelWidth = pData->_LevelWidth;
 				s_iLevelHeight = pData->_LevelHeight;
+
+				// Remove the file extension so when we save it'll overwrite the file (extension is added automatically)
+				std::string sFilename = s_aFileList[s_iSelectedFile];
+				int iLength = sFilename.length();
+				iLength -= 6;
+				sFilename.erase(iLength, 5);
+				sFilename += "\0";
+
+				// Set the filename
+#if defined _WIN32
+				strcpy_s(s_pFilenameBuf, s_iFilenameLength, sFilename.c_str());
+#else
+				strcpy(s_pFilenameBuf, sFilename);
+#endif
+
 				// TODO: swap to the correct texture!
 				for(int i = 0; i < s_iLevelWidth * s_iLevelHeight; ++i)
 					s_aTileMap.push_back(pData->_aTileMap[i]);

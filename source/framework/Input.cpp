@@ -283,6 +283,37 @@ namespace Neutrino
 		}
 	}
 
+
+	bool GetInputAction(const eInputActions iAction)
+	{
+		switch (iAction)
+		{
+			case eInputActions::_P1_ACTION1: return GetKey(eKeyboard_GameInputs::_PLAYER1_ACTION1) || GetButton(_ACTIONBUTTON_A, 0); break;
+			case eInputActions::_P1_ACTION2: return GetKey(eKeyboard_GameInputs::_PLAYER1_ACTION2) || GetButton(_ACTIONBUTTON_B, 0); break;
+			case eInputActions::_P1_ACTION3: return GetKey(eKeyboard_GameInputs::_PLAYER1_ACTION3) || GetButton(_ACTIONBUTTON_X, 0); break;
+			case eInputActions::_P1_ACTION4: return GetKey(eKeyboard_GameInputs::_PLAYER1_ACTION4) || GetButton(_ACTIONBUTTON_Y, 0); break;
+
+			case eInputActions::_P2_ACTION1: return GetKey(eKeyboard_GameInputs::_PLAYER2_ACTION1) || GetButton(_ACTIONBUTTON_A, 1); break;
+			case eInputActions::_P2_ACTION2: return GetKey(eKeyboard_GameInputs::_PLAYER2_ACTION2) || GetButton(_ACTIONBUTTON_B, 1); break;
+			case eInputActions::_P2_ACTION3: return GetKey(eKeyboard_GameInputs::_PLAYER2_ACTION3) || GetButton(_ACTIONBUTTON_X, 1); break;
+			case eInputActions::_P2_ACTION4: return GetKey(eKeyboard_GameInputs::_PLAYER2_ACTION4) || GetButton(_ACTIONBUTTON_Y, 1); break;
+
+
+			// THESE ARE JOYPAD ONLY INPUTS. KEYBOARD IS A SECOND CLASS CITIZEN :D
+			case eInputActions::_P1_HOME: return GetButton(_META_BACK, 0);
+			case eInputActions::_P2_HOME: return GetButton(_META_BACK, 1);
+			case eInputActions::_P1_START: return GetButton(_META_START, 0);
+			case eInputActions::_P2_START: return GetButton(_META_START, 1);
+
+			case eInputActions::_P1_SHOULDER_LEFT: return GetButton(_SHOULDER_LEFT, 0);
+			case eInputActions::_P1_SHOULDER_RIGHT: return GetButton(_SHOULDER_RIGHT, 0);
+			case eInputActions::_P2_SHOULDER_LEFT: return GetButton(_SHOULDER_LEFT, 1);
+			case eInputActions::_P2_SHOULDER_RIGHT: return GetButton(_SHOULDER_RIGHT, 1);
+		}
+
+		return false;
+	}
+
 	bool GetRawKeyState(const int iRawKey)
 	{
 		ASSERT(iRawKey<512, "Raw Key called with index out of bounds of keymap");
@@ -306,6 +337,11 @@ namespace Neutrino
 	{
 		ASSERT(iPlayerIndex < _MAX_JOYPADS, "Get button called for a player index larger than _MAX_JOYPADS");
 		return (s_aJoypads[iPlayerIndex]->_FACE_BUTTONS >> iInput) & 1;
+	}
+
+	bool GetKey(const eKeyboard_GameInputs iInput)
+	{
+		return s_pKeyState[s_pInputMappings->_aKeyboardMappings[iInput]] == 1;
 	}
 
 	bool GetDPadDir(const uint8 iInput, const uint8 iPlayerIndex)

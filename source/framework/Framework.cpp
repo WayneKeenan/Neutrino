@@ -298,8 +298,6 @@ namespace Neutrino
 			EnterEditorMode();
 #endif
 
-
-
 		// Let SDL do its magic...
 		SDLPresent();
 

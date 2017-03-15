@@ -1,5 +1,6 @@
 #include "CMainMenuExit.h"
-
+#include "CTestLevelIn.h"
+#include "../../framework/GameStateManager.h"
 
 
 CMainMenuExit::CMainMenuExit()
@@ -15,20 +16,16 @@ CMainMenuExit::~CMainMenuExit()
 
 void CMainMenuExit::Init()
 {
-	// Check for existance of save games
-	// Initialise Steam Manager
-	// Set Localisation territory
-	// Do any pre-flight checks for existence of level data, etc. 
 }
 
 void CMainMenuExit::Update()
 {
-	// Immediate change of state to splash screen in (animation for company logo)
+	CGameState* pNextGameState = NEWX CTestLevelIn();
+	Neutrino::GameStateChange(pNextGameState);
 }
 
 void CMainMenuExit::Kill()
 {
-	// Nothing to do...
 }
 
 

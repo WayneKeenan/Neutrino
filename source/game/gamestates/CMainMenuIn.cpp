@@ -1,5 +1,8 @@
 #include "CMainMenuIn.h"
+#include "CMainMenuExit.h"
+#include "../../framework/GameStateManager.h"
 #include "../../framework/Sprite.h"
+#include "../../framework/Input.h"
 
 
 
@@ -20,11 +23,16 @@ void CMainMenuIn::Init()
 void CMainMenuIn::Update()
 {
 	Neutrino::TestSprite();
+
+	if( Neutrino::GetInputAction(Neutrino::eInputActions::_P1_ACTION1))
+	{
+		CGameState* pNextGameState = NEWX CMainMenuExit();
+		Neutrino::GameStateChange(pNextGameState);
+	}
 }
 
 void CMainMenuIn::Kill()
 {
-	// Nothing to do...
 }
 
 

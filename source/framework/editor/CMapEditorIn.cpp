@@ -370,7 +370,7 @@ void CMapEditorIn::Update()
 
 				// Remove the file extension so when we save it'll overwrite the file (extension is added automatically)
 				std::string sFilename = s_aFileList[s_iSelectedFile];
-				int iLength = sFilename.length();
+				int iLength = (int)sFilename.length();
 				iLength -= 6;
 				sFilename.erase(iLength, 5);
 				sFilename += "\0";
@@ -379,7 +379,7 @@ void CMapEditorIn::Update()
 #if defined _WIN32
 				strcpy_s(s_pFilenameBuf, s_iFilenameLength, sFilename.c_str());
 #else
-				strcpy(s_pFilenameBuf, sFilename);
+				strcpy(s_pFilenameBuf, sFilename.c_str());
 #endif
 
 				// TODO: swap to the correct texture!

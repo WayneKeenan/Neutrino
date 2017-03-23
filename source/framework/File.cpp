@@ -193,43 +193,51 @@ namespace Neutrino {
 	}
 #endif
 
-	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle)
+	const TileMapData_t* LoadTileMapData(const char* pFilePathAndName, const bool bFromResourceBundle)
 	{
-		// TODO: Check the length of the file. There should be a minimum filesize that'll indicate a broken file...?
-	#if defined _WIN32
-		FILE *pFile;
-		fopen_s(&pFile, sFilePathAndName, "r");	
-	#else	
-		FILE* pFile = fopen(sFilePathAndName, "r");
-	#endif
-		if(NULL == pFile)
-		{
-			LOG_ERROR("LoadTileMapData: unable to open %s", sFilePathAndName);
-			return NULL;
-		}
-
-		TileMapData_t* pDataCheck = NEWX(TileMapData_t);
+		// TODO: check version against that in the header so we know we don't have a conflict'
+		TileMapData_t* pTileData = NEWX(TileMapData_t);
 		int iFilenameLength = 0;
 
 		if(bFromResourceBundle)
 		{
-			// TODO
-			return NULL;
+		  ASSERT(PHYSFS_exists(pFilePathAndName), "Filename: %s doesn't exist in resource bundle", pFilePathAndName);
+		  PHYSFS_file *pFileHandle = PHYSFS_openRead(pFilePathAndName);
+			PHYSFS_read(pFileHandle, &(pTileData->_fVersion), sizeof(float), 1);
+			PHYSFS_read(pFileHandle, &iFilenameLength, sizeof(int), 1);
+			pTileData->_sTextureFilename = NEWX char[iFilenameLength];
+			PHYSFS_read(pFileHandle, &(pTileData->_sTextureFilename), sizeof(char), iFilenameLength);
+			PHYSFS_read(pFileHandle, &(pTileData->_LevelWidth), sizeof(uint16), 1);
+			PHYSFS_read(pFileHandle, &(pTileData->_LevelHeight), sizeof(uint16), 1);
+			pTileData->_aTileMap = NEWX int16[pTileData->_LevelWidth * pTileData->_LevelHeight];
+			PHYSFS_read(pFileHandle, &(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_LevelWidth * pTileData->_LevelHeight);
+			PHYSFS_close(pFileHandle);
 		}
 		else
 		{
-			// TODO: check version against that in the header so we know we don't have a conflict'
-			fread(&(pDataCheck->_fVersion), sizeof(float), 1, pFile);
+#if defined _WIN32
+			FILE *pFile;
+			fopen_s(&pFile, pFilePathAndName, "r");	
+#else	
+			FILE* pFile = fopen(pFilePathAndName, "r");
+#endif
+			if(NULL == pFile)
+			{
+				LOG_ERROR("LoadTileMapData: unable to open %s", pFilePathAndName);
+				return NULL;
+			}
+
+			fread(&(pTileData->_fVersion), sizeof(float), 1, pFile);
 			fread(&iFilenameLength, sizeof(int), 1, pFile);
-			pDataCheck->_sTextureFilename = NEWX char[iFilenameLength];
-			fread(&(pDataCheck->_sTextureFilename), sizeof(char), iFilenameLength, pFile);
-			fread(&(pDataCheck->_LevelWidth), sizeof(uint16), 1, pFile);
-			fread(&(pDataCheck->_LevelHeight), sizeof(uint16), 1, pFile);
-			pDataCheck->_aTileMap = NEWX int16[pDataCheck->_LevelWidth * pDataCheck->_LevelHeight];
-			fread(&(pDataCheck->_aTileMap[0]), sizeof(int16), pDataCheck->_LevelWidth * pDataCheck->_LevelHeight, pFile);
+			pTileData->_sTextureFilename = NEWX char[iFilenameLength];
+			fread(&(pTileData->_sTextureFilename), sizeof(char), iFilenameLength, pFile);
+			fread(&(pTileData->_LevelWidth), sizeof(uint16), 1, pFile);
+			fread(&(pTileData->_LevelHeight), sizeof(uint16), 1, pFile);
+			pTileData->_aTileMap = NEWX int16[pTileData->_LevelWidth * pTileData->_LevelHeight];
+			fread(&(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_LevelWidth * pTileData->_LevelHeight, pFile);
 			fclose(pFile);
 		}
 
-		return pDataCheck;
+		return pTileData;
 	}
 }

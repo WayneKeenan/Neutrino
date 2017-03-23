@@ -45,5 +45,9 @@ namespace Neutrino {
 
 	// LoadTileMapData()
 	//		Populates a TileMapData_t struct with data previously written to a file. No integrity checking. 	
+	// 		This function is partially overloaded, it can load a file directly (for the map editor) or from 
+	// 		the resource bundle for the game runtime. bFromResourceBundle toggles this behaviour.  
+	// 		If bResourceBundle is true, FilePathAndName does not need to include the path, the filename in the 
+	// 		resource bundle will be sufficient. 
 	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle = false);
 }

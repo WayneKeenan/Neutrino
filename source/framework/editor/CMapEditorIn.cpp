@@ -352,7 +352,8 @@ void CMapEditorIn::Update()
 			strcat_s(sFile, iSize, "\\");
 			strcat_s(sFile, iSize, s_aFileList[s_iSelectedFile].c_str());
 #else
-			char* sFile = (char*) malloc (strlen(s_pFilepathBuf)+strlen(s_aFileList[s_iSelectedFile].c_str())); 
+			char* sFile = (char*) malloc (strlen(s_pFilepathBuf)+strlen(s_aFileList[s_iSelectedFile].c_str()))+4; 
+			strcpy(sFile, s_pFilepathBuf);
 			strcat(sFile, "/");
 			strcat(sFile, s_aFileList[s_iSelectedFile].c_str());
 #endif

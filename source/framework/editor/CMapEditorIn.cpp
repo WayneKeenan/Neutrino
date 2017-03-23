@@ -31,7 +31,6 @@ static Sprite_t* s_pSelectedTile;
 static uint16 s_iTileIndex = 0;
 static bool s_bSpriteSelected;
 static bool s_bLevelNameEmpty = true;
-static bool s_bRespondingToPopup = false;
 
 
 // Level Details statics
@@ -45,6 +44,7 @@ static int s_iLevelHeight = s_iScreenHeight / 32;
 static bool s_bLevelCreated = false;
 static bool s_bFilepathValid = false;
 static bool s_bUnsavedChanges = false;
+static bool s_bDebounceMouse = false;
 static char s_pFilenameBuf[s_iFilenameLength] = "\0";
 static std::vector<std::string> s_aFileList;
 
@@ -212,12 +212,11 @@ void CMapEditorIn::Update()
 			ImGui::Text("The file path for saving / loading tile maps is invalid!\n\n\"%s\"\n\nPlease enter a valid path below:\n\n", s_pFilepathBuf);
 			ImGui::PushItemWidth(340); 
 			ImGui::InputText("Filepath", s_pFilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
-
+			s_bDebounceMouse = true;
 			if (ImGui::Button("OK", ImVec2(400,0))) 
 			{ 
 				CheckFilepath();
 				ImGui::CloseCurrentPopup(); 
-				s_bRespondingToPopup = true;
 			}
 			ImGui::PopItemWidth();
 			ImGui::EndPopup();
@@ -415,7 +414,8 @@ void CMapEditorIn::Update()
 	if (ImGui::BeginPopupModal("saveok", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Level has been saved!");
-		if (ImGui::Button("OK", ImVec2(200,0))) {ImGui::CloseCurrentPopup(); s_bRespondingToPopup = true;}
+		s_bDebounceMouse = true;
+		if (ImGui::Button("OK", ImVec2(200,0))) ImGui::CloseCurrentPopup(); 
 		ImGui::EndPopup();
 	}
 
@@ -424,6 +424,7 @@ void CMapEditorIn::Update()
 	if (ImGui::BeginPopupModal("savefail", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Level save failed. Er...");
+		s_bDebounceMouse = true;
 		if (ImGui::Button("OK", ImVec2(200,0))) ImGui::CloseCurrentPopup(); 
 		ImGui::EndPopup();
 	}
@@ -510,7 +511,7 @@ void CMapEditorIn::Update()
 	
 
 
-	// Bounds check mouse to this window. We'll hide the sprite while we're over the window. 
+	// Bounds check mouse to main window. We'll hide the sprite while we're over the window. 
 	bool bMouseOverWindow = false; 
 	{
 		ImVec2 s_pWindowDim = ImGui::GetWindowSize();
@@ -579,8 +580,7 @@ void CMapEditorIn::Update()
 
 	// Respond to Mouse Down event and Add/Remove a tile to the map....
 	// NOTE: See above, we're only saving tiles in grid mode. 
-	static bool bDebounceMouse = false;
-	if (!bMouseOverWindow && !bDebounceMouse && !s_bRespondingToPopup)
+	if (!bMouseOverWindow && !s_bDebounceMouse)
 	{
 		int iTilesX = (int)(vMouseWorldPosition->x / fGridSize);
 		int iTilesY = (int)(vMouseWorldPosition->y / fGridSize);
@@ -593,7 +593,7 @@ void CMapEditorIn::Update()
 		{
 			if (bMouseOverMapArea && s_bSpriteSelected && s_bSnapToGrid)
 			{
-			  bDebounceMouse = true;
+			  //s_bDebounceMouse = true;
 				s_bUnsavedChanges = true;
 				Command_t* pNewCommand = NULL;
 				if( s_iCommandListIndex == (int)s_aCommandList.size())
@@ -622,7 +622,7 @@ void CMapEditorIn::Update()
 		{
 			if (bMouseOverMapArea && s_bSnapToGrid && s_aTileMap[iIndex] != -1)
 			{
-				bDebounceMouse = true;
+				//s_bDebounceMouse = true;
 				s_bUnsavedChanges = true;
 				Command_t* pNewCommand = NULL;
 				if( s_iCommandListIndex == (int)s_aCommandList.size())
@@ -647,8 +647,10 @@ void CMapEditorIn::Update()
 		}
 	}
 
-	// Clear bDebounceMouse
-	if( bDebounceMouse && !GetMouseLB() && !GetMouseRB() ) bDebounceMouse = false;
+
+	// Clear bDebounceMouse and only clear modal popup flag when the mouse buttons have been let go. No accidental write to tilemap
+	if( s_bDebounceMouse && !GetMouseLB() && !GetMouseRB() ) 
+		s_bDebounceMouse = false;
 
 
 	// Respond to Undo / Redo
@@ -674,8 +676,10 @@ void CMapEditorIn::Update()
 		}
 	}
 
-	if( bDebounceKey && !GetKeyState(eKeyboard_EditorInputs::_UNDO) && !GetKeyState(eKeyboard_EditorInputs::_REDO) ) bDebounceKey = false;
-	s_bRespondingToPopup = false;
+
+	// Debounce keyboard
+	if( bDebounceKey && !GetKeyState(eKeyboard_EditorInputs::_UNDO) && !GetKeyState(eKeyboard_EditorInputs::_REDO) ) 
+		bDebounceKey = false;
 
 	DELETEX vMouseWorldPosition;
 }

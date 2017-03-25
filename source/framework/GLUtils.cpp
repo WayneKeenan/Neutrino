@@ -36,7 +36,7 @@ namespace Neutrino {
 		// Static allocated arrays for the buffered VBOs
 		static VBO_t* s_pVBOArrays[iMAX_TEXTURES];
 		static VBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
-		static VBO_t* s_pTilemapVBOs[iMAX_TILEMAPS];
+		static GLuint s_pTilemapVBOs[iMAX_TILEMAPS];
 
 		// Counters
 		static uint8 s_iAllocatedDynamicVBOSets = 0;
@@ -121,7 +121,7 @@ namespace Neutrino {
 
 		void AllocateDynamicVBOSet()
 		{
-			ASSERT(s_iAllocatedDynamicVBOSets < iMAX_TEXTURES, "Call to CreateVBOs made when max textures has been reached.");
+			ASSERT(s_iAllocatedDynamicVBOSets < iMAX_TEXTURES, "Call to AllocateDynamicVBOSet made when max textures has been reached.");
 
 			s_pVBOArrays[s_iAllocatedDynamicVBOSets] = NEWX(VBO_t);
 			s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_iVBOCounter = 0;
@@ -165,7 +165,32 @@ namespace Neutrino {
 				DELETEX s_pVBOArrays[i];
 			}
 
-			LOG_INFO("VBOs Deallocated.");
+			LOG_INFO("Dynamic VBOs Deallocated.");
+		}
+
+
+		void CreateTilemapVBO(const uint32 iTilemapSize)
+		{
+			ASSERT(s_iAllocatedTilemapVBOs < iMAX_TILEMAPS, "Call to CreateTilemapVBO made when max tilemaps has been reached.");
+			glGenBuffers(1, &s_pTilemapVBOs[s_iAllocatedTilemapVBOs]);
+			ASSERT_GL_ERROR;
+			glBindBuffer(GL_ARRAY_BUFFER, s_pTilemapVBOs[s_iAllocatedTilemapVBOs]);
+			ASSERT_GL_ERROR;
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iTilemapSize, NULL, GL_STATIC_DRAW);
+			ASSERT_GL_ERROR;
+			++s_iAllocatedTilemapVBOs;
+		}
+
+
+		void DeallocateTilemapVBOs()
+		{
+			for (int i = 0; i < s_iAllocatedDynamicVBOSets; i++)
+			{
+				glDeleteBuffers(1, &s_pTilemapVBOs[i]);
+				GL_ERROR;
+			}
+
+			LOG_INFO("Tilemap VBOs Deallocated.");
 		}
 
 

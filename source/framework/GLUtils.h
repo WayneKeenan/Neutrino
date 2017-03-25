@@ -74,16 +74,24 @@ namespace Neutrino
 		//		Called by LoadTexturesFromConfigFile()
 		void AllocateDynamicVBOSet();
 
-		// CreateStaticVBO
-
 		// DeleteVBO
 		// 		Safely cleans up any created VBOs, with error checking.
 		void DeallocateDynamicVBOs();
 
+		// CreateTilemapVBO()
+		//		Level tilemaps are created once during framework init and stored through the lifetime
+		//		of the game. VBOs are GL_STATIC_DRAW.
+		//		
+		//		TODO: Should this function return a struct or a straight pointer to the VBO?
+		void CreateTilemapVBO(const uint32 iTilemapSize);
+
+		// DeallocateTilemapVBOs()
+		//		Cleans up any tilemap VBOs that were created by the levels
+		void DeallocateTilemapVBOs();
+
 		// GetCameraMatrix
 		// 		Returns address of the camera matrix for current viewport
 		float* GetCameraMatrix();
-
 
 		// PopulateVBO
 		// 		Traverses the "sprite settings" arrays, and builds the VBO to be rendered this frame

@@ -13,6 +13,7 @@
 #else
 	#define GL_ERROR
 	#define ASSERT_GL_ERROR
+	#define IMGUI_GL_ERROR
 #endif
 
 struct SDL_Window;

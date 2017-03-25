@@ -61,7 +61,7 @@ namespace Neutrino
 		// 	 Use the GL_ERROR / ASSERT_GL_ERROR for simplicity
 		bool LogGlError(const char *pFile, int iLine);
 
-		// CreateVBOs
+		// CreateDynamicVBOSet
 		//		Generates 3 VBO arrays which we iterate over each frame. 
 		//		Bit of fluff logic here, as I'm second guessing what the driver is going to do, but
 		//		avoiding the case where we're doing a data map&copy into a VBO the driver might still 
@@ -72,11 +72,13 @@ namespace Neutrino
 		//		one that was used two frames ago...
 		//
 		//		Called by LoadTexturesFromConfigFile()
-		void CreateVBOs();
+		void AllocateDynamicVBOSet();
+
+		// CreateStaticVBO
 
 		// DeleteVBO
 		// 		Safely cleans up any created VBOs, with error checking.
-		void DeallocateVBOs();
+		void DeallocateDynamicVBOs();
 
 		// GetCameraMatrix
 		// 		Returns address of the camera matrix for current viewport
@@ -116,7 +118,7 @@ namespace Neutrino
 		// 		buffered in the same way the main render path is. 
 		//
 		//		This will be called by the Framework Init
-		void CreateDebugVBOs();
+		void AllocateDebugVBOs();
 
 		// DeleteDebugVBO
 		// 		Safely cleans up any created VBOs, with error checking.

@@ -191,18 +191,8 @@ namespace Neutrino {
 
 			bLoadStatus = GLTextureFromSDLSurface(&s_aTexturePages[iCount]._iTextureID, pSurf, true);
 
-			if( bLoadStatus )
-				s_iLoadedTextureCount++;
-
 			SDL_FreeSurface(pSurf);
 			DELETEX [] pFileBytes;		// NEWX in LoadResourceBytes()
-		}
-
-
-		// Allocate sprite arrays and VBOs for this texture...
-		{
-			AllocateSpriteArrays(s_aTexturePages[iCount]._iTextureID);
-			GLUtils::CreateVBOs();
 		}
 
 		return bLoadStatus;
@@ -220,7 +210,6 @@ namespace Neutrino {
 			s_aTexturePages = NEWX TPage_t[iMAX_TEXTURES];
 			s_iLoadedTextureCount = 0;				
 		}
-
 
 		// Iterate over the possible textures
 		// 
@@ -241,7 +230,13 @@ namespace Neutrino {
 				  if ( NULL != pFilename && NULL != pTPageFilename )
 					{
 						LOG_INFO("Found texture: %s\nINF: Found texture info: %s", pFilename, pTPageFilename);
-						if( !LoadTexture(pFilename, pTPageFilename, s_iLoadedTextureCount) )
+						if (LoadTexture(pFilename, pTPageFilename, s_iLoadedTextureCount))
+						{
+							AllocateSpriteArrays(s_aTexturePages[s_iLoadedTextureCount]._iTextureID);
+							GLUtils::AllocateDynamicVBOSet();
+							++s_iLoadedTextureCount;
+						}
+						else
 						{
 							LOG_ERROR("Failed to load %s, exiting...", pFilename);
 							return false;
@@ -267,7 +262,7 @@ namespace Neutrino {
 		}
 
 		DELETEX [] s_aTexturePages;
-		GLUtils::DeallocateVBOs();
+		GLUtils::DeallocateDynamicVBOs();
 		LOG_INFO("Textures deallocated.");
 	}
 }

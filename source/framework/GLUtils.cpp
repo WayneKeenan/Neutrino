@@ -30,20 +30,23 @@ namespace Neutrino {
 		static float s_fUnscaledPixelWidth;
 		static float s_fUnscaledPixelHeight;
 
-
 		static const int s_iSizeOfSprite = 6*sizeof(Vertex_t);
 		static const int s_iSizeOfVertex = sizeof(Vertex_t);
 
 		// Static allocated arrays for the buffered VBOs
 		static VBO_t* s_pVBOArrays[iMAX_TEXTURES];
 		static VBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
+		static VBO_t* s_pTilemapVBOs[iMAX_TILEMAPS];
 
 		// Counters
-		static uint8 s_iAllocatedSets = 0;
+		static uint8 s_iAllocatedDynamicVBOSets = 0;
+		static uint8 s_iAllocatedTilemapVBOs = 0;
 
+		// Transform matrices
 		static GLfloat s_mTransformationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
 		static GLfloat s_mScaleMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
 		static GLfloat s_mRotationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
+
 
 		float* GetCameraMatrix()
 		{
@@ -116,41 +119,41 @@ namespace Neutrino {
 		}
 
 
-		void CreateVBOs()
+		void AllocateDynamicVBOSet()
 		{
-			ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to CreateVBOs made when max textures has been reached.");
+			ASSERT(s_iAllocatedDynamicVBOSets < iMAX_TEXTURES, "Call to CreateVBOs made when max textures has been reached.");
 
-			s_pVBOArrays[s_iAllocatedSets] = NEWX(VBO_t);
-			s_pVBOArrays[s_iAllocatedSets]->_iVBOCounter = 0;
+			s_pVBOArrays[s_iAllocatedDynamicVBOSets] = NEWX(VBO_t);
+			s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_iVBOCounter = 0;
 
-			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[0]); 
+			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[0]); 
 			ASSERT_GL_ERROR;
-			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[0]); 
+			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[0]); 
 			ASSERT_GL_ERROR;
 			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW  );
 			ASSERT_GL_ERROR;
 
-			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[1]); 
+			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[1]); 
 			ASSERT_GL_ERROR;
-			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[1]); 
-			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
-			ASSERT_GL_ERROR;
-
-			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedSets]->_aVBOs[2]); 
-			ASSERT_GL_ERROR;
-			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedSets]->_aVBOs[2]); 
+			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[1]); 
 			ASSERT_GL_ERROR;
 			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
 			ASSERT_GL_ERROR;
 
-			s_iAllocatedSets++;
+			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[2]); 
+			ASSERT_GL_ERROR;
+			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[2]); 
+			ASSERT_GL_ERROR;
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
+			ASSERT_GL_ERROR;
+
+			++s_iAllocatedDynamicVBOSets;
 		}
 
 
-		void DeallocateVBOs()
+		void DeallocateDynamicVBOs()
 		{
-			for ( int i=0; i<s_iAllocatedSets; i++)
+			for ( int i=0; i<s_iAllocatedDynamicVBOSets; i++)
 			{
 				glDeleteBuffers( 1, &s_pVBOArrays[i]->_aVBOs[0] );
 				GL_ERROR;                
@@ -473,7 +476,7 @@ namespace Neutrino {
 		}
 
 #ifdef DEBUG 
-		void CreateDebugVBOs()
+		void AllocateDebugVBOs()
 		{
 				s_pDebugVBOs = NEWX(VBO_t);
 				s_pDebugVBOs->_iVBOCounter = 0;

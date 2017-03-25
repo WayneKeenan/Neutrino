@@ -2,8 +2,6 @@
 #include "Log.h"
 #include <stdio.h>
 
-#if defined DEBUG
-
 int ShowAssert(const char * _sMsg, ...)
 {
 	char sBuffer[1024] = {'\0'};
@@ -23,5 +21,3 @@ int ShowAssert(const char * _sMsg, ...)
 	//	2 to skip once
 	return 1;
 }
-
-#endif //defined _DEBUG

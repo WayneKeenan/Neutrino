@@ -101,10 +101,9 @@ namespace Neutrino
 	uint32 GetSpriteCount();
 
 
+#if defined DEBUG
 	uint32 GetDebugSpriteCount();
 
-
-#if defined DEBUG
 	// In debug modes, where editor modes are compiled in, untextured sprites are used by several of the editors to show
 	// bounds, grids and other information. 
 	typedef struct UntexturedSpriteArraySet_t

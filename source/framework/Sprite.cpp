@@ -19,9 +19,11 @@ namespace Neutrino
 	// Static allocated arrays for the sprite settings
 	// 
 	static SpriteRenderInfo_t* s_aSpriteRenderInfo[iMAX_TEXTURES];
-	static UntexturedSpriteRenderInfo_t* s_aUntexturedSpriteRenderInfo = NULL;	// Only used in DEBUG builds
 	static uint8 s_iAllocatedSets = 0;
 
+#if defined DEBUG
+	static UntexturedSpriteRenderInfo_t* s_aUntexturedSpriteRenderInfo = NULL;	// Only used in DEBUG builds
+#endif
 
 	void AllocateSpriteArrays(const GLuint iTextureID)
 	{
@@ -92,7 +94,6 @@ namespace Neutrino
 	Sprite_t* GetActiveSprite(const GLuint iTextureID)
 	{
 		Sprite_t* pRet = NULL;
-		ASSERT(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES, "GetActiveSprite iMAX_SPRITES limit reached");
 		for( int i = 0; i < s_iAllocatedSets; i++)
 		{
 			if ( s_aSpriteRenderInfo[i]->_iTextureID == iTextureID)
@@ -158,10 +159,12 @@ namespace Neutrino
 		return iRet;
 	}
 
+#if defined DEBUG
 	uint32 GetDebugSpriteCount()
 	{
 		return s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount;
 	}
+#endif 
 
 	void DrawSprites()
 	{

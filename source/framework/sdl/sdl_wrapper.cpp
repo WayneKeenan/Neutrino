@@ -55,7 +55,10 @@ namespace Neutrino
 
 	// TODO: Integrate the community SDL mappings from here:
 	//       https://github.com/gabomdq/SDL_GameControllerDB
-
+	//       
+	// TODO: The framework needs to detect the current working resolution and open with 
+	//				SDL_FULLSCREEN_DESKTOP. Then use the internal coord system for rendering
+	//				game elements (editors should be unaffected)
 
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
@@ -200,7 +203,6 @@ namespace Neutrino
 	// Setup responses to standard controls, like Alt+Enter, Esc to bring up exit overly, etc. 
 	static void ProcessStandardInputs()
 	{
-
 		if (s_iKeyDown[SDLK_LALT & ~SDLK_SCANCODE_MASK] && s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK])
 		{
 			// Debounce the keys so we don't flip back and forth
@@ -208,13 +210,12 @@ namespace Neutrino
 			s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK] = 0;
 
 			if (!s_bIsFullscreen)
-				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN);
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN); // Switch to --> SDL_WINDOW_FULLSCREEN_DESKTOP);
 			else
 				SDL_SetWindowFullscreen(pSDL_WindowHandle, 0);
 
 			s_bIsFullscreen = !s_bIsFullscreen;
 		}
-
 	}
 
 
@@ -302,9 +303,7 @@ namespace Neutrino
 			LOG_INFO("There are now %d game controllers attached.", s_aControllers.size());
 		}
 		else
-		{
 			LOG_ERROR("Unable to find a game controller matching ID %d in the list of attached controllers! You may have a player assigned to a disconnected controller!", iID);
-		}
 	}
 
 
@@ -601,7 +600,4 @@ namespace Neutrino
 
 		return true;
 	}
-
-
-
 }

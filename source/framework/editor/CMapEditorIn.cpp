@@ -15,6 +15,8 @@
 #include <glm/glm.hpp> 
 #include <vector>
 
+#if defined DEBUG
+
 using namespace Neutrino;
 
 #if defined _WIN32
@@ -702,4 +704,4 @@ bool CMapEditorIn::ForceKill()
 	return !s_bUnsavedChanges;
 }
 
-
+#endif

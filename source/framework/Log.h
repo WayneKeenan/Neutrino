@@ -3,9 +3,9 @@
 
 #define FOUR_BYTE_HEX " %#010x "
 
-#if defined DEBUG
+//#if defined DEBUG
 #define ENABLE_LOGGING
-#endif //defined DEBUG
+//#endif //defined DEBUG
 
 #if defined ENABLE_LOGGING
 #define SYSLOG(_nLogType, _sMsg, ...) \

@@ -71,6 +71,13 @@ namespace Neutrino
 		return s_pOverlayParams->_pvCameraOffset;
 	}
 
+	void ResetFlyCamOffset()
+	{
+		s_pOverlayParams->_pvCameraOffset->x = 0.0f; 
+		s_pOverlayParams->_pvCameraOffset->y = 0.0f;
+		s_pOverlayParams->_pvCameraOffset->z = 0.0f;
+	}
+
 	void DebugOverlayUpdate()
 	{
 		const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;

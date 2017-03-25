@@ -32,4 +32,9 @@ namespace Neutrino
 	// 		Returns the current vec3 position for the flycam, this will be an additive to the game camera position
 	//   	when the framework generates new camera matrices for the frame. 
 	glm::vec3* GetFlyCamOffset();
+
+
+	// ResetFlyCamOffset
+	// 		This will zero the flycam offset.
+	void ResetFlyCamOffset();
 }

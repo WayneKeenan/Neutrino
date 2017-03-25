@@ -243,7 +243,11 @@ namespace Neutrino
 	bool CoreUpdate()
 	{
 		TimeUpdate();																														// Update the internal clocks
+
+#if defined DEBUG
 		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;			// TODO: remove this, should the framework even know about this?
+#endif
+
 		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state
 
 		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
@@ -288,7 +292,8 @@ namespace Neutrino
 			DELETEX(NeutrinoPreferences);
 
 			DeallocateSpriteArrays();
-			DeallocateAllTextures();		// Also deletes all VBOs
+			DeallocateAllTextures();		// Also deletes all VBOs 
+			GLUtils::DeallocateTilemapVBOs();	// TODO: this needs to be replaced with "DeallocateLevels"
 			DetachShaders();
 		}
 
@@ -296,7 +301,6 @@ namespace Neutrino
 
 #if defined DEBUG
 		DebugOverlayKill();
-		DeallocateUntexturedSpriteArrays();
 		GLUtils::DeallocateDebugVBOs();
 #endif
 
@@ -308,21 +312,23 @@ namespace Neutrino
 	}
 
 
+#if defined DEBUG
 	void EnterEditorMode()
 	{
+
 		// Can we even do this?
-		if( !GameStateAttemptForceKill() )
+		if (!GameStateAttemptForceKill())
 		{
 			LOG_WARNING("Attempt to enter editor mode failed, current game mode does not support immediate exit");
-			return; 
+			return;
 		}
 
 		// Which mode do we want?
 
 		// Tile Map Editor
-		if(s_iEditorModeFlag & _MAP_ED)
+		if (s_iEditorModeFlag & _MAP_ED)
 		{
-			if( !(s_iIsInMode & _MAP_ED) )
+			if (!(s_iIsInMode & _MAP_ED))
 			{
 				// Ok, we're good to go and can enter the new mode...
 				s_iIsInMode |= _MAP_ED;
@@ -334,11 +340,14 @@ namespace Neutrino
 				s_pEditorState = NULL;
 			}
 		}
-	
+
 		// Change the game mode, either to our editor state, or back to the splash screen...
-		if( NULL != s_pEditorState && s_iEditorModeFlag != 0x00)
+		if (NULL != s_pEditorState && s_iEditorModeFlag != 0x00)
 			GameStateChange(s_pEditorState);
 		else
 			GameStateInit();
 	}
+#endif
 }
+
+

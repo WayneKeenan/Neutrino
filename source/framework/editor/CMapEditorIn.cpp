@@ -695,7 +695,10 @@ void CMapEditorIn::Kill()
 
 bool CMapEditorIn::ForceKill()
 {
-	if( s_bUnsavedChanges) LOG_WARNING("You cannot exit the editor mode as there are unsaved modifcations to the active level");
+	if(s_bUnsavedChanges) 
+		LOG_WARNING("You cannot exit the editor mode as there are unsaved modifcations to the active level");
+	else
+		ResetFlyCamOffset();
 	return !s_bUnsavedChanges;
 }
 

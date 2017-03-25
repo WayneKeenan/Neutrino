@@ -13,7 +13,6 @@
 #endif
 namespace Neutrino 
 {
-
 	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
 	CGameGlobals* pGameGlobals;		// Remove this, just a test...
 
@@ -24,6 +23,10 @@ namespace Neutrino
 	static bool s_bRunningStatus = true;
 	static uint8 s_iEditorModeFlag = 0x00;
 	static uint8 s_iIsInMode = 0x00;
+
+#if defined DEBUG
+	static CGameState* s_pEditorState = NULL;
+#endif
 
 
 	// TODO: This is temporary, should be retrieved from the active game state.
@@ -67,35 +70,35 @@ namespace Neutrino
 				// (This is for pixel games, so assumption is we'll always render to a smaller
 				// backbuffer and then present that scaled up in the final displayport)
 				//     
-				if(! config_read_file(&cfg, pPlayerPrefsFilename)) 
+				if(!config_read_file(&cfg, pPlayerPrefsFilename)) 
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse Player Prefs file, exiting...");
 					return false;
 				}
 
-				if( !config_lookup_int(&cfg, "screenheight", &NeutrinoPreferences->s_iScreenHeight))
+				if(!config_lookup_int(&cfg, "screenheight", &NeutrinoPreferences->s_iScreenHeight))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse screenhieght from Player Prefs file, exiting...");
 					return false;
 				}
 
-				if( !config_lookup_int(&cfg, "screenwidth", &NeutrinoPreferences->s_iScreenWidth ))
+				if(!config_lookup_int(&cfg, "screenwidth", &NeutrinoPreferences->s_iScreenWidth ))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse screenwidth from Player Prefs file, exiting...");
 					return false;
 				}
 
-				if( !config_lookup_int(&cfg, "internalheight", &NeutrinoPreferences->s_iInternalHeight))
+				if(!config_lookup_int(&cfg, "internalheight", &NeutrinoPreferences->s_iInternalHeight))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse internalhieght from Player Prefs file, exiting...");
 					return false;
 				}
 
-				if( !config_lookup_int(&cfg, "internalwidth", &NeutrinoPreferences->s_iInternalWidth ))
+				if(!config_lookup_int(&cfg, "internalwidth", &NeutrinoPreferences->s_iInternalWidth ))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse internalwidth from Player Prefs file, exiting...");
@@ -103,9 +106,8 @@ namespace Neutrino
 				}
 
 
-				//
 				//	Now parse the player's input preferences
-				if( !InputInit(&cfg) )
+				if(!InputInit(&cfg))
 				{
 					config_destroy(&cfg);	
 					return false;
@@ -128,7 +130,7 @@ namespace Neutrino
 				fopen_s(&pPlayerPrefsFile, pPlayerPrefsFilename, "w");
 				if(pPlayerPrefsFile)
 #else
-				if( (pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")) )
+				if((pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")))
 #endif
 				{
 
@@ -220,20 +222,16 @@ namespace Neutrino
 		// If we're a DEBUG build, allocate some sprite arrays for untextured sprites. The 
 		// editor modes will use these. 
 		AllocateUntexturedSpriteArrays();
-		GLUtils::CreateDebugVBOs();
+		GLUtils::AllocateDebugVBOs();
 #endif
 
 
 		// Create any Singletons we need
-		//
 		CGameGlobals::Create();
 		pGameGlobals = CGameGlobals::InstancePtr(); // Remove this, just a test...
 
-
-
 		// Enter Initial Gamestate
 		GameStateInit();
-
 
 		return s_bRunningStatus;
 	}
@@ -242,65 +240,31 @@ namespace Neutrino
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	static CGameState* s_pEditorState = NULL;
-
 	bool CoreUpdate()
 	{
-		// TODO: Remove this, temporary calc of the camera position to support the flycam
-#if defined DEBUG
-		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;
-#endif
-		// Update clocks 
-		TimeUpdate();
+		TimeUpdate();																														// Update the internal clocks
+		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;			// TODO: remove this, should the framework even know about this?
+		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state
 
-		// Poll input events, pass controls to IMGUI and capture Quit state
-		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);
+		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
+		GameStateUpdate();																											// Process whatever is the active game state
 
-		// Reset active sprite count to zero
-		ResetSpriteCount();
-
-		// Process the active game state
-		GameStateUpdate();
-
-		// Generate new Camera/World matrices for this frame
-		// TODO: Need to get Game Camera Position and add it to this for MCV generation
-		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
-
-		// Set the active shader for this pass
-		SetActiveShader(DEFAULT_SHADER);
-
-		// Draw everything
+		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											// TODO: Need to get Game Camera Position and add it to this for MCV generation
+		SetActiveShader(DEFAULT_SHADER);																				// TODO: This needs to be more flexible
 		DrawSprites();
 
 #if defined DEBUG
-		// Output the debug mode overlay
 		DebugOverlayUpdate();
-
 		SetActiveShader(DEFAULT_UNTEXTURED);
-
-		// Draw everything
 		DrawDebugSprites();
 
-		// If we're to enter an editor mode FORCEKILL current state, and innit the editor mode. 
-		// Note: not all states will let themselves be forcekilled so this attempt may fail. 
-
-		// Spline Editor
-		if(s_iEditorModeFlag & _SPLINE_ED)
-			LOG_INFO("Spline Editor Not Implemented");
-
-
-		// Particle Editor
-		if( s_iEditorModeFlag & _PARTICLE_ED )
-			LOG_INFO("Particle Editor Not Implemented");
-
-		// Tile Map Editor
-		if(s_iEditorModeFlag & _MAP_ED)
-			EnterEditorMode();
+		// Process editor toggling
+		if(s_iEditorModeFlag & _SPLINE_ED) LOG_INFO("Spline Editor Not Implemented");
+		if(s_iEditorModeFlag & _PARTICLE_ED) LOG_INFO("Particle Editor Not Implemented");
+		if(s_iEditorModeFlag & _MAP_ED) EnterEditorMode();
 #endif
 
-		// Let SDL do its magic...
 		SDLPresent();
-
 		return s_bRunningStatus;
 	}
 
@@ -316,7 +280,7 @@ namespace Neutrino
 			char pResourcesFilename[4096]={'\0'};
 			sprintf(pResourcesFilename, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
 
-			if (!UnmountResources(pResourcesFilename))
+			if (!UnmountResources(pResourcesFilename)) 
 				LOG_ERROR("Unable to unmount resources file: %s", pResourcesFilename);
 
 			// Remove any singletons we created...
@@ -335,6 +299,7 @@ namespace Neutrino
 		DeallocateUntexturedSpriteArrays();
 		GLUtils::DeallocateDebugVBOs();
 #endif
+
 		GameStateKill();
 		SDLKill();
 

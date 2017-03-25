@@ -107,7 +107,9 @@ namespace Neutrino
 				ImGui::PlotLines(sDELTA_Text, s_FPSSampler.GetSamples(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 1.0f / 120.0f, 1.0f / 24.0f, ImVec2(150, 32));
 				ImGui::PlotLines(sFPS_Text, s_FPSSampler.GetFPS(), (int)s_FPSSampler.GetSampleSize(), (int)s_FPSSampler.GetSampleOffset(), "", 0.0f, 120.0f, ImVec2(150, 32));
 				ImGui::Text("T Sprites: %d", GetSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO0: %dk", (int) (GetSpriteCount() * (sizeof(GLUtils::Vertex_t)*6)) / 1024);
+				#if defined DEBUG 
 				ImGui::Text("U Sprites: %d", GetDebugSpriteCount()); ImGui::SameLine(150); ImGui::Text("VBO1: %dk", (int) (GetDebugSpriteCount() * (sizeof(GLUtils::Vertex_t)*6)) / 1024);
+				#endif
 			}
 
 			// Check for the flycam keyboard input

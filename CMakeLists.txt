@@ -44,13 +44,13 @@ include_directories(
 
 
 if(SDL2_IMAGE_FOUND)
-    MESSAGE("SDL2 Image found...")
+    MESSAGE("-- SDL2 Image found...")
     link_libraries(${SDL2_IMAGE_LIBRARY})
 endif()
 
 find_package(GLEW REQUIRED)
 if (GLEW_FOUND)
-    MESSAGE("Glew found...")
+    MESSAGE("-- Glew found...")
     include_directories(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
 endif()
@@ -58,14 +58,14 @@ endif()
 
 find_package(LIBCONFIG REQUIRED)
 if(LIBCONFIG_FOUND)
-    MESSAGE("LibConfig found...")
+    MESSAGE("-- LibConfig found...")
     include_directories(${LIBCONFIG_INCLUDE_DIR})
     link_libraries(${LIBCONFIG_LIBRARY})
 endif()
 
 find_package(PhysFS REQUIRED)
 if(PHYSFS_FOUND)
-    MESSAGE("Phyfs found...")
+    MESSAGE("-- Phyfs found...")
     include_directories(${PHYSFS_INCLUDE_DIR})
     link_libraries(${PHYSFS_LIBRARY})
 endif()

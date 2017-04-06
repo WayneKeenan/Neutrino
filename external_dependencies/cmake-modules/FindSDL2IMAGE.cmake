@@ -42,7 +42,7 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-message("Looking for SDL2IMAGE:")
+message("-- Looking for SDL2IMAGE:")
 find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
         HINTS
         ENV SDL2IMAGEDIR

@@ -10,7 +10,7 @@
 # LIBCONFIG_LIBRARY, where to find the CUnit library.
 
 #MESSAGE("Searching for libconfig library")
-MESSAGE("Looking for LibCONFIG")
+MESSAGE("-- Looking for LibCONFIG")
 FIND_PATH(LIBCONFIG_INCLUDE_DIR libconfig.h
   /usr/local/include
   /usr/include

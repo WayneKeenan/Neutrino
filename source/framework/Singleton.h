@@ -12,6 +12,7 @@
 
 #pragma once
 #include "Memory.h"
+#include "Assert.h"
 
 template <typename T> class CSingleton
 {

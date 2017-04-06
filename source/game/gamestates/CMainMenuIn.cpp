@@ -22,13 +22,15 @@ void CMainMenuIn::Init()
 
 void CMainMenuIn::Update()
 {
-	Neutrino::TestSprite();
+//	Neutrino::TestSprite();
 
-	if( Neutrino::GetInputAction(Neutrino::eInputActions::_P1_ACTION1))
-	{
-		CGameState* pNextGameState = NEWX CMainMenuExit();
-		Neutrino::GameStateChange(pNextGameState);
-	}
+//	if( Neutrino::GetInputAction(Neutrino::eInputActions::_P1_ACTION1))
+//	{
+//		CGameState* pNextGameState = NEWX CMainMenuExit();
+//		Neutrino::GameStateChange(pNextGameState);
+//	}
+	CGameState* pNextGameState = NEWX CMainMenuExit();
+	Neutrino::GameStateChange(pNextGameState);
 }
 
 void CMainMenuIn::Kill()

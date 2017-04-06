@@ -1,5 +1,6 @@
 #include "CMainMenuExit.h"
 #include "CTestLevelIn.h"
+#include "../global/CGameGlobals.h"
 #include "../../framework/GameStateManager.h"
 
 
@@ -26,6 +27,7 @@ void CMainMenuExit::Update()
 
 void CMainMenuExit::Kill()
 {
+	CGameGlobals::Instance().SetGameDefaults();
 }
 
 

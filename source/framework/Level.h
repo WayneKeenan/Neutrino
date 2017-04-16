@@ -21,7 +21,6 @@ namespace Neutrino {
 		int16* _aTileMap;
 	}TileMapData_t;
 
-
 	// Level structures are game specific, but as the framework provides a bunch of core
 	// types this provides a convenient wrapper that can be embedded into a game specific
 	// structure. 
@@ -36,5 +35,6 @@ namespace Neutrino {
 		GLuint*	_iStaticVBO_ID;
 	}FrameworkLevelData_t;
 
-	// TODO: Create a level's static tilemap VBO'
+	bool LoadLevelsFromConfig();
+
 }

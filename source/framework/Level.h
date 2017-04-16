@@ -20,6 +20,6 @@ namespace Neutrino {
 		int16* _aTileMap;
 	}TileMapData_t;
 
+	bool LoadLevelsFromConfig();
 
-	// TODO: Create a level's static tilemap VBO'
 }

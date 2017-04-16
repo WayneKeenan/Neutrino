@@ -114,7 +114,7 @@ namespace Neutrino
 	}
 
 
-	const config_setting_t* GameConfigGetList(const char* pParam)
+	const config_setting_t* GameConfigGetSetting(const char* pParam)
 	{
 		ASSERT(s_bConfigLoaded, "Attempting to parse details out of game config file before it is loaded");
 		config_setting_t* pSetting = config_lookup(&s_Config, pParam);
@@ -148,7 +148,7 @@ namespace Neutrino
 	}
 
 
-	const config_setting_t* GameConfigGetListElement(const config_setting_t* pList, int iCount)
+	const config_setting_t* GetSettingElement(const config_setting_t* pList, int iCount)
 	{
 		config_setting_t* pElem = config_setting_get_elem(pList, iCount);
 		if( NULL != pElem )
@@ -157,18 +157,18 @@ namespace Neutrino
 		}
 		else
 		{
-			LOG_ERROR("GameConfigGetListElement: failed to get element index %d",iCount);
+			LOG_ERROR("GetSettingElement: failed to get element index %d",iCount);
 			return NULL;
 		}
 	}
 
-	const char* GameConfigGetStringFromSetting(const config_setting_t* pSetting, const char* pParam )
+	const char* GetStringFromSetting(const config_setting_t* pSetting, const char* pParam )
 	{
 		const char* pValueStore;
 
 		if ( config_setting_lookup_string(pSetting, pParam, &pValueStore) != CONFIG_TRUE )
 		{
-			LOG_ERROR("GameConfigGetStringFromSetting failed for param: %s");
+			LOG_ERROR("GetStringFromSetting failed for param: %s", pParam);
 			pValueStore = NULL;
 		}
 	

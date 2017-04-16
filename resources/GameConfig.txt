@@ -1,3 +1,5 @@
+
+
 textures: {
 	count: 1,
 	texture0: "tiletpage.png",
@@ -6,6 +8,7 @@ textures: {
 
 levels: (
   {
+  		name: "Level1",
 		tilemap: "level1_test.ltdi",
   }
 )

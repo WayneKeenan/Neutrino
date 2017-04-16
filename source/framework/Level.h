@@ -31,10 +31,20 @@ namespace Neutrino {
 	//	
 	typedef struct FrameworkLevelData_t
 	{
+		const char* _sLevelName;						// invalid when game config file is released. 
+		const char* _sTilemapFilename;
 		TileMapData_t* _pBackgroundTilemap;
 		GLuint*	_iStaticVBO_ID;
 	}FrameworkLevelData_t;
 
+
+	// LoadLevelsFromConfig()
+	//		Parses the GameConfig.txt file in the resources bundle for the generic level data
+	//		to load on init. Stores this in an array of FrameworkLevelData_t that the game 
+	//		logic can grab. 
 	bool LoadLevelsFromConfig();
 
+	// DeallocateLevels()
+	//		Deallocates all the static arrays created during init
+	bool DeallocateLevels();
 }

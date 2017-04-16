@@ -20,6 +20,8 @@ namespace Neutrino
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
+	static char s_pResourcesPath[4096] = { '\0' };
+
 	static bool s_bRunningStatus = true;
 	static uint8 s_iEditorModeFlag = 0x00;
 	static uint8 s_iIsInMode = 0x00;
@@ -161,9 +163,8 @@ namespace Neutrino
 		// Mount the resources pack file. Must do this prior to OGL setup as shaders will need to be loaded
 		// from it.
 		{
-			char pResourcesFilename[4096]={'\0'};
-			sprintf(pResourcesFilename, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
-			if (!MountResources(pResourcesFilename))
+			sprintf(s_pResourcesPath, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+			if (!MountResources(s_pResourcesPath))
 			{
 				LOG_ERROR("Unable to mount resources file, exiting.");
 				return false;
@@ -218,6 +219,15 @@ namespace Neutrino
 			return false;
 		}
 
+		// Load the generic level data defined in GameConfig.txt
+		// Levels structures are game specific, but the framework generically supports tilemaps
+		// audio data, and [TODO] that we can parse/load on init.
+		if (!LoadLevelsFromConfig())
+		{
+			LOG_ERROR("Unable to load the level data, exiting...");
+			return false;
+		}
+
 #if defined DEBUG
 		// If we're a DEBUG build, allocate some sprite arrays for untextured sprites. The 
 		// editor modes will use these. 
@@ -228,11 +238,12 @@ namespace Neutrino
 
 		// Create any Singletons we need
 		CGameGlobals::Create();
-		pGameGlobals = CGameGlobals::InstancePtr(); // Remove this, just a test...
+		pGameGlobals = CGameGlobals::InstancePtr(); // TODO: Remove this, just a test...
 
 		// Enter Initial Gamestate
 		GameStateInit();
 
+		// Init finished successfully 
 		return s_bRunningStatus;
 	}
 
@@ -248,13 +259,11 @@ namespace Neutrino
 		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;			// TODO: remove this, should the framework even know about this?
 #endif
 
-		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state
-
+		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state TODO: make status a param to the function
 		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
 		GameStateUpdate();																											// Process whatever is the active game state
-
-		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											// TODO: Need to get Game Camera Position and add it to this for MCV generation
-		SetActiveShader(DEFAULT_SHADER);																				// TODO: This needs to be more flexible
+		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											
+		SetActiveShader(DEFAULT_SHADER);																				
 		DrawSprites();
 
 #if defined DEBUG
@@ -279,24 +288,20 @@ namespace Neutrino
 
 	bool CoreKill()
 	{
-		// Unmount resources bundle
-		{
-			char pResourcesFilename[4096]={'\0'};
-			sprintf(pResourcesFilename, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+		sprintf(s_pResourcesPath, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
 
-			if (!UnmountResources(pResourcesFilename)) 
-				LOG_ERROR("Unable to unmount resources file: %s", pResourcesFilename);
+		if (!UnmountResources(s_pResourcesPath))
+			LOG_ERROR("Unable to unmount resources file: %s", s_pResourcesPath);
 
-			// Remove any singletons we created...
-			CGameGlobals::Destroy();
-			DELETEX(NeutrinoPreferences);
+		// Remove any singletons we created...
+		CGameGlobals::Destroy();
+		DELETEX(NeutrinoPreferences);
 
-			DeallocateSpriteArrays();
-			DeallocateAllTextures();		// Also deletes all VBOs 
-			GLUtils::DeallocateTilemapVBOs();	// TODO: this needs to be replaced with "DeallocateLevels"
-			DetachShaders();
-		}
-
+		DeallocateLevels();
+		DeallocateSpriteArrays();
+		DeallocateAllTextures();		// Also deletes all VBOs 
+		GLUtils::DeallocateTilemapVBOs();	// TODO: this needs to be replaced with "DeallocateLevels"
+		DetachShaders();
 		InputKill();
 
 #if defined DEBUG
@@ -310,6 +315,15 @@ namespace Neutrino
 		LOG_INFO("Framework terminated (CoreKill) cleanly. Have a nice day!");
 		return true;
 	}
+
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 #if defined DEBUG

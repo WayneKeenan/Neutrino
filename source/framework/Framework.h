@@ -18,6 +18,7 @@
 #include "Input.h"
 #include "Level.h"
 #include "ConfigFile.h"
+#include "Level.h"
 
 namespace Neutrino {
 	

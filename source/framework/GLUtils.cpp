@@ -34,8 +34,8 @@ namespace Neutrino {
 		static const int s_iSizeOfVertex = sizeof(Vertex_t);
 
 		// Static allocated arrays for the buffered VBOs
-		static VBO_t* s_pVBOArrays[iMAX_TEXTURES];
-		static VBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
+		static DynamicVBO_t* s_pVBOArrays[iMAX_TEXTURES];
+		static DynamicVBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
 		static GLuint s_pTilemapVBOs[iMAX_TILEMAPS];
 
 		// Counters
@@ -123,7 +123,7 @@ namespace Neutrino {
 		{
 			ASSERT(s_iAllocatedDynamicVBOSets < iMAX_TEXTURES, "Call to AllocateDynamicVBOSet made when max textures has been reached.");
 
-			s_pVBOArrays[s_iAllocatedDynamicVBOSets] = NEWX(VBO_t);
+			s_pVBOArrays[s_iAllocatedDynamicVBOSets] = NEWX(DynamicVBO_t);
 			s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_iVBOCounter = 0;
 
 			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[0]); 
@@ -503,7 +503,7 @@ namespace Neutrino {
 #ifdef DEBUG 
 		void AllocateDebugVBOs()
 		{
-				s_pDebugVBOs = NEWX(VBO_t);
+				s_pDebugVBOs = NEWX(DynamicVBO_t);
 				s_pDebugVBOs->_iVBOCounter = 0;
 
 				glGenBuffers(1, &s_pDebugVBOs->_aVBOs[0]); 

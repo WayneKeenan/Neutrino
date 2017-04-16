@@ -65,3 +65,4 @@ resources/tilemaps/
 build/Release/
 sh.exe.stackdump
 basename.exe.stackdump
+build/.vs/

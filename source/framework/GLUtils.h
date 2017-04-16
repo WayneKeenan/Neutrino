@@ -32,12 +32,15 @@ namespace Neutrino
 			GLfloat _position[3];
 		} Vertex_t; 
 
-
-		typedef struct VBO_t
+		// VBOs are triple buffered for dynamically drawn sprites, this structure wraps the 
+		// assigned VBOs for each texture, and holds the counter for the VBO to be rendered in 
+		// a given frame
+		// 
+		typedef struct DynamicVBO_t
 		{
 			GLuint _aVBOs[3];
 			uint8  _iVBOCounter;
-		} VBO_t;
+		} DynamicVBO_t;
 	
 		
 		// SetViewport

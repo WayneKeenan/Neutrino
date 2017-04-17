@@ -5,6 +5,7 @@
 #include "Types.h"
 #include "Memory.h"
 #include "File.h"
+#include "string.h"
 
 namespace Neutrino {
 
@@ -58,14 +59,14 @@ namespace Neutrino {
 			}
 
 			s_pFrameworkLevels[i]->_sLevelName = GetStringFromSetting(pLevel, "name");
-			if (s_pFrameworkLevels[i]->_sLevelName == "")
+			if (strcmp(s_pFrameworkLevels[i]->_sLevelName,"") == 0)
 			{
 				LOG_ERROR("Unable to parse level name from GameConfig.txt... Is the latest config file in the resources bundle?");
 				return false;
 			}
 
 			s_pFrameworkLevels[i]->_sTilemapFilename = GetStringFromSetting(pLevel, "tilemap");
-			if (s_pFrameworkLevels[i]->_sTilemapFilename == "")
+			if (strcmp(s_pFrameworkLevels[i]->_sTilemapFilename, "") == 0)
 			{
 				LOG_ERROR("Unable to parse tilemap filename from GameConfig.txt... Is the latest config file in the resources bundle ?");
 				return false;

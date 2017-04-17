@@ -207,7 +207,7 @@ namespace Neutrino {
 			if (NULL == pFileHandle)
 			{
 				LOG_ERROR("Unable to open file %s from resource bundle!", pFileHandle);
-				return false;
+				return NULL;
 			}
 
 			// This code will parse the binary files directly from the resource bundle

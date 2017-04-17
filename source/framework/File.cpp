@@ -155,6 +155,7 @@ namespace Neutrino {
 
 		const TileMapData_t Data = *pData;
 		int iFilenameLength = (int)strlen(pData->_sTextureFilename);
+		Data._sTextureFilename[iFilenameLength] = '\0';
 	
 		// Save the data
 		// 
@@ -168,7 +169,7 @@ namespace Neutrino {
 		{
 			fwrite(&Data._fVersion, sizeof(float), 1, pFile);
 			fwrite(&iFilenameLength, sizeof(int), 1, pFile);
-			fwrite(&Data._sTextureFilename, sizeof(char), strlen(Data._sTextureFilename), pFile);
+			fwrite(Data._sTextureFilename, sizeof(char), strlen(Data._sTextureFilename), pFile);
 			fwrite(&Data._LevelWidth, sizeof(uint16), 1, pFile);
 			fwrite(&Data._LevelHeight, sizeof(uint16), 1, pFile);
 			fwrite(&Data._aTileMap[0], sizeof(int16),  Data._LevelWidth * Data._LevelHeight, pFile);
@@ -180,7 +181,7 @@ namespace Neutrino {
 		const TileMapData_t* pDataCheck = LoadTileMapData(sFile);
 		bool bIntegrityPass = true;
 		if( pDataCheck->_fVersion != Data._fVersion ) bIntegrityPass = false;
-		if( pDataCheck->_sTextureFilename != Data._sTextureFilename ) bIntegrityPass = false;
+		if( strcmp(pDataCheck->_sTextureFilename,Data._sTextureFilename) !=0 ) bIntegrityPass = false;
 		if( pDataCheck->_LevelWidth != Data._LevelWidth ) bIntegrityPass = false;
 		if( pDataCheck->_LevelHeight != Data._LevelHeight ) bIntegrityPass = false;
 		for(int i = 0; i < Data._LevelWidth * Data._LevelHeight; ++i)
@@ -203,14 +204,39 @@ namespace Neutrino {
 		{
 		  ASSERT(PHYSFS_exists(pFilePathAndName), "Filename: %s doesn't exist in resource bundle", pFilePathAndName);
 		  PHYSFS_file *pFileHandle = PHYSFS_openRead(pFilePathAndName);
+			if (NULL == pFileHandle)
+			{
+				LOG_ERROR("Unable to open file %s from resource bundle!", pFileHandle);
+				return false;
+			}
+
+			// This code will parse the binary files directly from the resource bundle
+			//
 			PHYSFS_read(pFileHandle, &(pTileData->_fVersion), sizeof(float), 1);
 			PHYSFS_read(pFileHandle, &iFilenameLength, sizeof(int), 1);
 			pTileData->_sTextureFilename = NEWX char[iFilenameLength];
-			PHYSFS_read(pFileHandle, &(pTileData->_sTextureFilename), sizeof(char), iFilenameLength);
+			PHYSFS_sint64 iLength = PHYSFS_read(pFileHandle, pTileData->_sTextureFilename, sizeof(char), iFilenameLength);
+			pTileData->_sTextureFilename[iFilenameLength] = '\0';
+			if (iLength != iFilenameLength)
+			{
+				const char* sErr = PHYSFS_getLastError();
+			}
 			PHYSFS_read(pFileHandle, &(pTileData->_LevelWidth), sizeof(uint16), 1);
 			PHYSFS_read(pFileHandle, &(pTileData->_LevelHeight), sizeof(uint16), 1);
 			pTileData->_aTileMap = NEWX int16[pTileData->_LevelWidth * pTileData->_LevelHeight];
-			PHYSFS_read(pFileHandle, &(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_LevelWidth * pTileData->_LevelHeight);
+			iLength = PHYSFS_read(pFileHandle, &(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_LevelWidth * pTileData->_LevelHeight);
+			if (iLength != pTileData->_LevelWidth * pTileData->_LevelHeight)
+			{
+				LOG_INFO("%s", PHYSFS_getLastError());
+			}
+
+			// This block will load the whole file into a memory buffer. 
+
+// 			char* pBuffer;
+// 			PHYSFS_sint64 iLength = PHYSFS_fileLength(pFileHandle);
+// 			pBuffer = new char[iLength];
+// 			int length_read = PHYSFS_read(pFileHandle, pBuffer, 1, iLength);
+
 			PHYSFS_close(pFileHandle);
 		}
 		else
@@ -230,7 +256,8 @@ namespace Neutrino {
 			fread(&(pTileData->_fVersion), sizeof(float), 1, pFile);
 			fread(&iFilenameLength, sizeof(int), 1, pFile);
 			pTileData->_sTextureFilename = NEWX char[iFilenameLength];
-			fread(&(pTileData->_sTextureFilename), sizeof(char), iFilenameLength, pFile);
+			fread(pTileData->_sTextureFilename, sizeof(char), iFilenameLength, pFile);
+			pTileData->_sTextureFilename[iFilenameLength] = '\0';
 			fread(&(pTileData->_LevelWidth), sizeof(uint16), 1, pFile);
 			fread(&(pTileData->_LevelHeight), sizeof(uint16), 1, pFile);
 			pTileData->_aTileMap = NEWX int16[pTileData->_LevelWidth * pTileData->_LevelHeight];

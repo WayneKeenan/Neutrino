@@ -15,4 +15,5 @@ class CTestLevelIn: public CGameState
 		void Init();
 		void Update();
 		void Kill();
+		virtual bool ForceKill() override;
 };

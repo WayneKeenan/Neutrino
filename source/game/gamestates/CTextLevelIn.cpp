@@ -28,3 +28,10 @@ void CTestLevelIn::Kill()
 {
 	// Nothing to do...
 }
+
+bool CTestLevelIn::ForceKill()
+{
+	// No clean up to do atm...
+	LOG_INFO(">>>> %s, FORCEKILL called!", this->m_pStateName);
+	return true;
+}

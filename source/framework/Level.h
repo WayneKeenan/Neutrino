@@ -33,7 +33,7 @@ namespace Neutrino {
 	{
 		const char* _sLevelName;						// invalid when game config file is released. 
 		const char* _sTilemapFilename;
-		TileMapData_t* _pBackgroundTilemap;
+		const TileMapData_t* _pBackgroundTilemap;
 		GLuint*	_iStaticVBO_ID;
 	}FrameworkLevelData_t;
 

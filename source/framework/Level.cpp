@@ -4,6 +4,7 @@
 #include "Assert.h"
 #include "Types.h"
 #include "Memory.h"
+#include "File.h"
 
 namespace Neutrino {
 
@@ -69,14 +70,20 @@ namespace Neutrino {
 				LOG_ERROR("Unable to parse tilemap filename from GameConfig.txt... Is the latest config file in the resources bundle ?");
 				return false;
 			}
+
+			// Load the Tilemap Data from the binary files in the resource bundle
+			//
+			{
+				s_pFrameworkLevels[i]->_pBackgroundTilemap = LoadTileMapData(s_pFrameworkLevels[i]->_sTilemapFilename, true);
+				if (NULL == s_pFrameworkLevels[i]->_pBackgroundTilemap)
+				{
+					LOG_ERROR("Unable to load level tilemap data.");
+					return false;
+				}
+			}
 		}
 		
 
-		// Load the Tilemap Data from the binary files in the resource bundle
-		//
-		{
-
-		}
 
 
 		// Build the tilemap VBO for each tilemap

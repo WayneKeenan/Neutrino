@@ -367,8 +367,10 @@ void CMapEditorIn::Update()
 				s_iCommandListIndex = 0;
 				s_bLevelCreated = true;
 				s_bUnsavedChanges = false;
-				s_iLevelWidth = pData->_LevelWidth;
-				s_iLevelHeight = pData->_LevelHeight;
+				s_iLevelWidth = pData->_iLevelWidth;
+				s_iLevelHeight = pData->_iLevelHeight;
+				fGridSize = pData->_fGridSize;
+				s_iSelectedGridSize = (int)sqrt(fGridSize)-1;
 
 				// Remove the file extension so when we save it'll overwrite the file (extension is added automatically)
 				std::string sFilename = s_aFileList[s_iSelectedFile];
@@ -402,9 +404,10 @@ void CMapEditorIn::Update()
 			pData->_sTextureFilename = GetTPage((uint8)s_iSelectedTexture)->_sTextureFilename;
 			pData->_sFilenameBuf = s_pFilenameBuf;
 			pData->_sFilepathBuf = s_pFilepathBuf;
+			pData->_fGridSize = fGridSize;
 			pData->_aTileMap = &s_aTileMap[0];
-			pData->_LevelWidth = (uint16)s_iLevelWidth;
-			pData->_LevelHeight = (uint16)s_iLevelHeight;
+			pData->_iLevelWidth = (uint16)s_iLevelWidth;
+			pData->_iLevelHeight = (uint16)s_iLevelHeight;
 			if(SaveTileMapData(pData)) ImGui::OpenPopup("saveok"); else ImGui::OpenPopup("savefail");
 			DELETEX pData;
 			s_bUnsavedChanges = false;

@@ -170,9 +170,10 @@ namespace Neutrino {
 			fwrite(&Data._fVersion, sizeof(float), 1, pFile);
 			fwrite(&iFilenameLength, sizeof(int), 1, pFile);
 			fwrite(Data._sTextureFilename, sizeof(char), strlen(Data._sTextureFilename), pFile);
-			fwrite(&Data._LevelWidth, sizeof(uint16), 1, pFile);
-			fwrite(&Data._LevelHeight, sizeof(uint16), 1, pFile);
-			fwrite(&Data._aTileMap[0], sizeof(int16),  Data._LevelWidth * Data._LevelHeight, pFile);
+			fwrite(&Data._fGridSize, sizeof(float), 1, pFile);
+			fwrite(&Data._iLevelWidth, sizeof(uint16), 1, pFile);
+			fwrite(&Data._iLevelHeight, sizeof(uint16), 1, pFile);
+			fwrite(&Data._aTileMap[0], sizeof(int16),  Data._iLevelWidth * Data._iLevelHeight, pFile);
 		}
 		fclose(pFile);
 
@@ -182,9 +183,10 @@ namespace Neutrino {
 		bool bIntegrityPass = true;
 		if( pDataCheck->_fVersion != Data._fVersion ) bIntegrityPass = false;
 		if( strcmp(pDataCheck->_sTextureFilename,Data._sTextureFilename) !=0 ) bIntegrityPass = false;
-		if( pDataCheck->_LevelWidth != Data._LevelWidth ) bIntegrityPass = false;
-		if( pDataCheck->_LevelHeight != Data._LevelHeight ) bIntegrityPass = false;
-		for(int i = 0; i < Data._LevelWidth * Data._LevelHeight; ++i)
+		if (pDataCheck->_fGridSize != Data._fGridSize) bIntegrityPass = false;
+		if( pDataCheck->_iLevelWidth != Data._iLevelWidth ) bIntegrityPass = false;
+		if( pDataCheck->_iLevelHeight != Data._iLevelHeight ) bIntegrityPass = false;
+		for(int i = 0; i < Data._iLevelWidth * Data._iLevelHeight; ++i)
 			if(pDataCheck->_aTileMap[i] != Data._aTileMap[i]) bIntegrityPass = false;
 
 
@@ -213,6 +215,11 @@ namespace Neutrino {
 			// This code will parse the binary files directly from the resource bundle
 			//
 			PHYSFS_read(pFileHandle, &(pTileData->_fVersion), sizeof(float), 1);
+			if (pTileData->_fVersion < s_fTMD_Version)
+			{
+				LOG_ERROR("Unable to load tilemap, file format versions conflict.");
+				return NULL;
+			}
 			PHYSFS_read(pFileHandle, &iFilenameLength, sizeof(int), 1);
 			pTileData->_sTextureFilename = NEWX char[iFilenameLength];
 			PHYSFS_sint64 iLength = PHYSFS_read(pFileHandle, pTileData->_sTextureFilename, sizeof(char), iFilenameLength);
@@ -221,11 +228,12 @@ namespace Neutrino {
 			{
 				const char* sErr = PHYSFS_getLastError();
 			}
-			PHYSFS_read(pFileHandle, &(pTileData->_LevelWidth), sizeof(uint16), 1);
-			PHYSFS_read(pFileHandle, &(pTileData->_LevelHeight), sizeof(uint16), 1);
-			pTileData->_aTileMap = NEWX int16[pTileData->_LevelWidth * pTileData->_LevelHeight];
-			iLength = PHYSFS_read(pFileHandle, &(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_LevelWidth * pTileData->_LevelHeight);
-			if (iLength != pTileData->_LevelWidth * pTileData->_LevelHeight)
+			PHYSFS_read(pFileHandle, &(pTileData->_fGridSize), sizeof(float), 1);
+			PHYSFS_read(pFileHandle, &(pTileData->_iLevelWidth), sizeof(uint16), 1);
+			PHYSFS_read(pFileHandle, &(pTileData->_iLevelHeight), sizeof(uint16), 1);
+			pTileData->_aTileMap = NEWX int16[pTileData->_iLevelWidth * pTileData->_iLevelHeight];
+			iLength = PHYSFS_read(pFileHandle, &(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_iLevelWidth * pTileData->_iLevelHeight);
+			if (iLength != pTileData->_iLevelWidth * pTileData->_iLevelHeight)
 			{
 				LOG_INFO("%s", PHYSFS_getLastError());
 			}
@@ -254,14 +262,20 @@ namespace Neutrino {
 			}
 
 			fread(&(pTileData->_fVersion), sizeof(float), 1, pFile);
+			if (pTileData->_fVersion < s_fTMD_Version)
+			{
+				LOG_ERROR("Unable to load tilemap, file format versions conflict.");
+				return NULL;
+			}
 			fread(&iFilenameLength, sizeof(int), 1, pFile);
 			pTileData->_sTextureFilename = NEWX char[iFilenameLength];
 			fread(pTileData->_sTextureFilename, sizeof(char), iFilenameLength, pFile);
 			pTileData->_sTextureFilename[iFilenameLength] = '\0';
-			fread(&(pTileData->_LevelWidth), sizeof(uint16), 1, pFile);
-			fread(&(pTileData->_LevelHeight), sizeof(uint16), 1, pFile);
-			pTileData->_aTileMap = NEWX int16[pTileData->_LevelWidth * pTileData->_LevelHeight];
-			fread(&(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_LevelWidth * pTileData->_LevelHeight, pFile);
+			fread(&(pTileData->_fGridSize), sizeof(float), 1, pFile); 
+			fread(&(pTileData->_iLevelWidth), sizeof(uint16), 1, pFile);
+			fread(&(pTileData->_iLevelHeight), sizeof(uint16), 1, pFile);
+			pTileData->_aTileMap = NEWX int16[pTileData->_iLevelWidth * pTileData->_iLevelHeight];
+			fread(&(pTileData->_aTileMap[0]), sizeof(int16), pTileData->_iLevelWidth * pTileData->_iLevelHeight, pFile);
 			fclose(pFile);
 		}
 

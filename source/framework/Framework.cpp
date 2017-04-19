@@ -224,8 +224,12 @@ namespace Neutrino
 		// audio data, and [TODO] that we can parse/load on init.
 		if (!LoadLevelsFromConfig())
 		{
+#if defined DEBUG
+			LOG_ERROR("Unable to load level data, assuming you want to go into editor modes though...");
+#else
 			LOG_ERROR("Unable to load the level data, exiting...");
 			return false;
+#endif
 		}
 
 #if defined DEBUG
@@ -262,8 +266,10 @@ namespace Neutrino
 		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state TODO: make status a param to the function
 		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
 		GameStateUpdate();																											// Process whatever is the active game state
-		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											
-		SetActiveShader(DEFAULT_SHADER);																				
+		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);	
+		GLUtils::ClearBuffers();
+		SetActiveShader(DEFAULT_SHADER);		
+		DrawTilemap();
 		DrawSprites();
 
 #if defined DEBUG

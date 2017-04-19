@@ -228,7 +228,7 @@ namespace Neutrino
 
 
 		Sprite_t* pSprite = NEWX(Sprite_t);
-		glm::vec3 vPos = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 vPos = glm::vec3(pTilemapData->_fGridSize/2.0f, pTilemapData->_fGridSize / 2.0f, 0.0f);
 
 		// Populate the array with tilemap data
 		for (int y = 0; y < (int)pTilemapData->_iLevelHeight; ++y)
@@ -265,7 +265,7 @@ namespace Neutrino
 				vPos.x += pTilemapData->_fGridSize;
 			}
 			vPos.y += pTilemapData->_fGridSize;
-			vPos.x = 0.0f;
+			vPos.x = pTilemapData->_fGridSize / 2.0f;
 		}
 
 		GLUtils::PopulateTilemapVBO(

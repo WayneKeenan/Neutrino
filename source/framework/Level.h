@@ -5,7 +5,7 @@
 
 namespace Neutrino {
 	// Version number for the current TileMapData file format 
-	static const float s_fTMD_Version= 0.1f;
+	static const float s_fTMD_Version = 0.2f;
 
 	// TileMapData_t defines the file format for a level's background tile map. 
 	// To create or amend a tile map, press F3 in debug builds to enter the Map editor. 
@@ -16,8 +16,9 @@ namespace Neutrino {
 		char* _sTextureFilename;
 		char* _sFilepathBuf;
 		char* _sFilenameBuf;
-		uint16 _LevelWidth;
-		uint16 _LevelHeight;
+		float _fGridSize;
+		uint16 _iLevelWidth;
+		uint16 _iLevelHeight;
 		int16* _aTileMap;
 	}TileMapData_t;
 
@@ -33,8 +34,10 @@ namespace Neutrino {
 	{
 		const char* _sLevelName;						// invalid when game config file is released. 
 		const char* _sTilemapFilename;
+		uint8 _iStaticVBO_Index;
+		uint32 _iTilemapSize;
+		GLuint _iTextureID;
 		const TileMapData_t* _pBackgroundTilemap;
-		GLuint*	_iStaticVBO_ID;
 	}FrameworkLevelData_t;
 
 
@@ -47,4 +50,8 @@ namespace Neutrino {
 	// DeallocateLevels()
 	//		Deallocates all the static arrays created during init
 	bool DeallocateLevels();
+
+	// DrawTilemap()
+	// 		Passes all relevant tilemap info to the OGL renderer so it can be rendered this frame
+	void DrawTilemap();
 }

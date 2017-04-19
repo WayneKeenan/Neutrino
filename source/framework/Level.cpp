@@ -5,6 +5,9 @@
 #include "Types.h"
 #include "Memory.h"
 #include "File.h"
+#include "GLUtils.h"
+#include "Texture.h"
+#include "Sprite.h"
 
 namespace Neutrino {
 
@@ -57,6 +60,7 @@ namespace Neutrino {
 				return false;
 			}
 
+			// Get the level name
 			s_pFrameworkLevels[i]->_sLevelName = GetStringFromSetting(pLevel, "name");
 			if (s_pFrameworkLevels[i]->_sLevelName == "")
 			{
@@ -64,6 +68,7 @@ namespace Neutrino {
 				return false;
 			}
 
+			// Get the filename of the tilemap binary file
 			s_pFrameworkLevels[i]->_sTilemapFilename = GetStringFromSetting(pLevel, "tilemap");
 			if (s_pFrameworkLevels[i]->_sTilemapFilename == "")
 			{
@@ -71,25 +76,38 @@ namespace Neutrino {
 				return false;
 			}
 
-			// Load the Tilemap Data from the binary files in the resource bundle
-			//
+			// Load the Tilemap Data from the binary file in the resource bundle
 			{
 				s_pFrameworkLevels[i]->_pBackgroundTilemap = LoadTileMapData(s_pFrameworkLevels[i]->_sTilemapFilename, true);
 				if (NULL == s_pFrameworkLevels[i]->_pBackgroundTilemap)
+					return false;
+
+				LOG_INFO("Level number: %d", i);
+				LOG_INFO("- Name: %s", s_pFrameworkLevels[i]->_sLevelName);
+				LOG_INFO("- Tilemap: %s", s_pFrameworkLevels[i]->_sTilemapFilename);
+				LOG_INFO("- Tilemap width: %d", s_pFrameworkLevels[i]->_pBackgroundTilemap->_iLevelWidth);
+				LOG_INFO("- Tilemap height: %d", s_pFrameworkLevels[i]->_pBackgroundTilemap->_iLevelHeight);
+				LOG_INFO("- Tilemap Grid Size: %.2f", s_pFrameworkLevels[i]->_pBackgroundTilemap->_fGridSize);
+			}
+
+
+			// Find the texture ID for the tpage referenced by this tilemap
+			{
+				s_pFrameworkLevels[i]->_iTextureID = GetTextureID(s_pFrameworkLevels[i]->_pBackgroundTilemap->_sTextureFilename);
+				if (s_pFrameworkLevels[i]->_iTextureID == iU32_BAD)
 				{
-					LOG_ERROR("Unable to load level tilemap data.");
+					LOG_ERROR("Tilemap creation failed, unable to find the texture ID for the tilemap's texture");
 					return false;
 				}
 			}
-		}
-		
 
-
-
-		// Build the tilemap VBO for each tilemap
-		//
-		{
-
+			// Build the static tilemap VBO for this tilemap
+			{
+				s_pFrameworkLevels[i]->_iTilemapSize = s_pFrameworkLevels[i]->_pBackgroundTilemap->_iLevelWidth * s_pFrameworkLevels[i]->_pBackgroundTilemap->_iLevelHeight;
+				s_pFrameworkLevels[i]->_iStaticVBO_Index = GLUtils::CreateTilemapVBO(s_pFrameworkLevels[i]->_iTilemapSize);
+				BuildSpriteArrayAndPopulateStaticVBO(s_pFrameworkLevels[i]->_iTextureID, s_pFrameworkLevels[i]->_pBackgroundTilemap, s_pFrameworkLevels[i]->_iStaticVBO_Index);
+				LOG_INFO("Static VBO built and populated!");
+			}
 		}
 
 		// Finished!
@@ -105,5 +123,13 @@ namespace Neutrino {
 		}
 		LOG_INFO("TODO: Delete the FrameworkLevels data!");
 		return true;
+	}
+
+
+	void DrawTilemap()
+	{
+		// TODO: This needs to get whatever the current level tilemap is from somewhere. GameGlobals?
+		const int iLevelDataIndex = 0;
+		GLUtils::RenderTilemapVBO(s_pFrameworkLevels[iLevelDataIndex]->_iTilemapSize, s_pFrameworkLevels[iLevelDataIndex]->_iTextureID, s_pFrameworkLevels[iLevelDataIndex]->_iStaticVBO_Index);
 	}
 }

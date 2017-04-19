@@ -12,6 +12,9 @@ typedef signed short int16;
 typedef signed int int32;
 typedef int64_t int64;
 
+static const uint32 iU32_BAD = 0xDEADBEEF;
+static const uint16 iU16_BAD = 0xDEAD;
+
 static const float fEPSILON = 0.00001f;
 static const float fASPECT_RATIO = 1.6f;
 static const float fPI = 3.141592653589f;

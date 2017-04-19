@@ -60,6 +60,11 @@ namespace Neutrino {
 			//LOG_INFO("Clear Colour Set to: %.2f, %.2f, %.2f, %.2f",  s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
 		}
 
+		void ClearBuffers()
+		{
+			glClearColor(s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
 
 		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
 		{
@@ -169,7 +174,7 @@ namespace Neutrino {
 		}
 
 
-		void CreateTilemapVBO(const uint32 iTilemapSize)
+		uint8 CreateTilemapVBO(const uint32 iTilemapSize)
 		{
 			ASSERT(s_iAllocatedTilemapVBOs < iMAX_TILEMAPS, "Call to CreateTilemapVBO made when max tilemaps has been reached.");
 			glGenBuffers(1, &s_pTilemapVBOs[s_iAllocatedTilemapVBOs]);
@@ -179,6 +184,7 @@ namespace Neutrino {
 			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iTilemapSize, NULL, GL_STATIC_DRAW);
 			ASSERT_GL_ERROR;
 			++s_iAllocatedTilemapVBOs;
+			return s_iAllocatedTilemapVBOs-1;
 		}
 
 
@@ -467,9 +473,7 @@ namespace Neutrino {
 			glUniform1i (pUniforms[UNIFORM_TEXTURE], 0);
 
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glClearColor( s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
 			glBindBuffer ( GL_ARRAY_BUFFER, s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter]);
-			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ASSERT_GL_ERROR;
 
 			if (iSpriteCount != 0)
@@ -499,6 +503,216 @@ namespace Neutrino {
 			s_pVBOArrays[iVBOSet]->_iVBOCounter++;
 			if ( s_pVBOArrays[iVBOSet]->_iVBOCounter == 3) s_pVBOArrays[iVBOSet]->_iVBOCounter = 0;
 		}
+
+
+		void PopulateTilemapVBO(const float* pX_S,
+			const float* pY_T,
+			const float* pX_SnS,
+			const float* pY_TnT,
+			const float* pHWidths,
+			const float* pHHeights,
+			const float* pRots,
+			const float* pScales,
+			glm::vec4* pColours,
+			glm::vec3* pPos,
+			const uint32 iCount,
+			const int iStaticVBO_Index)
+		{
+			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4* vQuadTL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4* vQuadTR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			glm::vec4 vTransBL = glm::vec4();
+			glm::vec4 vTransBR = glm::vec4();
+			glm::vec4 vTransTL = glm::vec4();
+			glm::vec4 vTransTR = glm::vec4();
+			glm::vec3* vPos = NEWX glm::vec3();
+
+
+			GLuint iVBO_ID = s_pTilemapVBOs[iStaticVBO_Index];
+			glBindBuffer(GL_ARRAY_BUFFER, s_pTilemapVBOs[iStaticVBO_Index]);
+			ASSERT_GL_ERROR;
+			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+			ASSERT(NULL != pVertex, "Unable to map to a tilemap's buffer. Have you passed the correct StaticVBO_Index?");
+
+			// Traverse the sprite array
+			{
+				float fScaledWidth;
+				float fScaledHeight;
+				uint32 iColour;
+
+				// For each sprite up to iCount
+				for (uint32 i = 0; i < iCount; i++)
+				{
+					// TODO: Ignore sprites outside the frustrum
+
+					// Build the transform matrix for this sprite
+					s_mRotationMatrix[0] = (float)cos(*pRots);
+					s_mRotationMatrix[1] = (float)sin(*pRots);
+					s_mRotationMatrix[3] = (float)-sin(*pRots);
+					s_mRotationMatrix[4] = (float)cos(*pRots);
+					s_mRotationMatrix[8] = 1.0f;
+
+					s_mScaleMatrix[0] = *pScales;
+					s_mScaleMatrix[4] = *pScales;
+					s_mScaleMatrix[8] = 1.0f;
+
+					s_mTransformationMatrix[0] = (s_mRotationMatrix[0] * s_mScaleMatrix[0]);
+					s_mTransformationMatrix[1] = (s_mRotationMatrix[1] * s_mScaleMatrix[4]);
+					s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
+					s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
+					s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
+					vPos->x = (float)pPos->x * s_fScaledPixelWidth;
+					vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+					vPos->z = (float)pPos->z;
+
+					// Build the vertex positions
+					{
+						fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
+						fScaledHeight = (*pHHeights * s_fScaledPixelHeight);
+
+						vQuadTL_Pos->x = 0.0f - fScaledWidth;
+						vQuadTL_Pos->y = 0.0f + fScaledHeight;
+
+						vQuadTR_Pos->x = 0.0f + fScaledWidth;
+						vQuadTR_Pos->y = 0.0f + fScaledHeight;
+
+						vQuadBL_Pos->x = 0.0f - fScaledWidth;
+						vQuadBL_Pos->y = 0.0f - fScaledHeight;
+
+						vQuadBR_Pos->x = 0.0f + fScaledWidth;
+						vQuadBR_Pos->y = 0.0f - fScaledHeight;
+					}
+
+					vTransBL.x = (vQuadBL_Pos->x * s_mTransformationMatrix[0]) + (vQuadBL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransBL.y = (vQuadBL_Pos->y * s_mTransformationMatrix[3]) + (vQuadBL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransBL.z = vPos->z;
+
+					vTransBR.x = (vQuadBR_Pos->x * s_mTransformationMatrix[0]) + (vQuadBR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransBR.y = (vQuadBR_Pos->x * s_mTransformationMatrix[3]) + (vQuadBR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransBR.z = vPos->z;
+
+					vTransTL.x = (vQuadTL_Pos->x * s_mTransformationMatrix[0]) + (vQuadTL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransTL.y = (vQuadTL_Pos->x * s_mTransformationMatrix[3]) + (vQuadTL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransTL.z = vPos->z;
+
+					vTransTR.x = (vQuadTR_Pos->x * s_mTransformationMatrix[0]) + (vQuadTR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
+					vTransTR.y = (vQuadTR_Pos->x * s_mTransformationMatrix[3]) + (vQuadTR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
+					vTransTR.z = vPos->z;
+
+					// Populate the VBO vertex corners
+					iColour = GetPackedColourV4(pColours);
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = *pX_S;
+					pVertex->_uv[1] = *pY_TnT;
+					pVertex->_position[0] = vTransBL.x;
+					pVertex->_position[1] = vTransBL.y;
+					pVertex->_position[2] = vTransBL.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = *pX_SnS;
+					pVertex->_uv[1] = *pY_TnT;
+					pVertex->_position[0] = vTransBR.x;
+					pVertex->_position[1] = vTransBR.y;
+					pVertex->_position[2] = vTransBR.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = *pX_S;
+					pVertex->_uv[1] = *pY_T;
+					pVertex->_position[0] = vTransTL.x;
+					pVertex->_position[1] = vTransTL.y;
+					pVertex->_position[2] = vTransTL.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = *pX_SnS;
+					pVertex->_uv[1] = *pY_TnT;
+					pVertex->_position[0] = vTransBR.x;
+					pVertex->_position[1] = vTransBR.y;
+					pVertex->_position[2] = vTransBR.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = *pX_SnS;
+					pVertex->_uv[1] = *pY_T;
+					pVertex->_position[0] = vTransTR.x;
+					pVertex->_position[1] = vTransTR.y;
+					pVertex->_position[2] = vTransTR.z;
+					pVertex++;
+
+					pVertex->_colour = iColour;
+					pVertex->_uv[0] = *pX_S;
+					pVertex->_uv[1] = *pY_T;
+					pVertex->_position[0] = vTransTL.x;
+					pVertex->_position[1] = vTransTL.y;
+					pVertex->_position[2] = vTransTL.z;
+					pVertex++;
+
+					// VBO Vertex pointer is now pointing at the next sprite, so increment through the 
+					// sprite settings arrays to get the data for the next iteration
+					++pX_S;
+					++pY_T;
+					++pX_SnS;
+					++pY_TnT;
+					++pHWidths;
+					++pHHeights;
+					++pRots;
+					++pScales;
+					++pColours;
+					++pPos;
+				}
+			}
+
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+
+			DELETEX vQuadBL_Pos;
+			DELETEX vQuadBR_Pos;
+			DELETEX vQuadTL_Pos;
+			DELETEX vQuadTR_Pos;
+			DELETEX vPos;
+		}
+
+
+		void RenderTilemapVBO(const uint32 iTilemapSize, GLuint iTextureID, const int iStaticVBO_Index)
+		{
+			GLint* pUniforms = GetActiveUniforms();
+			glBindTexture(GL_TEXTURE_2D, iTextureID);
+			glUniform1i(pUniforms[UNIFORM_TEXTURE], 0);
+
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBindBuffer(GL_ARRAY_BUFFER,s_pTilemapVBOs[iStaticVBO_Index]);
+
+			ASSERT_GL_ERROR;
+
+			if (iTilemapSize != 0)
+			{
+				glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+				ASSERT_GL_ERROR;
+
+				glEnableVertexAttribArray(ATTRIB_VERTEX);
+				ASSERT_GL_ERROR;
+
+				glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+				ASSERT_GL_ERROR;
+
+				glEnableVertexAttribArray(ATTRIB_COLOR);
+				ASSERT_GL_ERROR;
+
+				glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+				ASSERT_GL_ERROR;
+
+				glEnableVertexAttribArray(ATTRIB_TEXTURE);
+				ASSERT_GL_ERROR;
+
+				glDrawArrays(GL_TRIANGLES, 0, iTilemapSize * 6);
+				ASSERT_GL_ERROR;
+			}
+		}
+
+
+
 
 #ifdef DEBUG 
 		void AllocateDebugVBOs()

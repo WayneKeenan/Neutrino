@@ -86,7 +86,7 @@ namespace Neutrino
 		//		of the game. VBOs are GL_STATIC_DRAW.
 		//		
 		//		TODO: Should this function return a struct or a straight pointer to the VBO?
-		void CreateTilemapVBO(const uint32 iTilemapSize);
+		uint8 CreateTilemapVBO(const uint32 iTilemapSize);
 
 		// DeallocateTilemapVBOs()
 		//		Cleans up any tilemap VBOs that were created by the levels
@@ -112,15 +112,40 @@ namespace Neutrino
                       const uint32 iCount, 
                       const int iVBOSet	);
 
+		// PopulateTilemapVBO
+		// 		Populates a STATIC_DRAW VBO for a background tilemap on a level. This can be rendered by passing
+		// 		the appropriate texture ID and VBO index to RenderTilemapVBO()
+		void PopulateTilemapVBO(const float* pX_S,
+														const float* pY_T,
+														const float* pX_SnS,
+														const float* pY_TnT,
+														const float* pHWidths,
+														const float* pHHeights,
+														const float* pRots,
+														const float* pScales,
+														glm::vec4* pColours,
+														glm::vec3* pPos,
+														const uint32 iCount,
+														const int iStaticVBO_Index);
+
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
 		//   	TO_DO: If there's not a lot of shader changes, merge this and Populate VBO above...
-		void RenderVBO(const uint32 iSpriteCount, GLuint iID, const int iVBOSet);
+		void RenderVBO(const uint32 iSpriteCount, GLuint iTextureID, const int iVBOSet);
+
+		// RenderVBO
+		// 		Bind the a Tilemap VBO and call GLDrawArrays
+		void RenderTilemapVBO(const uint32 iTilemapSize, GLuint iTextureID, const int iStaticVBO_Index);
 
 		// SetClearColour
 		// 		Changes the glClearColor parameter. This will remain the background colour every tick until 
 		// 		either the game or editor mode changes it. 
 		void SetClearColour(const float fR, const float fG, const float fB, const float fA);
+
+		// ClearBuffers
+		//		Clears the colour and depth buffers, effectively clearing the screen. Should be called once
+		//		per tick
+		void ClearBuffers();
 
 #if defined DEBUG
 		// CreateDebugVBOs()

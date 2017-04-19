@@ -74,6 +74,11 @@ namespace Neutrino {
 	//		Will return the index of the packed texture page for the given ID. This index can be passed to GetSpriteInfo if 
 	// 		you only know the texture's OGL id
 	uint16 GetTextureSet( const GLuint iTextureID );
+	
+	// GetTextureID
+	//		Searches through the loaded textures to return a GLuint Texture ID from the Textures filename. This is slow! Should only
+	//		be used during Init, not during the main loop. 
+	GLuint GetTextureID(const char* sTextureFilename);
 
 	// ClearAllTextures()
 	// 		Free memory allocated for TPage_t arrays created during LoadTexturesFromConfigFile(), delete the texture

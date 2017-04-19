@@ -40,6 +40,23 @@ namespace Neutrino {
 		ASSERT(true, "GetTextureSet: unable to find a loaded texture with this id: %d", iTextureID);
 		return 0;
 	}
+
+	GLuint GetTextureID(const char* sTextureFilename)
+	{
+		GLuint iTextureID = iU32_BAD;
+		for (int i = 0; i < s_iLoadedTextureCount; ++i)
+		{
+			if (strcmp(s_aTexturePages[i]._sTextureFilename, sTextureFilename) == 0)
+			{
+				iTextureID = s_aTexturePages[i]._iTextureID;
+				LOG_INFO("Texture ID for %s is: %d", sTextureFilename, iTextureID);
+				return iTextureID;
+			}
+		}
+
+		LOG_ERROR("Unable to find Texture ID for %s!", sTextureFilename);
+		return iTextureID;
+	}
 		
 	
 	uint8 GetLoadedTextureCount()

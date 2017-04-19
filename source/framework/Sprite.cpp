@@ -228,7 +228,7 @@ namespace Neutrino
 
 
 		Sprite_t* pSprite = NEWX(Sprite_t);
-		glm::vec3 vPos = glm::vec3(pTilemapData->_fGridSize/2.0f, pTilemapData->_fGridSize / 2.0f, 0.0f);
+		glm::vec3 vPos = glm::vec3(pTilemapData->_fGridSize/2.0f, pTilemapData->_fGridSize / 2.0f, fTILEMAP_ZPOS);		// Push the tilemap back in the view...
 
 		// Populate the array with tilemap data
 		for (int y = 0; y < (int)pTilemapData->_iLevelHeight; ++y)

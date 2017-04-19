@@ -266,7 +266,7 @@ namespace Neutrino
 		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state TODO: make status a param to the function
 		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
 		GameStateUpdate();																											// Process whatever is the active game state
-		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);	
+		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											
 		GLUtils::ClearBuffers();
 		SetActiveShader(DEFAULT_SHADER);		
 		DrawTilemap();

@@ -123,7 +123,6 @@ namespace Neutrino {
 			s_mCameraMatrix = s_mProjectionMatrix * s_mModelViewMatrix;
 		}
 
-
 		void AllocateDynamicVBOSet()
 		{
 			ASSERT(s_iAllocatedDynamicVBOSets < iMAX_TEXTURES, "Call to AllocateDynamicVBOSet made when max textures has been reached.");

@@ -21,9 +21,10 @@ static const float fPI = 3.141592653589f;
 static const float fHALF_PI = fPI / 2.0f;
 static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
+static const float fTILEMAP_ZPOS = 5.0f;								// Ortho far distance is 10 so tilemaps effectively sit in the middle of our z-range
 static const int iMAX_TEXTURES = 4;											// The intention is for these textures to be 4k ;)
 static const int iMAX_LEVELS = 16;											// Arbitrary, just picked that out of my arse. 
-static const uint32 iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick.
+static const uint32 iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick by the looks of things
 static const uint32 iMAX_TILEMAP_SPRITES = 1024 * 256;	// These are static draw, so pushed to the GPU once. No real limit needed
 static const uint8 iMAX_TILEMAPS = 32;									// We're statically allocating the GLuint VBO IDs, so can have more (static GLuint s_pTilemapVBOs[iMAX_TILEMAPS])
 

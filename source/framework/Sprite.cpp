@@ -7,7 +7,7 @@
 #include "Time.h"
 #include "Types.h"
 #include "Texture.h"
-
+#include "Level.h"
 
 // TODO: Remove this, just for testing the INPUT axis...
 #include "Input.h"
@@ -87,6 +87,7 @@ namespace Neutrino
 			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._avSprColours;
 			DELETEX [] s_aSpriteRenderInfo[i]->_SprArrayBase._avSprPositions;
 			DELETEX [] s_aSpriteRenderInfo[i]->_SpriteBasePointers;			
+			DELETEX s_aSpriteRenderInfo[i];
 		}
 		LOG_INFO("Sprite Arrays deallocated.");
 	}
@@ -166,10 +167,11 @@ namespace Neutrino
 	}
 #endif 
 
+
 	void DrawSprites()
 	{
 		// Render the main VBOs if we have any active sprites in any of the sets allocated per texture
-		for( int i = 0; i < s_iAllocatedSets; i++)
+		for( int i = 0; i < s_iAllocatedSets; ++i)
 		{
 			if( s_aSpriteRenderInfo[i]->_iActiveSpriteCount > 0 )
 			{
@@ -197,6 +199,105 @@ namespace Neutrino
 					i );
 		}
 	}
+
+
+
+	void BuildSpriteArrayAndPopulateStaticVBO(const GLuint iTextureID, const TileMapData_t* pTilemapData, const uint8 iStaticVBO_ID)
+	{
+		SpriteRenderInfo_t* aSpriteRenderInfo = NEWX(SpriteRenderInfo_t);
+
+		aSpriteRenderInfo->_iActiveSpriteCount = 0;
+		aSpriteRenderInfo->_iTextureID = iTextureID;
+		uint16 iLevelSize = pTilemapData->_iLevelWidth * pTilemapData->_iLevelHeight;
+		uint16 iTextureSet = GetTextureSet(iTextureID);
+
+		// Allocate the memory
+		{
+			aSpriteRenderInfo->_SprArrayBase._afX_S = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afY_T = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afX_SnS = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afY_TnT = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afHalfWidth = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afHalfHeight = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._afSpriteScale = NEWX float[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._avSprColours = NEWX glm::vec4[iLevelSize];
+			aSpriteRenderInfo->_SprArrayBase._avSprPositions = NEWX glm::vec3[iLevelSize];
+			aSpriteRenderInfo->_SpriteBasePointers = NEWX Sprite_t[iLevelSize];
+		}
+
+
+		Sprite_t* pSprite = NEWX(Sprite_t);
+		glm::vec3 vPos = glm::vec3(0.0f, 0.0f, 0.0f);
+
+		// Populate the array with tilemap data
+		for (int y = 0; y < (int)pTilemapData->_iLevelHeight; ++y)
+		{
+			for (int x = 0; x < (int)pTilemapData->_iLevelWidth; ++x)
+			{
+				// Setup the sprite to point into the array
+				pSprite->_fX_S = &aSpriteRenderInfo->_SprArrayBase._afX_S[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fY_T = &aSpriteRenderInfo->_SprArrayBase._afY_T[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fX_SnS = &aSpriteRenderInfo->_SprArrayBase._afX_SnS[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fY_TnT = &aSpriteRenderInfo->_SprArrayBase._afY_TnT[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fHalfWidth = &aSpriteRenderInfo->_SprArrayBase._afHalfWidth[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fHalfHeight = &aSpriteRenderInfo->_SprArrayBase._afHalfHeight[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fRotDegrees = &aSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_fScale = &aSpriteRenderInfo->_SprArrayBase._afSpriteScale[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_vColour = &aSpriteRenderInfo->_SprArrayBase._avSprColours[(y*pTilemapData->_iLevelWidth) + x];
+				pSprite->_vPosition = &aSpriteRenderInfo->_SprArrayBase._avSprPositions[(y*pTilemapData->_iLevelWidth) + x];
+
+				// Get the sprite infomation from the texture page
+				const TPageSpriteInfo_t* pSpriteInfo = GetSpriteInfo(iTextureSet, pTilemapData->_aTileMap[(y*pTilemapData->_iLevelWidth) + x]);
+
+				// Populate
+				*(pSprite->_vPosition) = vPos;
+				*(pSprite->_fHalfWidth) = pSpriteInfo->_fHalfWidth;
+				*(pSprite->_fHalfHeight) = pSpriteInfo->_fHalfHeight;
+				*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				*(pSprite->_fScale) = 1.0f;
+				*(pSprite->_fRotDegrees) = 0.0f;
+				*(pSprite->_fX_S) = pSpriteInfo->_fX_S;
+				*(pSprite->_fY_T) = pSpriteInfo->_fY_T;
+				*(pSprite->_fX_SnS) = pSpriteInfo->_fX_SnS;
+				*(pSprite->_fY_TnT) = pSpriteInfo->_fY_TnT;
+
+				vPos.x += pTilemapData->_fGridSize;
+			}
+			vPos.y += pTilemapData->_fGridSize;
+			vPos.x = 0.0f;
+		}
+
+		GLUtils::PopulateTilemapVBO(
+			&aSpriteRenderInfo->_SprArrayBase._afX_S[0],
+			&aSpriteRenderInfo->_SprArrayBase._afY_T[0],
+			&aSpriteRenderInfo->_SprArrayBase._afX_SnS[0],
+			&aSpriteRenderInfo->_SprArrayBase._afY_TnT[0],
+			&aSpriteRenderInfo->_SprArrayBase._afHalfWidth[0],
+			&aSpriteRenderInfo->_SprArrayBase._afHalfHeight[0],
+			&aSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees[0],
+			&aSpriteRenderInfo->_SprArrayBase._afSpriteScale[0],
+			&aSpriteRenderInfo->_SprArrayBase._avSprColours[0],
+			&aSpriteRenderInfo->_SprArrayBase._avSprPositions[0],
+			iLevelSize,
+			iStaticVBO_ID);
+
+		// Deallocate everything
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afX_S;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afY_T;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afX_SnS;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afY_TnT;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afHalfWidth;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afHalfHeight;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afSpriteScale;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._avSprColours;
+		DELETEX[] aSpriteRenderInfo->_SprArrayBase._avSprPositions;
+		DELETEX[] aSpriteRenderInfo->_SpriteBasePointers;
+		DELETEX aSpriteRenderInfo;
+		DELETEX pSprite;
+	}
+
 
 	// Temp vars
 	static float fAngle=0.0f;

@@ -1,6 +1,7 @@
 #pragma once
 #include "GLUtils.h"
 #include "Types.h"
+#include "Level.h"
 
 namespace Neutrino
 {
@@ -18,7 +19,7 @@ namespace Neutrino
 	// and consequently output in one draw call. 
 	// 
 	// The framework currently makes no distinction for alpha blended sprites, so will potentially be slower on mobile until 
-	// these aren't split into their own VBO and rendered last.
+	// these are split into their own VBO (and rendered last).
 	// 
 	typedef struct SpriteArraySet_t
 	{
@@ -47,9 +48,9 @@ namespace Neutrino
 		float*		_fHalfWidth;		// The pixel dimensions, as mapped to the internal coord system, not the GL pixel output
 		float* 		_fHalfHeight;
 		float*		_fRotDegrees;		// Sprite rotation
-		float*		_fScale;			// Sprite's scale
+		float*		_fScale;				// Sprite's scale
 		glm::vec4*	_vColour;			// Sprite's RGBA colour values
-		glm::vec3* 	_vPosition;			// Sprites position, as mapped to the internal coord system, not the GL pixel output
+		glm::vec3* 	_vPosition;		// Sprites position, as mapped to the internal coord system, not the GL pixel output
 	} Sprite_t;
 
 	// SpriteRenderInfo_t contains the information Sprite functions pass to GLUtils so it can 
@@ -61,16 +62,6 @@ namespace Neutrino
 		Sprite_t* _SpriteBasePointers;
 		SpriteArraySet_t 	_SprArrayBase;
 	} TextureSpriteArrayInfo_t;
-
-
-	// AllocateSpriteArrays
-	// 		Called by a successfully loaded texture to allocate the SpriteArraySet_t, and
-	//		SpriteRenderInfo_t structures. 
-	void AllocateSpriteArrays(const GLuint iTextureID);
-
-	// DeallocateSpriteArrays
-	// 		Called by the framework to release the sprite settings arrays
-	void DeallocateSpriteArrays();
 
 	// NewSprite()
 	// 		Returns a populated Sprite_t for the sprite at the given index on the given texture 
@@ -91,13 +82,29 @@ namespace Neutrino
 	//		this frame. 
 	void DrawSprites();
 
+	// AllocateSpriteArrays
+	// 		Called by a successfully loaded texture to allocate the SpriteArraySet_t, and
+	//		SpriteRenderInfo_t structures. 
+	void AllocateSpriteArrays(const GLuint iTextureID);
+
+	// DeallocateSpriteArrays
+	// 		Called by the framework to release the sprite settings arrays
+	void DeallocateSpriteArrays();
+
+	// BuildSpriteArrayAndPopulateStaticVBO()
+	//		Helper function for the level loader, creates temporary sprite arrays, with data from a  
+	//		tilemap, that are then be passed to GLutils to populate a static draw VBO. This is called
+	//		by the framework during CoreInit and is not something that should be used at runtime. 
+	void BuildSpriteArrayAndPopulateStaticVBO(const GLuint iTextureID, const TileMapData_t* pTilemapData, const uint8 iStaticVBO_ID);
 
 	// TestSprite()
-	// 		Simple functoin to draw a sprite to the centre of the screen and verify Sprite_t
+	// 		Simple function to draw a sprite to the centre of the screen and verify Sprite_t
 	//   	data is working correctly in the VBO
 	void TestSprite();
 
-
+	// GetSpriteCount()
+	//		Returns the total number of sprites that have been added to the sprite arrays for all allocated
+	//		SpriteArraySets 
 	uint32 GetSpriteCount();
 
 

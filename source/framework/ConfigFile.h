@@ -60,6 +60,6 @@ namespace Neutrino
 
 	// GetSettingLength()
 	//		Returns the length of a group, or list config setting, or 0 for other element types
-	inline const int GetSettingLength(const config_setting_t* pSetting) { return config_setting_length(pSetting); };
+	inline int GetSettingLength(const config_setting_t* pSetting) { return config_setting_length(pSetting); };
 
 }

@@ -97,7 +97,7 @@ namespace Neutrino {
 			}
 
 			// Set the projection matrix for this viewport. 0,0 at TOP LEFT.
-			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RANGE, s_fOGL_Y_RANGE,  0.0f,  1.0f, -1.0f );
+			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RANGE, s_fOGL_Y_RANGE,  0.0f,  1.0f, -10.0f );
 
 		}
 

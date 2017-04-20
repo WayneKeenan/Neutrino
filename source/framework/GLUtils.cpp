@@ -183,7 +183,7 @@ namespace Neutrino {
 			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iTilemapSize, NULL, GL_STATIC_DRAW);
 			ASSERT_GL_ERROR;
 			++s_iAllocatedTilemapVBOs;
-			return s_iAllocatedTilemapVBOs-1;
+			return (uint8)(s_iAllocatedTilemapVBOs-1);
 		}
 
 
@@ -528,7 +528,6 @@ namespace Neutrino {
 			glm::vec3* vPos = NEWX glm::vec3();
 
 
-			GLuint iVBO_ID = s_pTilemapVBOs[iStaticVBO_Index];
 			glBindBuffer(GL_ARRAY_BUFFER, s_pTilemapVBOs[iStaticVBO_Index]);
 			ASSERT_GL_ERROR;
 			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);

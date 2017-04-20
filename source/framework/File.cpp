@@ -218,6 +218,7 @@ namespace Neutrino {
 			if (pTileData->_fVersion < s_fTMD_Version)
 			{
 				LOG_ERROR("Unable to load tilemap, file format versions conflict.");
+				PHYSFS_close(pFileHandle);
 				return NULL;
 			}
 			PHYSFS_read(pFileHandle, &iFilenameLength, sizeof(int), 1);
@@ -226,7 +227,7 @@ namespace Neutrino {
 			pTileData->_sTextureFilename[iFilenameLength] = '\0';
 			if (iLength != iFilenameLength)
 			{
-				const char* sErr = PHYSFS_getLastError();
+				LOG_INFO("%s", PHYSFS_getLastError());
 			}
 			PHYSFS_read(pFileHandle, &(pTileData->_fGridSize), sizeof(float), 1);
 			PHYSFS_read(pFileHandle, &(pTileData->_iLevelWidth), sizeof(uint16), 1);

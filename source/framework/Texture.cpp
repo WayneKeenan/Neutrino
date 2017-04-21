@@ -206,7 +206,7 @@ namespace Neutrino {
 			SDL_Surface* pSurf = IMG_Load_RW(pOps, 1);
 			ASSERT(pSurf, "LoadGLTexture: SDL Surface conversion failed");
 
-			bLoadStatus = GLTextureFromSDLSurface(&s_aTexturePages[iCount]._iTextureID, pSurf, true);
+			bLoadStatus = GLTextureFromSDLSurface(&s_aTexturePages[iCount]._iTextureID, pSurf, false);
 
 			SDL_FreeSurface(pSurf);
 			DELETEX [] pFileBytes;		// NEWX in LoadResourceBytes()

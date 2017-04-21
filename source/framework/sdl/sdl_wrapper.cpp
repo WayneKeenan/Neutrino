@@ -281,7 +281,7 @@ namespace Neutrino
 		LOG_INFO("Looking to remove controller matching istance ID: %d.", iID);
 
 		ControllerList::iterator it;
-		GameController_t* pElem;
+		GameController_t* pElem = NULL;
 		bool bFound = false;
 
 		for (it = s_aControllers.begin(); it != s_aControllers.end(); ++it)

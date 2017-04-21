@@ -83,7 +83,7 @@ namespace Neutrino {
 	// ClearAllTextures()
 	// 		Free memory allocated for TPage_t arrays created during LoadTexturesFromConfigFile(), delete the texture
 	//   	and call the GLUtils framework to delete the associated VBOS
-	void DeallocateAllTextures();
+	void DeallocateTextures();
 
 	// GetLoadedTextureCount()
 	//		Returns the number currently loaded textures

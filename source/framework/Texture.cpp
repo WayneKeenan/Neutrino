@@ -270,7 +270,7 @@ namespace Neutrino {
 
 
 
-	void DeallocateAllTextures()
+	void DeallocateTextures()
 	{
 		for (int i =0; i < s_iLoadedTextureCount; i++)
 		{
@@ -279,7 +279,6 @@ namespace Neutrino {
 		}
 
 		DELETEX [] s_aTexturePages;
-		GLUtils::DeallocateDynamicVBOs();
 		LOG_INFO("Textures deallocated.");
 	}
 }

@@ -45,7 +45,12 @@ namespace Neutrino
 		
 		// SetViewport
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
-		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight);
+		void SetViewport(const int iViewportWidth, const int iViewportHeight);
+
+		// SetDimensions
+		//		Stores internal and viewport dimensions, and calculates initial projection matrix for the 
+		//		viewport. "Internal" refers to the low res render texture dimensions used. 
+		void SetDimensions(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight);
 
 		// GetViewportDimensions
 		//		Returns a vector2 for the width and height of the active viewport
@@ -68,6 +73,10 @@ namespace Neutrino
 		// 	 Wrapper to chcek glError & LOG_ERR to the logfile in a clean way. 
 		// 	 Use the GL_ERROR / ASSERT_GL_ERROR for simplicity
 		bool LogGlError(const char *pFile, int iLine);
+
+		void AllocateFBOs();
+
+		void DeallocateFBOs();
 
 		// CreateDynamicVBOSet
 		//		Generates 3 VBO arrays which we iterate over each frame. 
@@ -115,7 +124,7 @@ namespace Neutrino
                       glm::vec4* pColours, 
                       glm::vec3* pPos, 
                       const uint32 iCount, 
-                      const int iVBOSet	);
+                      const int iVBOSet, bool bIsScaled = true);
 
 		// PopulateTilemapVBO
 		// 		Populates a STATIC_DRAW VBO for a background tilemap on a level. This can be rendered by passing
@@ -131,7 +140,7 @@ namespace Neutrino
 														glm::vec4* pColours,
 														glm::vec3* pPos,
 														const uint32 iCount,
-														const int iStaticVBO_Index);
+														const int iStaticVBO_Index, bool bIsScaled = true);
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays
@@ -174,7 +183,7 @@ namespace Neutrino
 													const float* pScales, 
 													glm::vec4* pColours, 
 													glm::vec3* pPos, 
-													const uint32 iCount);
+													const uint32 iCount, bool bIsScaled = true);
 
 		// RenderVBO
 		// 		Bind the DEBUG VBO and render it. 

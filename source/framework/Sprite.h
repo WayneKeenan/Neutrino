@@ -80,7 +80,7 @@ namespace Neutrino
 	// DrawSprites()
 	// 		Passes all active sprites to the OGL renderer to populate the VBOs that will be output 
 	//		this frame. 
-	void DrawSprites();
+	void DrawSprites(const bool bIsScaled);
 
 	// AllocateSpriteArrays
 	// 		Called by a successfully loaded texture to allocate the SpriteArraySet_t, and
@@ -155,7 +155,7 @@ namespace Neutrino
 
 	// DrawDebugSprites()
 	// 		Passes all the untextured sprites to OGL for rendering. 
-	void DrawDebugSprites();
+	void DrawDebugSprites(const bool bIsScaled);
 #endif 
 
 }

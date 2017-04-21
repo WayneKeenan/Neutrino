@@ -16,11 +16,14 @@ namespace Neutrino {
 		static glm::mat4 s_mProjectionMatrix;
 		static glm::vec4 s_vClearColour = glm::vec4(0.25f, 0.25f, 0.0f, 1.0f);
 
+		// OGL Ranges
 		static float s_fOGL_X_RANGE;
 		static float s_fOGL_Y_RANGE;
 
 		static float s_fViewportWidth;
 		static float s_fViewportHeight;
+		static float s_fInternalWidth;
+		static float s_fInternalHeight;
 
 		// Pixel scaler for low res render output 
 		static float s_fScaledPixelWidth;
@@ -37,6 +40,12 @@ namespace Neutrino {
 		static DynamicVBO_t* s_pVBOArrays[iMAX_TEXTURES];
 		static DynamicVBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
 		static GLuint s_pTilemapVBOs[iMAX_TILEMAPS];
+
+		// FBO / RBO pointers
+		static GLuint s_iFBO1;
+		static GLuint s_iFBO2;
+		static GLuint s_iRBO1;
+		static GLuint s_iRBO2;
 
 		// Counters
 		static uint8 s_iAllocatedDynamicVBOSets = 0;
@@ -66,7 +75,7 @@ namespace Neutrino {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
-		void SetViewport(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
+		void SetViewport(const int iViewportWidth, const int iViewportHeight)
 		{
 			// Create an OGL viewport with basic settings
 			{
@@ -80,25 +89,33 @@ namespace Neutrino {
 				glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				ASSERT_GL_ERROR;                
 			}
+		}
 
+		void SetDimensions(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight)
+		{
 			// Set viewport dimensions, OGL coord range, and internal pixel dimensions
 			{
 				s_fViewportWidth = (float)iViewportWidth;
 				s_fViewportHeight = (float)iViewportHeight;
+				s_fInternalWidth = (float)iInternalWidth;
+				s_fInternalHeight = (float)iInternalHeight;
 
+				// The aspect ratios for the viewport and the internal render buffers are
+				// assumed to be the same: 1.777 by 1. 
 				s_fOGL_X_RANGE = s_fViewportWidth / s_fViewportHeight;
 				s_fOGL_Y_RANGE = 1.0f;
 
 				s_fScaledPixelWidth = s_fOGL_X_RANGE / (float)iInternalWidth;
 				s_fScaledPixelHeight = s_fOGL_Y_RANGE / (float)iInternalHeight;
 
-				s_fUnscaledPixelWidth = s_fOGL_X_RANGE /(float)iViewportWidth;
+				s_fUnscaledPixelWidth = s_fOGL_X_RANGE / (float)iViewportWidth;
 				s_fUnscaledPixelHeight = s_fOGL_Y_RANGE / (float)iViewportHeight;
 			}
 
 			// Set the projection matrix for this viewport. 0,0 at TOP LEFT.
-			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RANGE, s_fOGL_Y_RANGE,  0.0f,  1.0f, -10.0f );
+			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RANGE, s_fOGL_Y_RANGE, 0.0f, 1.0f, -10.0f);
 
+			//LOG_INFO("- Viewport Dimensions: %d by %d\n- FBO Dimensions: %d by %d, )
 		}
 
 		const glm::vec2 GetViewportDimensions()
@@ -127,6 +144,81 @@ namespace Neutrino {
 			s_mModelViewMatrix = mTranslationMatrix;    // * mRotationMatrix;  // Add in scale? Are we going to zoom in and out?
 			s_mCameraMatrix = s_mProjectionMatrix * s_mModelViewMatrix;
 		}
+
+
+		void AllocateFBOs()
+		{
+			glClearColor(0.0, 0.0, 0.0, 0.0);
+			glViewport(0, 0, (GLsizei)s_fInternalWidth, (GLsizei)s_fInternalHeight);
+
+			// Create two textures for this FBO
+			// Note, not using Mipmaps here - just linear filter the textures when miniturising. 
+// 			glGenTextures(1, &s_iFBO1);
+// 			glBindTexture(GL_TEXTURE_2D, s_iFBO1);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+// 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s_fInternalWidth, s_fInternalHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+// 			glBindTexture(GL_TEXTURE_2D, 0);
+// 
+// 
+// 			glGenTextures(1, &mFBOTextureID2);
+// 			glBindTexture(GL_TEXTURE_2D, mFBOTextureID2);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+// 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FBO_DIMENSION, FBO_DIMENSION, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+// 			glBindTexture(GL_TEXTURE_2D, 0);
+// 
+// 			// Create a render buffer for this FBO
+// 			glGenRenderbuffersEXT(1, &mRBO1);
+// 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mRBO1);
+// 			glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA, FBO_DIMENSION, FBO_DIMENSION);
+// 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+// 
+// 
+// 			// Create the framebuffer object...
+// 			glGenFramebuffersEXT(1, &mFBO1);
+// 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO1);
+// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mFBOTextureID1, 0);
+// 			glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_RGBA, GL_RENDERBUFFER_EXT, mRBO1);
+// 			GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+// 
+// 			// Check the status of this FBO
+// 			mbFBO_Used = TRUE;
+// 			if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+// 				mbFBO_Used = false;
+// 			assert(mbFBO_Used && "Failed to create first FBO for feedback...\n");
+// 
+// 			SetFBOSprites();
+// 
+// 			// Clear any garbage from the two textures in on the FBO
+// 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO1);
+// 			glViewport(0, 0, FBO_DIMENSION, FBO_DIMENSION);
+// 			glDisable(GL_DEPTH_TEST);
+// 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mFBOTextureID2, 0);
+// 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mFBOTextureID2, 0);
+// 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+// 
+// 
+// 			// Return to the default render output (Screen)
+// 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+// 			glViewport(0, 0, mScreenDimensioX, mScreenDimensioY);
+// 			glClearColor(s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w);
+// 			glEnable(GL_DEPTH_TEST);
+		}
+
+		void DeallocateFBOs()
+		{
+		}
+
+
 
 		void AllocateDynamicVBOSet()
 		{
@@ -258,7 +350,8 @@ namespace Neutrino {
 											glm::vec4* pColours, 
 											glm::vec3* pPos, 
 											const uint32 iCount, 
-											const int iVBOSet   )
+											const int iVBOSet, 
+											bool bIsScaled)
 		{
 			ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
@@ -281,15 +374,20 @@ namespace Neutrino {
 			// Traverse the sprite arrays
 			// TODO: Split this into 4 and spread across threads
 			{
-#ifdef GLM_MATRIX
-				glm::mat4 mScale = glm::mat4(1.0f);
-				glm::mat4 mRotation = glm::mat4(1.0f);
-				glm::mat4 mTranslate = glm::mat4(1.0f);
-				glm::mat4 mTransform = glm::mat4(1.0f);
-#endif
-				float fScaledWidth;
-				float fScaledHeight;
 				uint32 iColour;
+				float fScaledWidth, fScaledHeight, fPixelWidth, fPixelHeight;
+
+				// We're scaled if we are rendering to the low res FBO, otherwise this is probably an editor mode. 
+				if (!bIsScaled)
+				{
+					fPixelWidth = s_fUnscaledPixelWidth;
+					fPixelHeight = s_fUnscaledPixelHeight;
+				}
+				else
+				{
+					fPixelWidth = s_fScaledPixelWidth;
+					fPixelHeight = s_fScaledPixelHeight;
+				}
 
 				// For each sprite up to iCount
 				for (uint32 i = 0; i < iCount; i++)
@@ -297,20 +395,6 @@ namespace Neutrino {
 					// TODO: Ignore sprites outside the frustrum
 
 					// Build the transform matrix for this sprite
-#ifdef GLM_MATRIX
-					mScale[0].x = *pScales;
-					mScale[1].y = *pScales;
-
-					mRotation[0].x = (float)cos(*pRots);
-					mRotation[0].y = (float)-sin(*pRots);
-					mRotation[1].x = (float)sin(*pRots);
-					mRotation[1].y = (float)cos(*pRots);
-					
-					mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
-					// This is the slowest line in here. 
-					// TODO: Move this into the Vertex Shader
-					mTransform = mTranslate * mRotation * mScale;
-#else
 					s_mRotationMatrix[0] = (float)cos(*pRots);
 					s_mRotationMatrix[1] = (float)sin(*pRots);
 					s_mRotationMatrix[3] = (float)-sin(*pRots);
@@ -326,52 +410,29 @@ namespace Neutrino {
 					s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
 					s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
 					s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
-#endif
-					vPos->x = (float)pPos->x * s_fScaledPixelWidth;
-					vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+
+					vPos->x = (float)pPos->x * fPixelWidth;
+					vPos->y = (float)pPos->y * fPixelHeight;
 					vPos->z = (float)pPos->z;
 
 					// Build the vertex positions
 					{
-						fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
-						fScaledHeight = (*pHHeights * s_fScaledPixelHeight);
+						fScaledWidth = (*pHWidths * fPixelWidth);
+						fScaledHeight = (*pHHeights * fPixelHeight);
 
 						vQuadTL_Pos->x = 0.0f - fScaledWidth;
 						vQuadTL_Pos->y = 0.0f + fScaledHeight;
-#ifdef GLM_MATRIX
-						vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-						vQuadTL_Pos->w = 1.0f;   
-#endif
+
 						vQuadTR_Pos->x = 0.0f + fScaledWidth;
 						vQuadTR_Pos->y = 0.0f + fScaledHeight;
-#ifdef GLM_MATRIX
- 						vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-						vQuadTR_Pos->w = 1.0f;   
-#endif
+
 						vQuadBL_Pos->x = 0.0f - fScaledWidth;
 						vQuadBL_Pos->y = 0.0f - fScaledHeight;
-#ifdef GLM_MATRIX
-						vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-						vQuadBL_Pos->w = 1.0f;   
-#endif
+
 						vQuadBR_Pos->x = 0.0f + fScaledWidth;
 						vQuadBR_Pos->y = 0.0f - fScaledHeight;
-#ifdef GLM_MATRIX
-						vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
-						vQuadBR_Pos->w = 1.0f;   
-#endif
-
 				}
-
-#ifdef GLM_MATRIX
-					// Transform the vertex positions
-					// TODO: Move this into the Vertex Shader
-					vTransBL = mTransform * *vQuadBL_Pos;
-					vTransBR = mTransform * *vQuadBR_Pos;
-					vTransTL = mTransform * *vQuadTL_Pos;
-					vTransTR = mTransform * *vQuadTR_Pos;
-#else
-					
+				
 					vTransBL.x = (vQuadBL_Pos->x * s_mTransformationMatrix[0]) + (vQuadBL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
 					vTransBL.y = (vQuadBL_Pos->y * s_mTransformationMatrix[3]) + (vQuadBL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
 					vTransBL.z = vPos->z;
@@ -387,7 +448,6 @@ namespace Neutrino {
 					vTransTR.x = (vQuadTR_Pos->x * s_mTransformationMatrix[0]) + (vQuadTR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
 					vTransTR.y = (vQuadTR_Pos->x * s_mTransformationMatrix[3]) + (vQuadTR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
 					vTransTR.z = vPos->z;
-#endif
 
 					// Populate the VBO vertex corners
 					iColour = GetPackedColourV4(pColours);
@@ -520,7 +580,7 @@ namespace Neutrino {
 			glm::vec4* pColours,
 			glm::vec3* pPos,
 			const uint32 iCount,
-			const int iStaticVBO_Index)
+			const int iStaticVBO_Index, bool bIsScaled)
 		{
 			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -532,8 +592,6 @@ namespace Neutrino {
 			glm::vec4 vTransTR = glm::vec4();
 			glm::vec3* vPos = NEWX glm::vec3();
 
-
-			GLuint iVBO_ID = s_pTilemapVBOs[iStaticVBO_Index];
 			glBindBuffer(GL_ARRAY_BUFFER, s_pTilemapVBOs[iStaticVBO_Index]);
 			ASSERT_GL_ERROR;
 			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -541,9 +599,20 @@ namespace Neutrino {
 
 			// Traverse the sprite array
 			{
-				float fScaledWidth;
-				float fScaledHeight;
 				uint32 iColour;
+				float fScaledWidth, fScaledHeight, fPixelWidth, fPixelHeight;
+
+				// We're scaled if we are rendering to the low res FBO, otherwise this is probably an editor mode. 
+				if (!bIsScaled)
+				{
+					fPixelWidth = s_fUnscaledPixelWidth;
+					fPixelHeight = s_fUnscaledPixelHeight;
+				}
+				else
+				{
+					fPixelWidth = s_fScaledPixelWidth;
+					fPixelHeight = s_fScaledPixelHeight;
+				}
 
 				// For each sprite up to iCount
 				for (uint32 i = 0; i < iCount; i++)
@@ -566,14 +635,14 @@ namespace Neutrino {
 					s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
 					s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
 					s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
-					vPos->x = (float)pPos->x * s_fScaledPixelWidth;
-					vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+					vPos->x = (float)pPos->x * fPixelWidth;
+					vPos->y = (float)pPos->y * fPixelHeight;
 					vPos->z = (float)pPos->z;
 
 					// Build the vertex positions
 					{
-						fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
-						fScaledHeight = (*pHHeights * s_fScaledPixelHeight);
+						fScaledWidth = (*pHWidths * fPixelWidth);
+						fScaledHeight = (*pHHeights * fPixelHeight);
 
 						vQuadTL_Pos->x = 0.0f - fScaledWidth;
 						vQuadTL_Pos->y = 0.0f + fScaledHeight;
@@ -770,7 +839,7 @@ namespace Neutrino {
 														const float* pScales, 
 														glm::vec4* pColours, 
 														glm::vec3* pPos, 
-														const uint32 iCount)
+														const uint32 iCount, bool bIsScaled)
 			{
 				ASSERT(iCount < iMAX_SPRITES, "PopulateDebugVBO: Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
@@ -793,35 +862,24 @@ namespace Neutrino {
 
 				// Traverse the sprite arrays
 				{
-#ifdef GLM_MATRIX
-					glm::mat4 mScale = glm::mat4(1.0f);
-					glm::mat4 mRotation = glm::mat4(1.0f);
-					glm::mat4 mTranslate = glm::mat4(1.0f);
-					glm::mat4 mTransform = glm::mat4(1.0f);
-#endif
-					float fScaledWidth;
-					float fScaledHeight;
 					uint32 iColour;
+					float fScaledWidth, fScaledHeight, fPixelWidth, fPixelHeight;
+
+					// We're scaled if we are rendering to the low res FBO, otherwise this is probably an editor mode. 
+					if (!bIsScaled)
+					{
+						fPixelWidth = s_fUnscaledPixelWidth;
+						fPixelHeight = s_fUnscaledPixelHeight;
+					}
+					else
+					{
+						fPixelWidth = s_fScaledPixelWidth;
+						fPixelHeight = s_fScaledPixelHeight;
+					}
 
 					// For each sprite up to iCount
 					for(uint32 i=0; i<iCount; i++)
 					{
-#ifdef GLM_MATRIX
-						// Build the transform matrix for this sprite
-						mScale[0].x = *pScales;
-						mScale[1].y = *pScales;
-
-						mRotation[0].x = (float)cos(*pRots);
-						mRotation[0].y = (float)-sin(*pRots);
-						mRotation[1].x = (float)sin(*pRots);
-						mRotation[1].y = (float)cos(*pRots);
-						mTranslate[3] = glm::vec4(vPos->x, vPos->y, vPos->z, 1.0f);
-
-						// This is the slowest line in here. 
-						// TODO: Possible to get a speed gain by removing the operator* ? Would remove the vec4 constructors
-						// glm::operator*<float,0>	Neutrino	e:\bitbucket\neutrino\external_dependencies\glm\glm\detail\type_mat4x4.inl	Line: 608	
-						mTransform = mTranslate * mRotation * mScale;
-#else
 						s_mRotationMatrix[0] = (float)cos(*pRots);
 						s_mRotationMatrix[1] = (float)sin(*pRots);
 						s_mRotationMatrix[3] = (float)-sin(*pRots);
@@ -837,48 +895,28 @@ namespace Neutrino {
 						s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
 						s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
 						s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
-#endif
-						vPos->x = (float)pPos->x * s_fScaledPixelWidth;
-						vPos->y = (float)pPos->y * s_fScaledPixelHeight;
+
+						vPos->x = (float)pPos->x * fPixelWidth;
+						vPos->y = (float)pPos->y * fPixelHeight;
 						vPos->z = (float)pPos->z;
 						// Build the vertex positions
 						{
-							fScaledWidth = (*pHWidths * s_fScaledPixelWidth);
-							fScaledHeight = (*pHHeights * s_fScaledPixelHeight);
+							fScaledWidth = (*pHWidths * fPixelWidth);
+							fScaledHeight = (*pHHeights * fPixelHeight);
 
 							vQuadTL_Pos->x = 0.0f - fScaledWidth;
 							vQuadTL_Pos->y = 0.0f + fScaledHeight;
-#ifdef GLM_MATRIX
-							vQuadTL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-							vQuadTL_Pos->w = 1.0f;   
-#endif
+
 							vQuadTR_Pos->x = 0.0f + fScaledWidth;
 							vQuadTR_Pos->y = 0.0f + fScaledHeight;
-#ifdef GLM_MATRIX							
-							vQuadTR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-							vQuadTR_Pos->w = 1.0f;   
-#endif
+
 							vQuadBL_Pos->x = 0.0f - fScaledWidth;
 							vQuadBL_Pos->y = 0.0f - fScaledHeight;
-#ifdef GLM_MATRIX							
-							vQuadBL_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here
-							vQuadBL_Pos->w = 1.0f;   
-#endif
+
 							vQuadBR_Pos->x = 0.0f + fScaledWidth;
 							vQuadBR_Pos->y = 0.0f - fScaledHeight;
-#ifdef GLM_MATRIX							
-							vQuadBR_Pos->z = 0.0f;   // TO_DO: need to put z-layer in here                    
-							vQuadBR_Pos->w = 1.0f;   
-#endif
 						}
 
-#ifdef GLM_MATRIX
-						// Transform the vertex positions
-						vTransBL = mTransform * *vQuadBL_Pos;
-						vTransBR = mTransform * *vQuadBR_Pos;
-						vTransTL = mTransform * *vQuadTL_Pos;
-						vTransTR = mTransform * *vQuadTR_Pos;
-#else
 						vTransBL.x = (vQuadBL_Pos->x * s_mTransformationMatrix[0]) + (vQuadBL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
 						vTransBL.y = (vQuadBL_Pos->y * s_mTransformationMatrix[3]) + (vQuadBL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
 						vTransBL.z = vPos->z;
@@ -894,7 +932,7 @@ namespace Neutrino {
 						vTransTR.x = (vQuadTR_Pos->x * s_mTransformationMatrix[0]) + (vQuadTR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
 						vTransTR.y = (vQuadTR_Pos->x * s_mTransformationMatrix[3]) + (vQuadTR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
 						vTransTR.z = vPos->z;
-#endif
+
 						// Get the packed colour
 						iColour = GetPackedColourV4(pColours);
 

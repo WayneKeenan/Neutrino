@@ -168,7 +168,7 @@ namespace Neutrino
 #endif 
 
 
-	void DrawSprites()
+	void DrawSprites(const bool bIsScaled)
 	{
 		// Render the main VBOs if we have any active sprites in any of the sets allocated per texture
 		for( int i = 0; i < s_iAllocatedSets; ++i)
@@ -188,7 +188,8 @@ namespace Neutrino
 						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vColour, 
 						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vPosition, 
 						s_aSpriteRenderInfo[i]->_iActiveSpriteCount,
-						i );
+						i,
+						bIsScaled);
 
 				// TO_DO: If we don't end up doing shader swaps in here, then merge these functions...
 			}				
@@ -480,7 +481,7 @@ namespace Neutrino
 		return pSprite;
 	}
 
-	void DrawDebugSprites()
+	void DrawDebugSprites(const bool bIsScaled)
 	{
 		// If there are Untextured DEBUG sprites, then pass this on to GLUtils and Render the DEBUG VBO
 		if (s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount > 0)
@@ -491,7 +492,8 @@ namespace Neutrino
 				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._fScale,
 				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._vColour,
 				s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[0]._vPosition,
-				s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount);
+				s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount,
+				bIsScaled);
 
 			GLUtils::RenderDebugVBO(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount);
 		}

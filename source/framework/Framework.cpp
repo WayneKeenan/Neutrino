@@ -193,14 +193,24 @@ namespace Neutrino
 
 			if( !AttachShaders() )
 				return false;
+		}
 
+		// Set our internal / external dimensions
+		{
 			GLUtils::SetViewport(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight);
 			GLUtils::SetDimensions(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight, s_pNeutrinoPreferences->_iInternalWidth, s_pNeutrinoPreferences->_iInternalHeight);
 			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 
 			const glm::vec2 vDims = GLUtils::GetInternalPixelScale();
-			s_pNeutrinoPreferences->_InternalPixelWidth = vDims.x; 
+			s_pNeutrinoPreferences->_InternalPixelWidth = vDims.x;
 			s_pNeutrinoPreferences->_InternalPixelHeight = vDims.y;
+		}
+
+		// Allocate FBOs and the render textures
+		if (!GLUtils::AllocateFBOs())
+		{
+			LOG_ERROR("Unable to allocate FBOs / Render Textures, exiting...");
+			return false;
 		}
 
 		// Init timing and logging facility
@@ -262,6 +272,12 @@ namespace Neutrino
 
 #if defined DEBUG
 		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;			// TODO: remove this, should the framework even know about this?
+
+		// Clamp to a texel
+		int fXPixels = (int)roundf(s_pvCameraPosition.x / GLUtils::GetViewportPixelScale().x);
+		int fYPixels = (int)roundf(s_pvCameraPosition.y / GLUtils::GetViewportPixelScale().y);
+		s_pvCameraPosition.x = (float)fXPixels * GLUtils::GetViewportPixelScale().x;
+		s_pvCameraPosition.y = (float)fYPixels * GLUtils::GetViewportPixelScale().y;
 #endif
 
 		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state TODO: make status a param to the function
@@ -316,11 +332,13 @@ namespace Neutrino
 
 		DeallocateLevels();
 		DeallocateSpriteArrays();
-		DeallocateAllTextures();		// Also deletes all VBOs 
+		DeallocateTextures();			
+		GLUtils::DeallocateDynamicVBOs();
 		GLUtils::DeallocateTilemapVBOs();	// TODO: this needs to be replaced with "DeallocateLevels"
+		GLUtils::DeallocateFBOs();
 		DetachShaders();
 		InputKill();
-
+		
 #if defined DEBUG
 		DebugOverlayKill();
 		GLUtils::DeallocateDebugVBOs();

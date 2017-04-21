@@ -111,6 +111,11 @@ namespace Neutrino {
 			return glm::vec2(s_fUnscaledPixelWidth, s_fUnscaledPixelHeight);
 		}
 
+		const glm::vec2 GetInternalPixelScale()
+		{
+			return glm::vec2(s_fScaledPixelWidth, s_fScaledPixelHeight);
+		}
+
 		void GenerateMVCMatrices(glm::vec3* vPos)
 		{
 			// We're not going to rotate the camera: 

@@ -55,6 +55,11 @@ namespace Neutrino
 		//		Returns a vector containing the OGL range of a single pixel
 		const glm::vec2 GetViewportPixelScale();
 
+		// GetPixelScale
+		//		Returns a vector containing the scaled internal range of a single pixel (for the pixel 
+		//		size when rendering to the low resolution FBO
+		const glm::vec2 GetInternalPixelScale();
+
 		// GenerateMatrices
 		// 		Create the new ModelView and Camera Matrices for this tick
 		void GenerateMVCMatrices(glm::vec3* vPos);

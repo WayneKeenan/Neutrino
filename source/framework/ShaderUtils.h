@@ -58,6 +58,10 @@ namespace Neutrino {
 	// 		Set shader pair for current OGL state from list of standard shaders defined in enum above
 	void SetActiveShader(eStandardShaders iIndex);
 
+	// SetOutputShader
+	// 		Final output of the lowres render target needs to have its own static camera matrix and custom
+	// 		shader, so this function is used by GLUtils::FinishOffscreenRender to handle setup of the 
+	// 		shader params. 
 	void SetOutputShader(float* pCameraMatrix);
 
 	// GetActiveUniforms

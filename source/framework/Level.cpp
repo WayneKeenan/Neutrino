@@ -126,11 +126,8 @@ namespace Neutrino {
 	}
 
 
-	void DrawTilemap(uint8 iInEditorMode)
+	void DrawTilemap()
 	{
-		if (iInEditorMode)
-			return;
-
 		// TODO: This needs to get whatever the current level tilemap is from somewhere. GameGlobals?
 		const int iLevelDataIndex = 0;
 		GLUtils::RenderTilemapVBO(s_pFrameworkLevels[iLevelDataIndex]->_iTilemapSize, s_pFrameworkLevels[iLevelDataIndex]->_iTextureID, s_pFrameworkLevels[iLevelDataIndex]->_iStaticVBO_Index);

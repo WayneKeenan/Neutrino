@@ -30,8 +30,8 @@ static const uint8 iMAX_TILEMAPS = 32;									// We're statically allocating th
 
 static const int iDEFAULT_VIEWPORT_WIDTH = 1920;				// TODO: When we go FULLSCREEN_WINDOW, this shouldn't matter. No need to open at a fixed resolution?
 static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;
-static const int iDEFAULT_INTERNAL_WIDTH = 1920;				// TODO: This will be used by the FBO, and game logic should scale to it [320(Div6) - 384(Div5)]
-static const int iDEFAULT_INTERNAL_HEIGHT = 1080;				// 180 - 216
+static const int iDEFAULT_INTERNAL_WIDTH = 384;					// TODO: This will be used by the FBO, and game logic should scale to it [320(Div6) - 384(Div5)]
+static const int iDEFAULT_INTERNAL_HEIGHT = 216;				// 180 - 216
 
 // Debug builds will check for function keys to flip the framework into specific editor modes. 
 // Bit flags are tested in CoreUpdate()

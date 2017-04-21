@@ -194,12 +194,8 @@ namespace Neutrino
 			if( !AttachShaders() )
 				return false;
 
-			GLUtils::SetViewport(	
-					s_pNeutrinoPreferences->_iScreenWidth, 
-					s_pNeutrinoPreferences->_iScreenHeight,
-					s_pNeutrinoPreferences->_iInternalWidth, 
-					s_pNeutrinoPreferences->_iInternalHeight 
-					);
+			GLUtils::SetViewport(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight);
+			GLUtils::SetDimensions(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight, s_pNeutrinoPreferences->_iInternalWidth, s_pNeutrinoPreferences->_iInternalHeight);
 			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 
 			const glm::vec2 vDims = GLUtils::GetInternalPixelScale();
@@ -260,7 +256,6 @@ namespace Neutrino
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	bool CoreUpdate()
 	{
 		TimeUpdate();																														// Update the internal clocks
@@ -274,14 +269,24 @@ namespace Neutrino
 		GameStateUpdate();																											// Process whatever is the active game state
 		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											
 		GLUtils::ClearBuffers();
-		SetActiveShader(DEFAULT_SHADER);		
-		DrawTilemap(s_iIsInMode);																								// Only draw the tilemaps by default if we're not in an editor mode. 
-		DrawSprites();
+		SetActiveShader(DEFAULT_SHADER);
+
+		if(0 == s_iIsInMode)
+		{
+			// We're in the normal game mode, do the full render path
+			DrawTilemap();																												
+			DrawSprites(true);
+		}
+		else
+		{
+			// We're in an editor mode, so do a simplified render path
+			DrawSprites(false);
+		}
 
 #if defined DEBUG
 		DebugOverlayUpdate();
 		SetActiveShader(DEFAULT_UNTEXTURED);
-		DrawDebugSprites();
+		DrawDebugSprites(false);
 
 		// Process editor toggling
 		if(s_iEditorModeFlag & _SPLINE_ED) LOG_INFO("Spline Editor Not Implemented");

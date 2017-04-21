@@ -30,7 +30,7 @@ namespace Neutrino
 	{
 		glm::vec3*	_pvCameraOffset;
 		bool _bFlyCameraMode = false;
-		float _fFlyCamSpeed = 0.5f;
+		float _fFlyCamSpeed = 3.5f;
 	} DebugOverlay_t;
 
 	static DebugOverlay_t* s_pOverlayParams;
@@ -92,7 +92,7 @@ namespace Neutrino
 				glm::vec3* vTraj = GetInputAxisGameDeltaScaled(1);
 				vTraj->x = vTraj->x;
 				vTraj->y = -vTraj->y;
-				*s_pOverlayParams->_pvCameraOffset += *vTraj * s_pOverlayParams->_fFlyCamSpeed;
+				*s_pOverlayParams->_pvCameraOffset += ((*vTraj) * s_pOverlayParams->_fFlyCamSpeed) * GetGameMSDelta();
 			}
 
 			// Update performance counters
@@ -127,7 +127,7 @@ namespace Neutrino
 				ImGui::Text("Camera Position: [%.1f,%.1f,%.1f] ", s_pOverlayParams->_pvCameraOffset->x, s_pOverlayParams->_pvCameraOffset->y, s_pOverlayParams->_pvCameraOffset->z);
 				ImGui::Checkbox("Fly Cam", &s_pOverlayParams->_bFlyCameraMode);
 				ImGui::SameLine(95);
-				ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 3.0f, "Fly Cam Speed: %.1f");
+				ImGui::SliderFloat("", &s_pOverlayParams->_fFlyCamSpeed, 0.0f, 10.0f, "Fly Cam Speed: %.1f");
 				if (ImGui::Button("Reset Fly Cam", ImVec2(292, 18)))
 				{
 					DELETEX s_pOverlayParams->_pvCameraOffset;

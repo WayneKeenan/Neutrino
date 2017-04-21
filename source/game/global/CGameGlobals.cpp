@@ -9,8 +9,8 @@ void CGameGlobals::SetGameDefaults(const NeutrinoPreferences_t* pPreferences)
 	// defaults will be set anyway. 
 	if(NULL != pPreferences)
 	{
-		m_iInternalWidth = pPreferences->_iInternalWidth;
-		m_iInternalHeight = pPreferences->_iInternalHeight;
+		m_iInternalWidth = (uint16)pPreferences->_iInternalWidth;
+		m_iInternalHeight = (uint16)pPreferences->_iInternalHeight;
 		m_fPixelWidth = pPreferences->_InternalPixelWidth;
 		m_fPixelHeight = pPreferences->_InternalPixelHeight;
 	}

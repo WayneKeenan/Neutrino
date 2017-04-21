@@ -27,7 +27,7 @@ void CMainMenuExit::Update()
 
 void CMainMenuExit::Kill()
 {
-	CGameGlobals::Instance().SetGameDefaults();
+	CGameGlobals::Instance().SetGameDefaults(NULL);
 }
 
 

@@ -137,6 +137,10 @@ namespace Neutrino
 		// 		Bind the a Tilemap VBO and call GLDrawArrays
 		void RenderTilemapVBO(const uint32 iTilemapSize, GLuint iTextureID, const int iStaticVBO_Index);
 
+		void StartOffscreenRender();
+
+		void FinishOffScreenRender();
+
 		// SetClearColour
 		// 		Changes the glClearColor parameter. This will remain the background colour every tick until 
 		// 		either the game or editor mode changes it. 

@@ -678,7 +678,7 @@ namespace Neutrino {
 
 			pVertex->_colour = iColour;
 			pVertex->_uv[0] = 0.0f;
-			pVertex->_uv[1] = 1.0f;
+			pVertex->_uv[1] = 0.0f;
 			pVertex->_position[0] = 0.0f;
 			pVertex->_position[1] = s_fOGL_Y_RANGE;
 			pVertex->_position[2] = 0.0f;
@@ -686,7 +686,7 @@ namespace Neutrino {
 
 			pVertex->_colour = iColour;
 			pVertex->_uv[0] = 1.0f;
-			pVertex->_uv[1] = 1.0f;
+			pVertex->_uv[1] = 0.0f;
 			pVertex->_position[0] = s_fOGL_X_RANGE;
 			pVertex->_position[1] = s_fOGL_Y_RANGE;
 			pVertex->_position[2] = 0.0f;
@@ -694,7 +694,7 @@ namespace Neutrino {
 
 			pVertex->_colour = iColour;
 			pVertex->_uv[0] = 0.0f;
-			pVertex->_uv[1] = 0.0f;
+			pVertex->_uv[1] = 1.0f;
 			pVertex->_position[0] = 0.0f;
 			pVertex->_position[1] = 0.0f;
 			pVertex->_position[2] = 0.0f;
@@ -702,7 +702,7 @@ namespace Neutrino {
 
 			pVertex->_colour = iColour;
 			pVertex->_uv[0] = 1.0f;
-			pVertex->_uv[1] = 1.0f;
+			pVertex->_uv[1] = 0.0f;
 			pVertex->_position[0] = s_fOGL_X_RANGE;
 			pVertex->_position[1] = s_fOGL_Y_RANGE;
 			pVertex->_position[2] = 0.0f;
@@ -710,7 +710,7 @@ namespace Neutrino {
 
 			pVertex->_colour = iColour;
 			pVertex->_uv[0] = 1.0f;
-			pVertex->_uv[1] = 0.0f;
+			pVertex->_uv[1] = 1.0f;
 			pVertex->_position[0] = s_fOGL_X_RANGE;
 			pVertex->_position[1] = 0.0f;
 			pVertex->_position[2] = 0.0f;
@@ -718,7 +718,7 @@ namespace Neutrino {
 
 			pVertex->_colour = iColour;
 			pVertex->_uv[0] = 0.0f;
-			pVertex->_uv[1] = 0.0f;
+			pVertex->_uv[1] = 1.0f;
 			pVertex->_position[0] = 0.0f;
 			pVertex->_position[1] = 0.0f;
 			pVertex->_position[2] = 0.0f;

@@ -263,4 +263,14 @@ namespace Neutrino {
 		glUniformMatrix4fv( s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, GLUtils::GetCameraMatrix());
   	GL_ERROR;
 	}
+
+	void SetOutputShader(float* pCameraMatrix)
+	{
+		s_pActiveShader = &s_aLoadedShaders[DEFAULT_SHADER];
+		GL_ERROR;
+		glUseProgram(s_pActiveShader->_ProgramID);
+		GL_ERROR;
+		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
+		GL_ERROR;
+	}
 }

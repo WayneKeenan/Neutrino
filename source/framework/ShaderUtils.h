@@ -58,6 +58,8 @@ namespace Neutrino {
 	// 		Set shader pair for current OGL state from list of standard shaders defined in enum above
 	void SetActiveShader(eStandardShaders iIndex);
 
+	void SetOutputShader(float* pCameraMatrix);
+
 	// GetActiveUniforms
 	// 		Returns the address of the current shader uniforms (see: struct _ShaderSettings_t in cpp file)
 	GLint* GetActiveUniforms ();

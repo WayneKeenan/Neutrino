@@ -53,5 +53,5 @@ namespace Neutrino {
 
 	// DrawTilemap()
 	// 		Passes all relevant tilemap info to the OGL renderer so it can be rendered this frame
-	void DrawTilemap();
+	void DrawTilemap(uint8 iInEditorMode);
 }

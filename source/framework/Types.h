@@ -42,3 +42,15 @@ static const uint8 _PARTICLE_ED = 0x04;
 
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)
+
+
+typedef struct NeutrinoPreferences_t {
+	int _iScreenWidth;							// Viewport Dimensions
+	int _iScreenHeight;
+	int _iInternalWidth;						// Internal coord dimensions
+	int _iInternalHeight;
+	float _InternalPixelWidth;
+	float _InternalPixelHeight;
+	const char* _pResourcePath;		// Packfile locations
+	const char* _pPrefsPath;				// Player prefs file location
+} NeutrinoPreferences_t;

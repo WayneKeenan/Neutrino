@@ -284,10 +284,10 @@ namespace Neutrino
 		{
 			// Clamp Camera Movement to a Texel
 			{
-				int fXPixels = (int)roundf(s_pvCameraPosition.x / GLUtils::GetInternalPixelScale().x);
-				int fYPixels = (int)roundf(s_pvCameraPosition.y / GLUtils::GetInternalPixelScale().y);
-				s_pvCameraPosition.x = (float)fXPixels * GLUtils::GetInternalPixelScale().x;
-				s_pvCameraPosition.y = (float)fYPixels * GLUtils::GetInternalPixelScale().y;
+// 				int fXPixels = (int)roundf(s_pvCameraPosition.x / GLUtils::GetInternalPixelScale().x);
+// 				int fYPixels = (int)roundf(s_pvCameraPosition.y / GLUtils::GetInternalPixelScale().y);
+// 				s_pvCameraPosition.x = (float)fXPixels * GLUtils::GetInternalPixelScale().x;
+// 				s_pvCameraPosition.y = (float)fYPixels * GLUtils::GetInternalPixelScale().y;
 				GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 			}
 

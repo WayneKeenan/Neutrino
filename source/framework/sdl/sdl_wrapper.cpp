@@ -210,7 +210,9 @@ namespace Neutrino
 			s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK] = 0;
 
 			if (!s_bIsFullscreen)
-				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN); // Switch to --> SDL_WINDOW_FULLSCREEN_DESKTOP);
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN); 
+			// TODO: Switch to --> SDL_WINDOW_FULLSCREEN_DESKTOP);
+			// And re-open a new window as the desktop resolution...
 			else
 				SDL_SetWindowFullscreen(pSDL_WindowHandle, 0);
 

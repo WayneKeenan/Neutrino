@@ -226,7 +226,8 @@ namespace Neutrino {
 			pTileData->_sTextureFilename[iFilenameLength] = '\0';
 			if (iLength != iFilenameLength)
 			{
-				const char* sErr = PHYSFS_getLastError();
+				LOG_INFO("%s", PHYSFS_getLastError());
+				return NULL;
 			}
 			PHYSFS_read(pFileHandle, &(pTileData->_fGridSize), sizeof(float), 1);
 			PHYSFS_read(pFileHandle, &(pTileData->_iLevelWidth), sizeof(uint16), 1);
@@ -236,6 +237,7 @@ namespace Neutrino {
 			if (iLength != pTileData->_iLevelWidth * pTileData->_iLevelHeight)
 			{
 				LOG_INFO("%s", PHYSFS_getLastError());
+				return NULL;
 			}
 
 			// This block will load the whole file into a memory buffer. 

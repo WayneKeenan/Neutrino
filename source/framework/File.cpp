@@ -218,6 +218,7 @@ namespace Neutrino {
 			if (pTileData->_fVersion < s_fTMD_Version)
 			{
 				LOG_ERROR("Unable to load tilemap, file format versions conflict.");
+				PHYSFS_close(pFileHandle);
 				return NULL;
 			}
 			PHYSFS_read(pFileHandle, &iFilenameLength, sizeof(int), 1);

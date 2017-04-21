@@ -209,7 +209,7 @@ namespace Neutrino
 
 		aSpriteRenderInfo->_iActiveSpriteCount = 0;
 		aSpriteRenderInfo->_iTextureID = iTextureID;
-		uint16 iLevelSize = pTilemapData->_iLevelWidth * pTilemapData->_iLevelHeight;
+		uint16 iLevelSize = (uint16)(pTilemapData->_iLevelWidth * pTilemapData->_iLevelHeight);
 		uint16 iTextureSet = GetTextureSet(iTextureID);
 
 		// Allocate the memory

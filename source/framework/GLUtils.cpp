@@ -280,7 +280,7 @@ namespace Neutrino {
 			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iTilemapSize, NULL, GL_STATIC_DRAW);
 			ASSERT_GL_ERROR;
 			++s_iAllocatedTilemapVBOs;
-			return s_iAllocatedTilemapVBOs-1;
+			return (uint8)(s_iAllocatedTilemapVBOs-1);
 		}
 
 

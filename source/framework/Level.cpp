@@ -8,6 +8,7 @@
 #include "GLUtils.h"
 #include "Texture.h"
 #include "Sprite.h"
+#include "string.h"
 
 namespace Neutrino {
 

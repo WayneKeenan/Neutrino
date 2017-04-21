@@ -13,7 +13,7 @@
 #endif
 namespace Neutrino 
 {
-	NeutrinioPreferences_t* NeutrinoPreferences = NULL; 
+	NeutrinoPreferences_t* s_pNeutrinoPreferences = NULL; 
 	CGameGlobals* pGameGlobals;		// Remove this, just a test...
 
 	static const char* const s_pOrganisation = "TripleEh";
@@ -47,17 +47,17 @@ namespace Neutrino
 		// Get PlayerPrefs.tdi for this game, parse it and populate engine preferences
 		//
 		{
-			NeutrinoPreferences = NEWX(NeutrinioPreferences_t);
-			NeutrinoPreferences->s_pPrefsPath = SDLGetPrefPath();
-			NeutrinoPreferences->s_pResourcePath = SDLGetBasePath();
+			s_pNeutrinoPreferences = NEWX(NeutrinoPreferences_t);
+			s_pNeutrinoPreferences->_pPrefsPath = SDLGetPrefPath();
+			s_pNeutrinoPreferences->_pResourcePath = SDLGetBasePath();
 
-			LOG_INFO("Resource path: %s", NeutrinoPreferences->s_pResourcePath);
-			LOG_INFO("Userdata path: %s", NeutrinoPreferences->s_pPrefsPath);
+			LOG_INFO("Resource path: %s", s_pNeutrinoPreferences->_pResourcePath);
+			LOG_INFO("Userdata path: %s", s_pNeutrinoPreferences->_pPrefsPath);
 
 
 			FILE* pPlayerPrefsFile;
 			char pPlayerPrefsFilename[4096]={'\0'};
-			sprintf(pPlayerPrefsFilename, "%s/%s", NeutrinoPreferences->s_pPrefsPath, s_pPrefsFilename);
+			sprintf(pPlayerPrefsFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsFilename);
 
 			if( FileExists(pPlayerPrefsFilename) )
 			{
@@ -79,28 +79,28 @@ namespace Neutrino
 					return false;
 				}
 
-				if(!config_lookup_int(&cfg, "screenheight", &NeutrinoPreferences->s_iScreenHeight))
+				if(!config_lookup_int(&cfg, "screenheight", &s_pNeutrinoPreferences->_iScreenHeight))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse screenhieght from Player Prefs file, exiting...");
 					return false;
 				}
 
-				if(!config_lookup_int(&cfg, "screenwidth", &NeutrinoPreferences->s_iScreenWidth ))
+				if(!config_lookup_int(&cfg, "screenwidth", &s_pNeutrinoPreferences->_iScreenWidth ))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse screenwidth from Player Prefs file, exiting...");
 					return false;
 				}
 
-				if(!config_lookup_int(&cfg, "internalheight", &NeutrinoPreferences->s_iInternalHeight))
+				if(!config_lookup_int(&cfg, "internalheight", &s_pNeutrinoPreferences->_iInternalHeight))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse internalhieght from Player Prefs file, exiting...");
 					return false;
 				}
 
-				if(!config_lookup_int(&cfg, "internalwidth", &NeutrinoPreferences->s_iInternalWidth ))
+				if(!config_lookup_int(&cfg, "internalwidth", &s_pNeutrinoPreferences->_iInternalWidth ))
 				{
 					config_destroy(&cfg);
 					LOG_ERROR("Unable to parse internalwidth from Player Prefs file, exiting...");
@@ -136,10 +136,10 @@ namespace Neutrino
 #endif
 				{
 
-					NeutrinoPreferences->s_iScreenWidth = iDEFAULT_VIEWPORT_WIDTH;
-					NeutrinoPreferences->s_iScreenHeight = iDEFAULT_VIEWPORT_HEIGHT;
-					NeutrinoPreferences->s_iInternalWidth = iDEFAULT_INTERNAL_WIDTH;
-					NeutrinoPreferences->s_iInternalHeight = iDEFAULT_INTERNAL_HEIGHT;
+					s_pNeutrinoPreferences->_iScreenWidth = iDEFAULT_VIEWPORT_WIDTH;
+					s_pNeutrinoPreferences->_iScreenHeight = iDEFAULT_VIEWPORT_HEIGHT;
+					s_pNeutrinoPreferences->_iInternalWidth = iDEFAULT_INTERNAL_WIDTH;
+					s_pNeutrinoPreferences->_iInternalHeight = iDEFAULT_INTERNAL_HEIGHT;
 
 					const char* pInputMappingsText = GetInputMappingsString();
 					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 320\ninternalheight: 180\n";
@@ -163,7 +163,7 @@ namespace Neutrino
 		// Mount the resources pack file. Must do this prior to OGL setup as shaders will need to be loaded
 		// from it.
 		{
-			sprintf(s_pResourcesPath, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+			sprintf(s_pResourcesPath, "%s%s", s_pNeutrinoPreferences->_pResourcePath, s_pResourcesFilename);
 			if (!MountResources(s_pResourcesPath))
 			{
 				LOG_ERROR("Unable to mount resources file, exiting.");
@@ -184,23 +184,27 @@ namespace Neutrino
 		// Create an SDL window with an OGL 3 Context and compile standard shaders
 		// 
 		{
-			LOG_INFO("Screen dimensions: %d x %d", NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight);
-			LOG_INFO("Internal dimensions: %d x %d", NeutrinoPreferences->s_iInternalWidth, NeutrinoPreferences->s_iInternalHeight);
+			LOG_INFO("Screen dimensions: %d x %d", s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight);
+			LOG_INFO("Internal dimensions: %d x %d", s_pNeutrinoPreferences->_iInternalWidth, s_pNeutrinoPreferences->_iInternalHeight);
 
 
-			if( !SDLCreateWindowAndContext(NeutrinoPreferences->s_iScreenWidth, NeutrinoPreferences->s_iScreenHeight) )
+			if( !SDLCreateWindowAndContext(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight) )
 				return false;
 
 			if( !AttachShaders() )
 				return false;
 
 			GLUtils::SetViewport(	
-					NeutrinoPreferences->s_iScreenWidth, 
-					NeutrinoPreferences->s_iScreenHeight,
-					NeutrinoPreferences->s_iInternalWidth, 
-					NeutrinoPreferences->s_iInternalHeight 
+					s_pNeutrinoPreferences->_iScreenWidth, 
+					s_pNeutrinoPreferences->_iScreenHeight,
+					s_pNeutrinoPreferences->_iInternalWidth, 
+					s_pNeutrinoPreferences->_iInternalHeight 
 					);
 			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
+
+			const glm::vec2 vDims = GLUtils::GetInternalPixelScale();
+			s_pNeutrinoPreferences->_InternalPixelWidth = vDims.x; 
+			s_pNeutrinoPreferences->_InternalPixelHeight = vDims.y;
 		}
 
 		// Init timing and logging facility
@@ -240,9 +244,11 @@ namespace Neutrino
 #endif
 
 
-		// Create any Singletons we need
-		CGameGlobals::Create();
-		pGameGlobals = CGameGlobals::InstancePtr(); // TODO: Remove this, just a test...
+		// Create GameGlobals and set the dimensions parsed from the preferences file. 
+		{
+			CGameGlobals::Create();
+			pGameGlobals = CGameGlobals::InstancePtr(); // TODO: Remove this, just a test...
+		}
 
 		// Enter Initial Gamestate
 		GameStateInit();
@@ -269,7 +275,7 @@ namespace Neutrino
 		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											
 		GLUtils::ClearBuffers();
 		SetActiveShader(DEFAULT_SHADER);		
-		DrawTilemap();
+		DrawTilemap(s_iIsInMode);																								// Only draw the tilemaps by default if we're not in an editor mode. 
 		DrawSprites();
 
 #if defined DEBUG
@@ -294,14 +300,14 @@ namespace Neutrino
 
 	bool CoreKill()
 	{
-		sprintf(s_pResourcesPath, "%s%s", NeutrinoPreferences->s_pResourcePath, s_pResourcesFilename);
+		sprintf(s_pResourcesPath, "%s%s", s_pNeutrinoPreferences->_pResourcePath, s_pResourcesFilename);
 
 		if (!UnmountResources(s_pResourcesPath))
 			LOG_ERROR("Unable to unmount resources file: %s", s_pResourcesPath);
 
 		// Remove any singletons we created...
 		CGameGlobals::Destroy();
-		DELETEX(NeutrinoPreferences);
+		DELETEX(s_pNeutrinoPreferences);
 
 		DeallocateLevels();
 		DeallocateSpriteArrays();

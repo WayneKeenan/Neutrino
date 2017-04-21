@@ -21,19 +21,6 @@
 #include "Level.h"
 
 namespace Neutrino {
-	
-	typedef struct NeutrinioPreferences_t {
-		int s_iScreenWidth;					// Viewport Dimensions
-		int s_iScreenHeight;
-		int s_iInternalWidth;				// Internal coord dimensions
-		int s_iInternalHeight;
-		const char* s_pResourcePath;		// Packfile locations
-		const char* s_pPrefsPath;			// Player prefs file location
-	} NeutrinioPreferences_t;
-
-	extern NeutrinioPreferences_t* NeutrinoPreferences;
-	extern CGameGlobals* pGameGlobals;
-	
 	bool CoreInit(const char* const pGameName);
 	bool CoreUpdate();
 	bool CoreKill();

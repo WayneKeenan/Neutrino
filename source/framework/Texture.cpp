@@ -172,10 +172,10 @@ namespace Neutrino {
 					float fTexelMovementH = (fTexelH / 2.0f);
 
 					// Store the UV coords
-					s_aTexturePages[iCount].aSprintInfo[i]._fX_S = ((float)iX * fTexelW) + fTexelMovementW;
-					s_aTexturePages[iCount].aSprintInfo[i]._fY_T = ((float)iY * fTexelH) + fTexelMovementH;
-					s_aTexturePages[iCount].aSprintInfo[i]._fX_SnS = (s_aTexturePages[iCount].aSprintInfo[i]._fX_S + ((float)iWidth * fTexelW)) - fTexelMovementW;
-					s_aTexturePages[iCount].aSprintInfo[i]._fY_TnT = (s_aTexturePages[iCount].aSprintInfo[i]._fY_T + ((float)iHeight * fTexelH)) - fTexelMovementH;
+					s_aTexturePages[iCount].aSprintInfo[i]._fX_S = ((float)iX * fTexelW);// -fTexelMovementW;
+					s_aTexturePages[iCount].aSprintInfo[i]._fY_T = ((float)iY * fTexelH);// - fTexelMovementH;
+					s_aTexturePages[iCount].aSprintInfo[i]._fX_SnS = (s_aTexturePages[iCount].aSprintInfo[i]._fX_S + ((float)iWidth * fTexelW));// + fTexelMovementW;
+					s_aTexturePages[iCount].aSprintInfo[i]._fY_TnT = (s_aTexturePages[iCount].aSprintInfo[i]._fY_T + ((float)iHeight * fTexelH));// + fTexelMovementH;
 
 					// And half dimensions (Quad's origin is always at the centre)
 					s_aTexturePages[iCount].aSprintInfo[i]._fHalfWidth = (float)iWidth/2.0f;

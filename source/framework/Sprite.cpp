@@ -189,7 +189,8 @@ namespace Neutrino
 						s_aSpriteRenderInfo[i]->_SpriteBasePointers[0]._vPosition, 
 						s_aSpriteRenderInfo[i]->_iActiveSpriteCount,
 						i,
-						bIsScaled);
+						bIsScaled,
+						false);
 
 				// TO_DO: If we don't end up doing shader swaps in here, then merge these functions...
 			}				
@@ -269,7 +270,7 @@ namespace Neutrino
 			vPos.x = pTilemapData->_fGridSize / 2.0f;
 		}
 
-		GLUtils::PopulateTilemapVBO(
+		GLUtils::PopulateVBO(
 			&aSpriteRenderInfo->_SprArrayBase._afX_S[0],
 			&aSpriteRenderInfo->_SprArrayBase._afY_T[0],
 			&aSpriteRenderInfo->_SprArrayBase._afX_SnS[0],
@@ -281,7 +282,9 @@ namespace Neutrino
 			&aSpriteRenderInfo->_SprArrayBase._avSprColours[0],
 			&aSpriteRenderInfo->_SprArrayBase._avSprPositions[0],
 			iLevelSize,
-			iStaticVBO_ID);
+			iStaticVBO_ID,
+			true, 
+			true);
 
 		// Deallocate everything
 		DELETEX[] aSpriteRenderInfo->_SprArrayBase._afX_S;

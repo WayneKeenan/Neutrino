@@ -42,10 +42,10 @@ namespace Neutrino {
 		static GLuint s_pTilemapVBOs[iMAX_TILEMAPS];
 
 		// FBO / RBO pointers
-		static GLuint s_iFBO1;
-		static GLuint s_iFBO2;
-		static GLuint s_iRBO1;
-		static GLuint s_iRBO2;
+		static GLuint s_iFBO_TextureID1;
+		static GLuint s_iFBO_TextureID2;
+		static GLuint s_iRBOID;
+		static GLuint s_iFBOID;
 
 		// Counters
 		static uint8 s_iAllocatedDynamicVBOSets = 0;
@@ -146,76 +146,92 @@ namespace Neutrino {
 		}
 
 
-		void AllocateFBOs()
+		bool AllocateFBOs()
 		{
-			glClearColor(0.0, 0.0, 0.0, 0.0);
-			glViewport(0, 0, (GLsizei)s_fInternalWidth, (GLsizei)s_fInternalHeight);
-
 			// Create two textures for this FBO
 			// Note, not using Mipmaps here - just linear filter the textures when miniturising. 
-// 			glGenTextures(1, &s_iFBO1);
-// 			glBindTexture(GL_TEXTURE_2D, s_iFBO1);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-// 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s_fInternalWidth, s_fInternalHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-// 			glBindTexture(GL_TEXTURE_2D, 0);
-// 
-// 
-// 			glGenTextures(1, &mFBOTextureID2);
-// 			glBindTexture(GL_TEXTURE_2D, mFBOTextureID2);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-// 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-// 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FBO_DIMENSION, FBO_DIMENSION, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-// 			glBindTexture(GL_TEXTURE_2D, 0);
-// 
-// 			// Create a render buffer for this FBO
-// 			glGenRenderbuffersEXT(1, &mRBO1);
-// 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mRBO1);
-// 			glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA, FBO_DIMENSION, FBO_DIMENSION);
-// 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-// 
-// 
-// 			// Create the framebuffer object...
-// 			glGenFramebuffersEXT(1, &mFBO1);
-// 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO1);
-// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mFBOTextureID1, 0);
-// 			glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_RGBA, GL_RENDERBUFFER_EXT, mRBO1);
-// 			GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-// 
-// 			// Check the status of this FBO
-// 			mbFBO_Used = TRUE;
-// 			if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
-// 				mbFBO_Used = false;
-// 			assert(mbFBO_Used && "Failed to create first FBO for feedback...\n");
-// 
-// 			SetFBOSprites();
-// 
-// 			// Clear any garbage from the two textures in on the FBO
-// 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO1);
-// 			glViewport(0, 0, FBO_DIMENSION, FBO_DIMENSION);
-// 			glDisable(GL_DEPTH_TEST);
-// 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
-// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mFBOTextureID2, 0);
-// 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
-// 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mFBOTextureID2, 0);
-// 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// 
-// 
-// 			// Return to the default render output (Screen)
-// 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-// 			glViewport(0, 0, mScreenDimensioX, mScreenDimensioY);
-// 			glClearColor(s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w);
-// 			glEnable(GL_DEPTH_TEST);
+			glGenTextures(1, &s_iFBO_TextureID1);
+			ASSERT_GL_ERROR;
+			glBindTexture(GL_TEXTURE_2D, s_iFBO_TextureID1);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			ASSERT_GL_ERROR;
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)s_fInternalWidth, (GLsizei)s_fInternalHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			ASSERT_GL_ERROR;
+			glBindTexture(GL_TEXTURE_2D, 0);
+			ASSERT_GL_ERROR;
+
+			glGenTextures(1, &s_iFBO_TextureID2);
+			ASSERT_GL_ERROR;
+			glBindTexture(GL_TEXTURE_2D, s_iFBO_TextureID2);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			ASSERT_GL_ERROR;
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			ASSERT_GL_ERROR;
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)s_fInternalWidth, (GLsizei)s_fInternalHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			ASSERT_GL_ERROR;
+			glBindTexture(GL_TEXTURE_2D, 0);
+			ASSERT_GL_ERROR;
+
+			// Create the framebuffer object...
+			glGenFramebuffersEXT(1, &s_iFBOID);
+			ASSERT_GL_ERROR;
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, s_iFBOID);
+			ASSERT_GL_ERROR;
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_TextureID1, 0);
+			ASSERT_GL_ERROR;
+			GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+
+			if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+			{
+				LOG_ERROR("Unable to create FBO object");
+				return false;
+			}
+
+
+			//SetFBOSprites();
+
+			// Clear any garbage that's in the two textures we've just allocated
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, s_iFBOID);
+			glClearColor(0.0, 0.0, 0.0, 0.0);
+			glViewport(0, 0, (GLsizei)s_fInternalWidth, (GLsizei)s_fInternalHeight);
+			glDisable(GL_DEPTH_TEST);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_TextureID1, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_TextureID2, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+
+			// Return to the default render output settings. 
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+			glViewport(0, 0, (GLsizei)s_fViewportWidth, (GLsizei)s_fViewportHeight);
+			glClearColor(s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w);
+			glEnable(GL_DEPTH_TEST);
+
+			return true;
 		}
+
 
 		void DeallocateFBOs()
 		{
+			glDeleteFramebuffersEXT(1, &s_iFBOID);
+			glDeleteRenderbuffers(1, &s_iRBOID);
+			glDeleteTextures(1, &s_iFBO_TextureID1);
+			glDeleteTextures(1, &s_iFBO_TextureID2);
 		}
 
 
@@ -350,10 +366,11 @@ namespace Neutrino {
 											glm::vec4* pColours, 
 											glm::vec3* pPos, 
 											const uint32 iCount, 
-											const int iVBOSet, 
-											bool bIsScaled)
+											const int iVBO_Index, 
+											bool bIsScaled,
+											bool bIsTilemap)
 		{
-			ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
+			if(!bIsTilemap)	ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
 			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -365,11 +382,16 @@ namespace Neutrino {
 			glm::vec4 vTransTR = glm::vec4();
 			glm::vec3* vPos = NEWX glm::vec3();
 
+			GLuint iVBO_ID;
+			if (!bIsTilemap)
+				iVBO_ID = s_pVBOArrays[iVBO_Index]->_aVBOs[s_pVBOArrays[iVBO_Index]->_iVBOCounter];
+			else
+				iVBO_ID = s_pTilemapVBOs[iVBO_Index];
 
-			GLuint iVBO_ID = s_pVBOArrays[iVBOSet]->_aVBOs[s_pVBOArrays[iVBOSet]->_iVBOCounter];
 			glBindBuffer( GL_ARRAY_BUFFER, iVBO_ID );
 			ASSERT_GL_ERROR;
 			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+			ASSERT(NULL != pVertex, "Unable to map to a buffer. Have you passed the correct VBO Index");
 
 			// Traverse the sprite arrays
 			// TODO: Split this into 4 and spread across threads
@@ -569,186 +591,7 @@ namespace Neutrino {
 		}
 
 
-		void PopulateTilemapVBO(const float* pX_S,
-			const float* pY_T,
-			const float* pX_SnS,
-			const float* pY_TnT,
-			const float* pHWidths,
-			const float* pHHeights,
-			const float* pRots,
-			const float* pScales,
-			glm::vec4* pColours,
-			glm::vec3* pPos,
-			const uint32 iCount,
-			const int iStaticVBO_Index, bool bIsScaled)
-		{
-			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-			glm::vec4* vQuadTL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-			glm::vec4* vQuadTR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-			glm::vec4 vTransBL = glm::vec4();
-			glm::vec4 vTransBR = glm::vec4();
-			glm::vec4 vTransTL = glm::vec4();
-			glm::vec4 vTransTR = glm::vec4();
-			glm::vec3* vPos = NEWX glm::vec3();
-
-			glBindBuffer(GL_ARRAY_BUFFER, s_pTilemapVBOs[iStaticVBO_Index]);
-			ASSERT_GL_ERROR;
-			Vertex_t* pVertex = (Vertex_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-			ASSERT(NULL != pVertex, "Unable to map to a tilemap's buffer. Have you passed the correct StaticVBO_Index?");
-
-			// Traverse the sprite array
-			{
-				uint32 iColour;
-				float fScaledWidth, fScaledHeight, fPixelWidth, fPixelHeight;
-
-				// We're scaled if we are rendering to the low res FBO, otherwise this is probably an editor mode. 
-				if (!bIsScaled)
-				{
-					fPixelWidth = s_fUnscaledPixelWidth;
-					fPixelHeight = s_fUnscaledPixelHeight;
-				}
-				else
-				{
-					fPixelWidth = s_fScaledPixelWidth;
-					fPixelHeight = s_fScaledPixelHeight;
-				}
-
-				// For each sprite up to iCount
-				for (uint32 i = 0; i < iCount; i++)
-				{
-					// TODO: Ignore sprites outside the frustrum
-
-					// Build the transform matrix for this sprite
-					s_mRotationMatrix[0] = (float)cos(*pRots);
-					s_mRotationMatrix[1] = (float)sin(*pRots);
-					s_mRotationMatrix[3] = (float)-sin(*pRots);
-					s_mRotationMatrix[4] = (float)cos(*pRots);
-					s_mRotationMatrix[8] = 1.0f;
-
-					s_mScaleMatrix[0] = *pScales;
-					s_mScaleMatrix[4] = *pScales;
-					s_mScaleMatrix[8] = 1.0f;
-
-					s_mTransformationMatrix[0] = (s_mRotationMatrix[0] * s_mScaleMatrix[0]);
-					s_mTransformationMatrix[1] = (s_mRotationMatrix[1] * s_mScaleMatrix[4]);
-					s_mTransformationMatrix[3] = (s_mRotationMatrix[3] * s_mScaleMatrix[0]);
-					s_mTransformationMatrix[4] = (s_mRotationMatrix[4] * s_mScaleMatrix[4]);
-					s_mTransformationMatrix[8] = (s_mRotationMatrix[8] * s_mScaleMatrix[8]);
-					vPos->x = (float)pPos->x * fPixelWidth;
-					vPos->y = (float)pPos->y * fPixelHeight;
-					vPos->z = (float)pPos->z;
-
-					// Build the vertex positions
-					{
-						fScaledWidth = (*pHWidths * fPixelWidth);
-						fScaledHeight = (*pHHeights * fPixelHeight);
-
-						vQuadTL_Pos->x = 0.0f - fScaledWidth;
-						vQuadTL_Pos->y = 0.0f + fScaledHeight;
-
-						vQuadTR_Pos->x = 0.0f + fScaledWidth;
-						vQuadTR_Pos->y = 0.0f + fScaledHeight;
-
-						vQuadBL_Pos->x = 0.0f - fScaledWidth;
-						vQuadBL_Pos->y = 0.0f - fScaledHeight;
-
-						vQuadBR_Pos->x = 0.0f + fScaledWidth;
-						vQuadBR_Pos->y = 0.0f - fScaledHeight;
-					}
-
-					vTransBL.x = (vQuadBL_Pos->x * s_mTransformationMatrix[0]) + (vQuadBL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
-					vTransBL.y = (vQuadBL_Pos->y * s_mTransformationMatrix[3]) + (vQuadBL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
-					vTransBL.z = vPos->z;
-
-					vTransBR.x = (vQuadBR_Pos->x * s_mTransformationMatrix[0]) + (vQuadBR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
-					vTransBR.y = (vQuadBR_Pos->x * s_mTransformationMatrix[3]) + (vQuadBR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
-					vTransBR.z = vPos->z;
-
-					vTransTL.x = (vQuadTL_Pos->x * s_mTransformationMatrix[0]) + (vQuadTL_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
-					vTransTL.y = (vQuadTL_Pos->x * s_mTransformationMatrix[3]) + (vQuadTL_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
-					vTransTL.z = vPos->z;
-
-					vTransTR.x = (vQuadTR_Pos->x * s_mTransformationMatrix[0]) + (vQuadTR_Pos->y * s_mTransformationMatrix[1]) + vPos->x;
-					vTransTR.y = (vQuadTR_Pos->x * s_mTransformationMatrix[3]) + (vQuadTR_Pos->y * s_mTransformationMatrix[4]) + vPos->y;
-					vTransTR.z = vPos->z;
-
-					// Populate the VBO vertex corners
-					iColour = GetPackedColourV4(pColours);
-					pVertex->_colour = iColour;
-					pVertex->_uv[0] = *pX_S;
-					pVertex->_uv[1] = *pY_TnT;
-					pVertex->_position[0] = vTransBL.x;
-					pVertex->_position[1] = vTransBL.y;
-					pVertex->_position[2] = vTransBL.z;
-					pVertex++;
-
-					pVertex->_colour = iColour;
-					pVertex->_uv[0] = *pX_SnS;
-					pVertex->_uv[1] = *pY_TnT;
-					pVertex->_position[0] = vTransBR.x;
-					pVertex->_position[1] = vTransBR.y;
-					pVertex->_position[2] = vTransBR.z;
-					pVertex++;
-
-					pVertex->_colour = iColour;
-					pVertex->_uv[0] = *pX_S;
-					pVertex->_uv[1] = *pY_T;
-					pVertex->_position[0] = vTransTL.x;
-					pVertex->_position[1] = vTransTL.y;
-					pVertex->_position[2] = vTransTL.z;
-					pVertex++;
-
-					pVertex->_colour = iColour;
-					pVertex->_uv[0] = *pX_SnS;
-					pVertex->_uv[1] = *pY_TnT;
-					pVertex->_position[0] = vTransBR.x;
-					pVertex->_position[1] = vTransBR.y;
-					pVertex->_position[2] = vTransBR.z;
-					pVertex++;
-
-					pVertex->_colour = iColour;
-					pVertex->_uv[0] = *pX_SnS;
-					pVertex->_uv[1] = *pY_T;
-					pVertex->_position[0] = vTransTR.x;
-					pVertex->_position[1] = vTransTR.y;
-					pVertex->_position[2] = vTransTR.z;
-					pVertex++;
-
-					pVertex->_colour = iColour;
-					pVertex->_uv[0] = *pX_S;
-					pVertex->_uv[1] = *pY_T;
-					pVertex->_position[0] = vTransTL.x;
-					pVertex->_position[1] = vTransTL.y;
-					pVertex->_position[2] = vTransTL.z;
-					pVertex++;
-
-					// VBO Vertex pointer is now pointing at the next sprite, so increment through the 
-					// sprite settings arrays to get the data for the next iteration
-					++pX_S;
-					++pY_T;
-					++pX_SnS;
-					++pY_TnT;
-					++pHWidths;
-					++pHHeights;
-					++pRots;
-					++pScales;
-					++pColours;
-					++pPos;
-				}
-			}
-
-			glUnmapBuffer(GL_ARRAY_BUFFER);
-
-			DELETEX vQuadBL_Pos;
-			DELETEX vQuadBR_Pos;
-			DELETEX vQuadTL_Pos;
-			DELETEX vQuadTR_Pos;
-			DELETEX vPos;
-		}
-
-
-		void RenderTilemapVBO(const uint32 iTilemapSize, GLuint iTextureID, const int iStaticVBO_Index)
+			void RenderTilemapVBO(const uint32 iTilemapSize, GLuint iTextureID, const int iStaticVBO_Index)
 		{
 			GLint* pUniforms = GetActiveUniforms();
 			glBindTexture(GL_TEXTURE_2D, iTextureID);

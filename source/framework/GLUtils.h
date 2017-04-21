@@ -74,7 +74,7 @@ namespace Neutrino
 		// 	 Use the GL_ERROR / ASSERT_GL_ERROR for simplicity
 		bool LogGlError(const char *pFile, int iLine);
 
-		void AllocateFBOs();
+		bool AllocateFBOs();
 
 		void DeallocateFBOs();
 
@@ -124,23 +124,9 @@ namespace Neutrino
                       glm::vec4* pColours, 
                       glm::vec3* pPos, 
                       const uint32 iCount, 
-                      const int iVBOSet, bool bIsScaled = true);
-
-		// PopulateTilemapVBO
-		// 		Populates a STATIC_DRAW VBO for a background tilemap on a level. This can be rendered by passing
-		// 		the appropriate texture ID and VBO index to RenderTilemapVBO()
-		void PopulateTilemapVBO(const float* pX_S,
-														const float* pY_T,
-														const float* pX_SnS,
-														const float* pY_TnT,
-														const float* pHWidths,
-														const float* pHHeights,
-														const float* pRots,
-														const float* pScales,
-														glm::vec4* pColours,
-														glm::vec3* pPos,
-														const uint32 iCount,
-														const int iStaticVBO_Index, bool bIsScaled = true);
+                      const int iVBO_Index, 
+											bool bIsScaled, 
+											bool bIsTilemap);
 
 		// RenderVBO
 		// 		Bind the current VBO and call GLDrawArrays

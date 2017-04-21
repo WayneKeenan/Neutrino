@@ -272,33 +272,46 @@ namespace Neutrino
 
 #if defined DEBUG
 		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;			// TODO: remove this, should the framework even know about this?
-
-		// Clamp to a texel
-		int fXPixels = (int)roundf(s_pvCameraPosition.x / GLUtils::GetViewportPixelScale().x);
-		int fYPixels = (int)roundf(s_pvCameraPosition.y / GLUtils::GetViewportPixelScale().y);
-		s_pvCameraPosition.x = (float)fXPixels * GLUtils::GetViewportPixelScale().x;
-		s_pvCameraPosition.y = (float)fYPixels * GLUtils::GetViewportPixelScale().y;
 #endif
 
 		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state TODO: make status a param to the function
 		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
 		GameStateUpdate();																											// Process whatever is the active game state
-		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);											
-		GLUtils::ClearBuffers();
-		SetActiveShader(DEFAULT_SHADER);
+							
+		GLUtils::ClearBuffers();																								// This doesn't clear the FBOs!
 
-		if(0 == s_iIsInMode)
+		if(0 == s_iIsInMode)  // We're in the normal game mode, do the full render path
 		{
-			// We're in the normal game mode, do the full render path
-			DrawTilemap();																												
-			DrawSprites(true);
+			// Clamp Camera Movement to a Texel
+			{
+				int fXPixels = (int)roundf(s_pvCameraPosition.x / GLUtils::GetInternalPixelScale().x);
+				int fYPixels = (int)roundf(s_pvCameraPosition.y / GLUtils::GetInternalPixelScale().y);
+				s_pvCameraPosition.x = (float)fXPixels * GLUtils::GetInternalPixelScale().x;
+				s_pvCameraPosition.y = (float)fYPixels * GLUtils::GetInternalPixelScale().y;
+				GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
+			}
+
+			// Set shader for rendering to a texture
+			SetActiveShader(DEFAULT_SHADER);
+
+			// Render our elements to an offscreen texture and present it to the final viewport
+			{
+				GLUtils::StartOffscreenRender();
+				DrawTilemap();
+				TestSprite();
+				DrawSprites(true);
+				GLUtils::FinishOffScreenRender();
+			}
 		}
-		else
+		else  // We're in an editor mode, so do a simplified render path
 		{
-			// We're in an editor mode, so do a simplified render path
+			
+			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
+			SetActiveShader(DEFAULT_SHADER);
 			DrawSprites(false);
 		}
 
+	
 #if defined DEBUG
 		DebugOverlayUpdate();
 		SetActiveShader(DEFAULT_UNTEXTURED);

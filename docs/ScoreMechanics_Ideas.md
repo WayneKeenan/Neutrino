@@ -14,3 +14,5 @@
 - Invulnerable mode: essentially a practice mode. Allow for everything except achievements. Have a leaderboard for invulnerable mode. 
 - Leaderboards: Steam etc. 
 - Screenshot?
+- Upload to Twitter?
+

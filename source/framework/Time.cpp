@@ -17,7 +17,7 @@ namespace Neutrino
 	static float s_fUIMS_Delta;
  
 	static float s_fMaxDelta = 1.0f/30.0f;
-	static float s_fMinDelta = 1.0f/60.0f;		// Really?
+	static float s_fMinDelta = 1.0f/120.0f;		// Really?
 
 	static time_t _Rawtime;
 	static const char* s_sTimeStamp;

@@ -28,6 +28,7 @@ namespace Neutrino {
 		BLOOM_SHADER,
 		BLUR_HORIZ,
 		BLUR_VERTICAL,
+		OUTPUT_CRT,
 		NUM_SHADERS
 	};
 
@@ -43,6 +44,8 @@ namespace Neutrino {
 	const char* const s_pBlurHorizShaderVertFilename = "blur-horiz-shader.vsh";
 	const char* const s_pBlurVertShaderFragFilename = "blur-vert-shader.fsh";
 	const char* const s_pBlurVertShaderVertFilename = "blur-vert-shader.vsh";
+	const char* const s_pOutputCRTShaderFragFilename = "Lottes_CRT.fsh";
+	const char* const s_pOutputCRTShaderVertFilename = "Lottes_CRT.vsh";
 
 	// LoadEngineShaders()
 	//		Framework init function to load the standard shaders (predefined) and validate them. 

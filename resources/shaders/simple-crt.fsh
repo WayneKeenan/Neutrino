@@ -4,8 +4,8 @@ varying vec2 fragmentTextureCoordinates;
 varying vec4 colorVarying;
 varying vec2 pixelDims;
 
-const float ScanlineDark = 0.4;
-const float PixelBias = 0.5;
+const float ScanlineDark = 0.2;
+const float PixelBias = 0.3;
 const float Brightness = 2.5;
 const float Contrast = 1.5;
 const float Width = 480.0;
@@ -27,6 +27,8 @@ void main()
   col.b = texture2D( texture, vec2( fragmentTextureCoordinates.x, fragmentTextureCoordinates.y ) ).z;
   col.a = texture2D( texture, vec2( fragmentTextureCoordinates.x, fragmentTextureCoordinates.y ) ).w;
 
+  vec4 addCol = col;
+
 	float yPos = mod(gl_FragCoord.y, 4.0);
 	float xPos = mod(gl_FragCoord.x, 4.0);
 
@@ -45,27 +47,30 @@ void main()
 	}
 	*/
 
-	// Do scanlines before adding the bloom bit
+	// Scanline
 	if(int(yPos) == 0 || int(yPos)==3)
 	{
 		col = col * ScanlineDark;
 	}
-
-	if(int(xPos) == 0)
+	else
 	{
-		col = col * vRBias;
-	}
- 	else if(int(xPos) == 1)
-	{
-		col = col * vGBias;
-	}
-  else if(int(xPos) == 2)
-	{
-		col = col * vBBias;
-	}
- 	else if(int(xPos) == 3)
-	{
-		col = col * ScanlineDark;
+		// Pixel bias
+		if(int(xPos) == 0)
+		{
+			col = col * vRBias;
+		}
+	 	else if(int(xPos) == 1)
+		{
+			col = col * vGBias;
+		}
+		else if(int(xPos) == 2)
+		{
+			col = col * vBBias;
+		}
+	 	else if(int(xPos) == 3)
+		{
+			col = col * ScanlineDark;
+		}
 	}
  
 	// Add everything up...
@@ -74,7 +79,8 @@ void main()
 	
 	col.rgb = ((col.rgb - 0.5) * max(Contrast, 0.0)) + 0.5;
 	col = col * vBright;
+	col += addCol * 0.4f;
 
-  gl_FragColor = col * colorVarying;
+  gl_FragColor = col  * colorVarying;
 
 }

@@ -168,8 +168,8 @@ namespace Neutrino {
 					float fTexelH = 1.0f / (float)s_aTexturePages[iCount]._iHeight;
 
 					// OpenGL samples from the middle of a texel, so we'll need to add an offset
-					float fTexelMovementW = (fTexelW / 2.0f);
-					float fTexelMovementH = (fTexelH / 2.0f);
+					//float fTexelMovementW = (fTexelW / 2.0f);
+					//float fTexelMovementH = (fTexelH / 2.0f);
 
 					// Store the UV coords
 					s_aTexturePages[iCount].aSprintInfo[i]._fX_S = ((float)iX * fTexelW);// -fTexelMovementW;

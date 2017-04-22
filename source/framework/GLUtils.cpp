@@ -408,7 +408,7 @@ namespace Neutrino {
 			// TODO: Split this into 4 and spread across threads
 			{
 				uint32 iColour;
-				float fScaledWidth, fScaledHeight, fPixelWidth, fPixelHeight, fHalfPixelWidth, fHalfPixelHeight;
+				float fScaledWidth, fScaledHeight, fPixelWidth, fPixelHeight; //, fHalfPixelWidth, fHalfPixelHeight;
 
 				// We're scaled if we are rendering to the low res FBO, otherwise this is probably an editor mode. 
 				if (!bIsScaled)
@@ -423,8 +423,8 @@ namespace Neutrino {
 					fPixelHeight = s_fScaledPixelHeight;
 				}
 
-				fHalfPixelWidth = fPixelWidth / 2.0f;
-				fHalfPixelHeight = fPixelHeight / 2.0f;
+				//fHalfPixelWidth = fPixelWidth / 2.0f;
+				//fHalfPixelHeight = fPixelHeight / 2.0f;
 
 				// For each sprite up to iCount
 				for (uint32 i = 0; i < iCount; i++)

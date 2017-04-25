@@ -15,7 +15,7 @@ namespace Neutrino {
 
 
 	static ShaderSettings_t* s_pActiveShader = NULL;
-	static ScanlineSettings_t* s_pCRTSettings = NULL; 
+	static PostProcessSettings_t* s_pCRTSettings = NULL; 
 	static ShaderSettings_t* s_aLoadedShaders = NEWX ShaderSettings_t[NUM_SHADERS];
 
 	static uint8 s_iNumShadersLoaded = 0;
@@ -248,8 +248,19 @@ namespace Neutrino {
 		LoadShader(s_pThresholdFragFilename, s_pThresholdVertFilename);
 		LoadShader(s_pAlphaScaledFragFilename, s_pAlphaScaledVertFilename);
 
+		s_pCRTSettings = NEWX(PostProcessSettings_t);
+
 		// Grab the uniforms for the CRT shader, as these are bespoke.
-		s_pCRTSettings = NEWX(ScanlineSettings_t);
+		PostProcessSettings_t* pCRTSettings = LoadPostProcessSettings(s_pPostProcessSettingsFilename, true);
+		if (NULL == pCRTSettings)
+		{
+			LOG_WARNING("There are no post process settings in the resource bundle, creating default settings");
+		}
+		else
+		{
+			*s_pCRTSettings = *pCRTSettings;
+		}
+
 		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "ScanlineDark");
 		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "VScanlineDark");
 		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "PixelBias");
@@ -272,7 +283,7 @@ namespace Neutrino {
 		return s_pActiveShader->_Uniforms;
 	};
 
-	ScanlineSettings_t* GetCRTSettings()
+	PostProcessSettings_t* GetCRTSettings()
 	{
 		return s_pCRTSettings;
 	}

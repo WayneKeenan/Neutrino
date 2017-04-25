@@ -1,5 +1,4 @@
 #pragma once
-#include "File.h"
 #include "GL/glew.h"
 #include "Memory.h"
 
@@ -52,8 +51,9 @@ namespace Neutrino {
 	// The scanline shader used for one of the final render passes has a set of custom 
 	// settings that control the RGB split and scanline darkness. These can be adjusted
 	// in realtime from the debug overlay, saved and loaded in as a preference. 
-	//
-	typedef struct ScanlineSettings_t
+
+	static const float s_fPPS_Version = 0.1f;
+	typedef struct PostProcessSettings_t
 	{
 		float _fScanlineDark = 0.2f;
 		float _fVScanlineDark = 0.5f;
@@ -69,7 +69,7 @@ namespace Neutrino {
 		bool _bDoScanlines = true;
 		bool _bDoBloom = true;
 		GLuint _aUniforms[(int)eCRTShaderUniforms::NUM_CRTUNIFORMS];
-	} ScanlineSettings_t;
+	} PostProcessSettings_t;
 
 
 	// TO_DO: Shaders to load should be read from GameConfig.txt
@@ -109,10 +109,19 @@ namespace Neutrino {
 	// 		shader params. 
 	void SetOutputScanlines(float* pCameraMatrix);
 
+	// SetOutputBloom
+	//		Sets the shader its uniform parameters for compositing the bloom buffer to the final output
 	void SetOutputBloom(float* pCameraMatrix);
 
+	// SetOutputThreshold
+	//		Sets the shader and its uniforms for rendering the low resolution render target to a buffer
+	//		that will be used as the initial source for the bloom passes. 
 	void SetOutputThreshold(float* pCameraMatrix);
 
+	// SetActiveShaderWithMatrix
+	//		Sets the shader pair from the list of standard shaders, but sets the shader's matrix uniform 
+	//		to be the parameter passed, rather than the internal camera matrix. Used when rendering the
+	//		final composite to the screen. 
 	void SetActiveShaderWithMatrix(eStandardShaders iIndex, float* pCameraMatrix);
 
 	// GetActiveUniforms
@@ -122,7 +131,7 @@ namespace Neutrino {
 	// GetCRTSettings
 	//		Returns a pointer to the ScanlineSettings_t static that's passed to the CRT shader at runtime. 
 	//		DebugOverlay provides a simple UI to adjust this in DEBUG builds.
-	ScanlineSettings_t* GetCRTSettings();
+	PostProcessSettings_t* GetCRTSettings();
 
 	// LogShader()
 	// 		Simple function to output compilation errors from shader source. IMGUI implementation will use this

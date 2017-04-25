@@ -7,8 +7,6 @@ uniform float   translate;
 
 varying	vec2    fragmentTextureCoordinates; 
 varying	vec4    colorVarying;
-varying vec2		pixelDims;
-
 
 void main()
 {

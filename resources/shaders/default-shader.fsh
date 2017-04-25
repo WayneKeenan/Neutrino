@@ -18,16 +18,6 @@ varying vec4 colorVarying;
 
 void main()
 {
-  vec4 col;
-  
-  
-  col.r = texture2D( texture, vec2( fragmentTextureCoordinates.x, fragmentTextureCoordinates.y ) ).x; 
-  col.g = texture2D( texture, vec2( fragmentTextureCoordinates.x, fragmentTextureCoordinates.y ) ).y;
-  col.b = texture2D( texture, vec2( fragmentTextureCoordinates.x, fragmentTextureCoordinates.y ) ).z;
-  col.a = texture2D( texture, vec2( fragmentTextureCoordinates.x, fragmentTextureCoordinates.y ) ).w;
-
-  
+	vec4 col =  texture2D( texture, fragmentTextureCoordinates.xy );  
   gl_FragColor = col * colorVarying;
-
-  //gl_FragColor = colorVarying;
 }

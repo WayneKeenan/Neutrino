@@ -15,5 +15,8 @@ void main()
   if(fV > Threshold)
     gl_FragColor = col;
   else
-   gl_FragColor = col * ThresholdBrightScaler;
+	{
+	 col.rgb = col.rgb * ThresholdBrightScaler;
+   gl_FragColor = col;
+	}
 }

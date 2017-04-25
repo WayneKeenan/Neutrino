@@ -216,7 +216,6 @@ namespace Neutrino {
 	PostProcessSettings_t* LoadPostProcessSettings(const char* pFilePathAndName, const bool bFromResourceBundle)
 	{
 		PostProcessSettings_t* pData = NEWX(PostProcessSettings_t);
-		int iFilenameLength = 0;
 		float fVersion;
 
 		if (bFromResourceBundle)

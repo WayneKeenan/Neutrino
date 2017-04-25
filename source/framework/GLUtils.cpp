@@ -50,7 +50,6 @@ namespace Neutrino {
 
 		// FBO / RBO pointers
 		static GLuint s_iFBO_PixelRenderTarget;
-		static GLuint s_iFBO_ViewportRenderTarget;
 		static GLuint s_iFBO_BloomThresholdTexture;
 		static GLuint s_iFBO_BlurHorizTexture;
 		static GLuint s_iFBO_BlurVertTexture;

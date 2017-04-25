@@ -1,4 +1,4 @@
 cd ./build
-./FullBuild.sh
+make
 cd ..
 

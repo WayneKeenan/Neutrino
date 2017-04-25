@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.h"
 #include "Level.h"
-
+#include "ShaderUtils.h"
 
 namespace Neutrino {
 
@@ -43,11 +43,19 @@ namespace Neutrino {
 	// 		resource bundle will be sufficient. 
 	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle = false);
 
+
+	PostProcessSettings_t* LoadPostProcessSettings(const char* sFilePathAndName, const bool bFromResourceBundle = false);
+
 #if defined DEBUG
 	// SaveTileMapData()
 	// 		Takes a TileMapData_t and writes it to a file at the given path. This is a destructive operation
 	// 		although the saved data is reloaded and a simple comparison done to check the file's integrity. 
 	// 		The function returns the result of that comparison
 	bool SaveTileMapData(const TileMapData_t* pData);
+
+	// SavePostProcessSettings()
+	//		The Debug Overlay provides an interface to change all the shader uniforms related to the composite
+	//		of the final image to screen. This function will save those params to a binary file
+	bool SavePostProcessSettings(const PostProcessSettings_t* pData, const char* pFilepath);
 #endif
 }

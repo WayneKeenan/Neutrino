@@ -389,6 +389,8 @@ void CMapEditorIn::Update()
 				// TODO: swap to the correct texture!
 				for(int i = 0; i < s_iLevelWidth * s_iLevelHeight; ++i)
 					s_aTileMap.push_back(pData->_aTileMap[i]);
+
+				DELETEX pData;
 			}
 		}
 	}

@@ -55,17 +55,17 @@ namespace Neutrino {
 	static const float s_fPPS_Version = 0.1f;
 	typedef struct PostProcessSettings_t
 	{
-		float _fScanlineDark = 0.2f;
+		float _fScanlineDark = 0.15f;
 		float _fVScanlineDark = 0.5f;
-		float _fPixelBias = 0.3f;
-		float _fBrightness = 2.5f;
-		float _fContrast = 1.5f;
-		float _fAdditiveStrength = 0.4f;
-		float _fThresholdBrightScaler = 1.0f;
-		float _fThreshold = 0.2f;
-		float _fBloomAlpha = 0.5f;
+		float _fPixelBias = 0.85f;
+		float _fBrightness = 1.15f;
+		float _fContrast = 2.35f;
+		float _fAdditiveStrength = 0.25f;
+		float _fThresholdBrightScaler = 0.85f;
+		float _fThreshold = 0.65f;
+		float _fBloomAlpha = 0.78f;
 		float _fBloomContrast = 1.0f;
-		float _fBloomBright = 1.0f;
+		float _fBloomBright = 0.75f;
 		bool _bDoScanlines = true;
 		bool _bDoBloom = true;
 		GLuint _aUniforms[(int)eCRTShaderUniforms::NUM_CRTUNIFORMS];

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <glm/glm.hpp> 
 #include "Input.h"
+#include "File.h"
 
 namespace Neutrino
 {
@@ -17,15 +18,14 @@ namespace Neutrino
 	static const ImVec2* s_pOverlayPosition = NEWX ImVec2(37.0f, 10.0f);
 	static const ImVec2* s_pLogPosition = NEWX ImVec2(1100.0f, 850.0f);
 	static const ImVec2* s_pOverlayDimensions = NEWX ImVec2(315.0f, 310.0f);
-	static const ImVec2* s_pPostProcessPosition = NEWX ImVec2(37.0f, 380.0f);
-	static const ImVec2* s_pPostProcessDimensions = NEWX ImVec2(315.0f, 200.0f);
+	static const ImVec2* s_pPostProcessPosition = NEWX ImVec2(1520.0f, 10.0f);
+	static const ImVec2* s_pPostProcessDimensions = NEWX ImVec2(380.0f, 380.0f);
 
 	static CFrameRate s_FPSSampler;
 	static DebugLog* s_pDebugLog;
 
 	static char sFPS_Text[32] = {0};
 	static char sDELTA_Text[32] = {0};
-
 
 	// Struct to hold all the params for the default debug overlay. 
 	// Suspect this will grow arms and legs, but see how it goes...
@@ -38,6 +38,15 @@ namespace Neutrino
 	} DebugOverlay_t;
 
 	static DebugOverlay_t* s_pOverlayParams;
+
+
+	// Filepath for the post process settings. 
+	static const int s_iFilepathLength = 4096;
+#if defined _WIN32 
+	static char s_pFilepathBuf[s_iFilepathLength] = "E:\\BitBucket\\Neutrino\\resources\\\0";
+#else
+	static char s_pFilepathBuf[s_iFilepathLength] = "/home/kor/Development/Neutrino/resources/\0";
+#endif 
 
 	
 	// ------------------------------------------------------------------------------------------------------
@@ -87,7 +96,7 @@ namespace Neutrino
 		const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
 		//float fFPS = (float)floorf( 1.0f / (float)fmax(fEPSILON, (float)fAvgFPS )+0.5f );
 		s_FPSSampler.Tick(GetMSDelta());
-		ScanlineSettings_t* pScanlineSettings = GetCRTSettings();
+		PostProcessSettings_t* pScanlineSettings = GetCRTSettings();
 
 		if (s_bDebugOverlayActive)
 		{
@@ -163,6 +172,7 @@ namespace Neutrino
 				ImGui::SetNextWindowPos(*s_pPostProcessPosition, ImGuiSetCond_FirstUseEver);
 				ImGui::SetNextWindowSize(*s_pPostProcessDimensions, ImGuiSetCond_FirstUseEver);
 				ImGui::Begin("Post Process Settings", &s_bDebugOverlayActive);
+				ImGui::InputText("Filepath", s_pFilepathBuf, s_iFilepathLength, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 				ImGui::Text("Click & move mouse to change values.\nHold ALT for smaller increments...");
 				if (NULL != pScanlineSettings)
 				{
@@ -177,6 +187,27 @@ namespace Neutrino
 					ImGui::DragFloat("Bloom Alpha", &pScanlineSettings->_fBloomAlpha, 0.05f, 0.0f, 2.0f, "Alpha: %.3f");
 					ImGui::DragFloat("Bloom Contrast", &pScanlineSettings->_fBloomContrast, 0.05f, 0.0f, 2.0f, "Contrast: %.3f");
 					ImGui::DragFloat("Bloom Brightness", &pScanlineSettings->_fBloomBright, 0.05f, 0.0f, 2.0f, "Brightness: %.3f");
+					if (ImGui::Button("Save", ImVec2(380, 0)))
+					{
+						if (SavePostProcessSettings(pScanlineSettings, s_pFilepathBuf)) ImGui::OpenPopup("saveok"); else ImGui::OpenPopup("savefail");
+					}
+
+					// Modal popup for save success
+					if (ImGui::BeginPopupModal("saveok", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ImGui::Text("Post Process Settings have been saved!");
+						if (ImGui::Button("OK", ImVec2(320, 0))) ImGui::CloseCurrentPopup();
+						ImGui::EndPopup();
+					}
+
+
+					// Modal popup for save success
+					if (ImGui::BeginPopupModal("savefail", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ImGui::Text("Unable to save Post Process Settings. Er...");
+						if (ImGui::Button("OK", ImVec2(320, 0))) ImGui::CloseCurrentPopup();
+						ImGui::EndPopup();
+					}
 				}
 				ImGui::End();
 			}

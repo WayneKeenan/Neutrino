@@ -800,7 +800,8 @@ namespace Neutrino {
 				glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				// Output scanline version of the output to the screen
+				// Reoutput the low resolution render target to a buffer we can use as source for the bloom pass
+				// Threshold shader will reduce the pixel weightings in this buffer. 
 				{
 					SetOutputThreshold(glm::value_ptr(s_mFinalOutputCameraMatrix));
 

@@ -16,16 +16,16 @@ namespace Neutrino
 	NeutrinoPreferences_t* s_pNeutrinoPreferences = NULL; 
 	CGameGlobals* pGameGlobals;		// Remove this, just a test...
 
+	static bool s_bRunningStatus = true;
+	static uint8 s_iEditorModeFlag = 0x00;
+	static uint8 s_iIsInMode = 0x00;
+	static const int s_iFilepathLength = 4096;
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
-	static char s_pResourcesPath[4096] = { '\0' };
-
-	static bool s_bRunningStatus = true;
-	static uint8 s_iEditorModeFlag = 0x00;
-	static uint8 s_iIsInMode = 0x00;
-
+	static char s_pResourcesPath[s_iFilepathLength] = { '\0' };
+	
 #if defined DEBUG
 	static CGameState* s_pEditorState = NULL;
 #endif

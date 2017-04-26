@@ -187,6 +187,8 @@ namespace Neutrino
 					ImGui::DragFloat("Bloom Alpha", &pScanlineSettings->_fBloomAlpha, 0.05f, 0.0f, 2.0f, "Alpha: %.3f");
 					ImGui::DragFloat("Bloom Contrast", &pScanlineSettings->_fBloomContrast, 0.05f, 0.0f, 2.0f, "Contrast: %.3f");
 					ImGui::DragFloat("Bloom Brightness", &pScanlineSettings->_fBloomBright, 0.05f, 0.0f, 2.0f, "Brightness: %.3f");
+					ImGui::Checkbox("Bloom", &pScanlineSettings->_bDoBloom); ImGui::SameLine();
+					ImGui::Checkbox("Scanlines", &pScanlineSettings->_bDoScanlines);
 					if (ImGui::Button("Save", ImVec2(380, 0)))
 					{
 						if (SavePostProcessSettings(pScanlineSettings, s_pFilepathBuf)) ImGui::OpenPopup("saveok"); else ImGui::OpenPopup("savefail");

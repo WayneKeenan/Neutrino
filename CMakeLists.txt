@@ -33,19 +33,25 @@ endif()
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2IMAGE REQUIRED)
+find_package(SDL2_Mixer REQUIRED)
 include_directories(
     ${SDL2_INCLUDE_DIR}
     ${SDL2_IMAGE_INCLUDE_DIR}
+		${SDL2_MIXER_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/external_dependencies/glm/
     ${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
     ${PROJECT_SOURCE_DIR}/external_dependencies/inih/
     ${PROJECT_SOURCE_DIR}/external_dependencies/inih/cpp/
 )
 
-
 if(SDL2_IMAGE_FOUND)
     MESSAGE("-- SDL2 Image found...")
     link_libraries(${SDL2_IMAGE_LIBRARY})
+endif()
+
+if(SDL2_MIXER_FOUND)
+		MESSAGE("-- SDL2 Mixer found...")
+		link_libraries(${SDL2_MIXER_LIBRARIES})
 endif()
 
 find_package(GLEW REQUIRED)
@@ -77,7 +83,7 @@ FILE( GLOB_RECURSE NEUTRINO_SOURCES source/*.cpp )
 
 add_executable(Neutrino ${NEUTRINO_SOURCES})
 target_link_libraries(
-    Neutrino ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${GLEW_LIBRARIES}
+	Neutrino ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_MIXER_LIBRARIES} ${GLEW_LIBRARIES}
  )
 
 # Technically don't need this as we run cmake from the build folder. Could use it to copy

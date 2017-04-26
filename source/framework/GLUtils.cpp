@@ -65,6 +65,7 @@ namespace Neutrino {
 		static GLfloat s_mScaleMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
 		static GLfloat s_mRotationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
 
+		static const Neutrino::PostProcessSettings_t* s_pPostProcessSettings;
 
 		float* GetCameraMatrix()
 		{
@@ -76,6 +77,11 @@ namespace Neutrino {
 		{
 			s_vClearColour.x = fR; s_vClearColour.y = fG; s_vClearColour.z = fB; s_vClearColour.w = fA;
 			//LOG_INFO("Clear Colour Set to: %.2f, %.2f, %.2f, %.2f",  s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w );
+		}
+
+		void SetPostProcessSettings(const PostProcessSettings_t* pSettings)
+		{
+			s_pPostProcessSettings = pSettings;
 		}
 
 		void ClearBuffers()
@@ -788,127 +794,131 @@ namespace Neutrino {
 			glBindBuffer(GL_ARRAY_BUFFER, s_iFullScreenQuadVBO);
 			ASSERT_GL_ERROR;
 
-			// Stage 2:
+			// If we're doing the bloom pass....
+			if (s_pPostProcessSettings->_bDoBloom)
 			{
-				// Re-render the low res pixel RT via a threshold shader, so only bright pixels are output
-				glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, s_iFBOID);
-				ASSERT_GL_ERROR;
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
-				ASSERT_GL_ERROR;
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_BloomThresholdTexture, 0);
-				ASSERT_GL_ERROR;
-				glBindTexture(GL_TEXTURE_2D, s_iFBO_PixelRenderTarget);
-				ASSERT_GL_ERROR;
-
-				glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				// Reoutput the low resolution render target to a buffer we can use as source for the bloom pass
-				// Threshold shader will reduce the pixel weightings in this buffer. 
+				// Stage 2:
 				{
-					SetOutputThreshold(glm::value_ptr(s_mFinalOutputCameraMatrix));
-
-					glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+					// Re-render the low res pixel RT, via a threshold shader, to a new RT, so only "bright" pixels are output
+					glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, s_iFBOID);
+					ASSERT_GL_ERROR;
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+					ASSERT_GL_ERROR;
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_BloomThresholdTexture, 0);
+					ASSERT_GL_ERROR;
+					glBindTexture(GL_TEXTURE_2D, s_iFBO_PixelRenderTarget);
 					ASSERT_GL_ERROR;
 
-					glEnableVertexAttribArray(ATTRIB_VERTEX);
-					ASSERT_GL_ERROR;
+					glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-					glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
-					ASSERT_GL_ERROR;
+					{
+						SetOutputThreshold(glm::value_ptr(s_mFinalOutputCameraMatrix));
 
-					glEnableVertexAttribArray(ATTRIB_COLOR);
-					ASSERT_GL_ERROR;
+						glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+						ASSERT_GL_ERROR;
 
-					glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
-					ASSERT_GL_ERROR;
+						glEnableVertexAttribArray(ATTRIB_VERTEX);
+						ASSERT_GL_ERROR;
 
-					glEnableVertexAttribArray(ATTRIB_TEXTURE);
-					ASSERT_GL_ERROR;
+						glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+						ASSERT_GL_ERROR;
 
-					glDrawArrays(GL_TRIANGLES, 0, 6);
-					ASSERT_GL_ERROR;
-				}
-			}
+						glEnableVertexAttribArray(ATTRIB_COLOR);
+						ASSERT_GL_ERROR;
 
-			// Stage 3:
-			{
-				ASSERT_GL_ERROR;
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
-				ASSERT_GL_ERROR;
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_BlurHorizTexture, 0);
-				ASSERT_GL_ERROR;
+						glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+						ASSERT_GL_ERROR;
 
-				glViewport(0, 0, (GLsizei)s_fBlurWidth, (GLsizei)s_fBlurHeight);
-				glBindTexture(GL_TEXTURE_2D, s_iFBO_BloomThresholdTexture);
-				ASSERT_GL_ERROR;
+						glEnableVertexAttribArray(ATTRIB_TEXTURE);
+						ASSERT_GL_ERROR;
 
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				// Output scanline version of the output to the screen
-				{
-					SetActiveShaderWithMatrix(BLUR_HORIZ, glm::value_ptr(s_mFinalOutputCameraMatrix));
-
-					glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
-					ASSERT_GL_ERROR;
-
-					glEnableVertexAttribArray(ATTRIB_VERTEX);
-					ASSERT_GL_ERROR;
-
-					glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
-					ASSERT_GL_ERROR;
-
-					glEnableVertexAttribArray(ATTRIB_COLOR);
-					ASSERT_GL_ERROR;
-
-					glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
-					ASSERT_GL_ERROR;
-
-					glEnableVertexAttribArray(ATTRIB_TEXTURE);
-					ASSERT_GL_ERROR;
-
-					glDrawArrays(GL_TRIANGLES, 0, 6);
-					ASSERT_GL_ERROR;
+						glDrawArrays(GL_TRIANGLES, 0, 6);
+						ASSERT_GL_ERROR;
+					}
 				}
 
-				ASSERT_GL_ERROR;
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
-				ASSERT_GL_ERROR;
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_BlurVertTexture, 0);
-				ASSERT_GL_ERROR;
-
-
-				glBindTexture(GL_TEXTURE_2D, s_iFBO_BlurHorizTexture);
-				ASSERT_GL_ERROR;
-
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				// Output scanline version of the output to the screen
+				// Stage 3:
 				{
-					SetActiveShaderWithMatrix(BLUR_VERT, glm::value_ptr(s_mFinalOutputCameraMatrix));
-
-					glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+					// Do a two stage blur pass, once horiz, once vert. 
+					ASSERT_GL_ERROR;
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+					ASSERT_GL_ERROR;
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_BlurHorizTexture, 0);
 					ASSERT_GL_ERROR;
 
-					glEnableVertexAttribArray(ATTRIB_VERTEX);
+					glViewport(0, 0, (GLsizei)s_fBlurWidth, (GLsizei)s_fBlurHeight);
+					glBindTexture(GL_TEXTURE_2D, s_iFBO_BloomThresholdTexture);
 					ASSERT_GL_ERROR;
 
-					glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+					// Horizontal
+					{
+						SetActiveShaderWithMatrix(BLUR_HORIZ, glm::value_ptr(s_mFinalOutputCameraMatrix));
+
+						glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+						ASSERT_GL_ERROR;
+
+						glEnableVertexAttribArray(ATTRIB_VERTEX);
+						ASSERT_GL_ERROR;
+
+						glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+						ASSERT_GL_ERROR;
+
+						glEnableVertexAttribArray(ATTRIB_COLOR);
+						ASSERT_GL_ERROR;
+
+						glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+						ASSERT_GL_ERROR;
+
+						glEnableVertexAttribArray(ATTRIB_TEXTURE);
+						ASSERT_GL_ERROR;
+
+						glDrawArrays(GL_TRIANGLES, 0, 6);
+						ASSERT_GL_ERROR;
+					}
+
+					ASSERT_GL_ERROR;
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+					ASSERT_GL_ERROR;
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, s_iFBO_BlurVertTexture, 0);
 					ASSERT_GL_ERROR;
 
-					glEnableVertexAttribArray(ATTRIB_COLOR);
+
+					glBindTexture(GL_TEXTURE_2D, s_iFBO_BlurHorizTexture);
 					ASSERT_GL_ERROR;
 
-					glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
-					ASSERT_GL_ERROR;
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-					glEnableVertexAttribArray(ATTRIB_TEXTURE);
-					ASSERT_GL_ERROR;
+					// Vertical
+					{
+						SetActiveShaderWithMatrix(BLUR_VERT, glm::value_ptr(s_mFinalOutputCameraMatrix));
 
-					glDrawArrays(GL_TRIANGLES, 0, 6);
-					ASSERT_GL_ERROR;
+						glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
+						ASSERT_GL_ERROR;
+
+						glEnableVertexAttribArray(ATTRIB_VERTEX);
+						ASSERT_GL_ERROR;
+
+						glVertexAttribPointer(ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _colour));
+						ASSERT_GL_ERROR;
+
+						glEnableVertexAttribArray(ATTRIB_COLOR);
+						ASSERT_GL_ERROR;
+
+						glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _uv));
+						ASSERT_GL_ERROR;
+
+						glEnableVertexAttribArray(ATTRIB_TEXTURE);
+						ASSERT_GL_ERROR;
+
+						glDrawArrays(GL_TRIANGLES, 0, 6);
+						ASSERT_GL_ERROR;
+					}
 				}
-			}
+			} // End If Bloom. 
+
 
 
 			// Stage 4:
@@ -917,17 +927,18 @@ namespace Neutrino {
 				glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 				ASSERT_GL_ERROR;
 
-
-
 				// Set dimensions to the screen output
 				glViewport(0, 0, (GLsizei)s_fViewportWidth, (GLsizei)s_fViewportHeight);
 
-				// Bind to the scanline render texture
+				// Bind to the low resolution render texture we initially redirected all the draw calls to at StartOffScreenRender
 				glBindTexture(GL_TEXTURE_2D, s_iFBO_PixelRenderTarget);
 
-				// Output scanline version of the output to the screen
+				// Output scanline or clean version of that to the screen
 				{
-					SetOutputScanlines(glm::value_ptr(s_mFinalOutputCameraMatrix));
+					if (s_pPostProcessSettings->_bDoScanlines)
+						SetOutputScanlines(glm::value_ptr(s_mFinalOutputCameraMatrix));
+					else
+						SetActiveShaderWithMatrix(DEFAULT_SHADER, glm::value_ptr(s_mFinalOutputCameraMatrix));
 
 					glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
 					ASSERT_GL_ERROR;
@@ -951,11 +962,12 @@ namespace Neutrino {
 					ASSERT_GL_ERROR;
 				}
 
-				glBlendFunc(GL_ONE, GL_ONE);
-				glBindTexture(GL_TEXTURE_2D, s_iFBO_BlurVertTexture);
-
-				// Output scanline version of the output to the screen
+				// Output the bloom, if we want it. 
+				if (s_pPostProcessSettings->_bDoBloom)
 				{
+					glBlendFunc(GL_ONE, GL_ONE);
+					glBindTexture(GL_TEXTURE_2D, s_iFBO_BlurVertTexture);
+
 					SetOutputBloom(glm::value_ptr(s_mFinalOutputCameraMatrix));
 
 					glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, 0, s_iSizeOfVertex, (void*)offsetof(Vertex_t, _position));
@@ -979,9 +991,9 @@ namespace Neutrino {
 					glDrawArrays(GL_TRIANGLES, 0, 6);
 					ASSERT_GL_ERROR;
 				}
-
 			}
 
+			// Reset clear colour, just in case. 
 			SetClearColour(s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w);
 		}
 

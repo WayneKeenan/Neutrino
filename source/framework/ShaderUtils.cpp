@@ -15,7 +15,7 @@ namespace Neutrino {
 
 
 	static ShaderSettings_t* s_pActiveShader = NULL;
-	static PostProcessSettings_t* s_pCRTSettings = NULL; 
+	static PostProcessSettings_t* s_pPostProcessSettings = NULL; 
 	static ShaderSettings_t* s_aLoadedShaders = NEWX ShaderSettings_t[NUM_SHADERS];
 
 	static uint8 s_iNumShadersLoaded = 0;
@@ -248,7 +248,7 @@ namespace Neutrino {
 		LoadShader(s_pThresholdFragFilename, s_pThresholdVertFilename);
 		LoadShader(s_pAlphaScaledFragFilename, s_pAlphaScaledVertFilename);
 
-		s_pCRTSettings = NEWX(PostProcessSettings_t);
+		s_pPostProcessSettings = NEWX(PostProcessSettings_t);
 
 		// Grab the uniforms for the CRT shader, as these are bespoke.
 		PostProcessSettings_t* pCRTSettings = LoadPostProcessSettings(s_pPostProcessSettingsFilename, true);
@@ -258,20 +258,21 @@ namespace Neutrino {
 		}
 		else
 		{
-			*s_pCRTSettings = *pCRTSettings;
+			*s_pPostProcessSettings = *pCRTSettings;
 		}
 
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "ScanlineDark");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "VScanlineDark");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "PixelBias");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BRIGHTNESS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "Brightness");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_CONTRAST] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "Contrast");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_ADDITIVE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "AdditiveStrength");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESHOLD] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::THRESHOLD]._ProgramID, "Threshold");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESBRIGHTSCALER] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::THRESHOLD]._ProgramID, "ThresholdBrightScaler");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMALPHA] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomAlpha");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMCONTRAST] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomContrast");
-		s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMBRIGHT] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomBrightness");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "ScanlineDark");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "VScanlineDark");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "PixelBias");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BRIGHTNESS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "Brightness");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_CONTRAST] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "Contrast");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_ADDITIVE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "AdditiveStrength");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESHOLD] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::THRESHOLD]._ProgramID, "Threshold");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESBRIGHTSCALER] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::THRESHOLD]._ProgramID, "ThresholdBrightScaler");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMALPHA] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomAlpha");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMCONTRAST] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomContrast");
+		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMBRIGHT] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomBrightness");
+		GLUtils::SetPostProcessSettings(s_pPostProcessSettings);
 		// Just in case. 
 		SetActiveShader(DEFAULT_UNTEXTURED);
 		return true;
@@ -285,7 +286,7 @@ namespace Neutrino {
 
 	PostProcessSettings_t* GetCRTSettings()
 	{
-		return s_pCRTSettings;
+		return s_pPostProcessSettings;
 	}
 
 	void SetActiveShader(eStandardShaders iIndex)
@@ -306,17 +307,17 @@ namespace Neutrino {
 		GL_ERROR;
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE], s_pCRTSettings->_fScanlineDark);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE], s_pPostProcessSettings->_fScanlineDark);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE], s_pCRTSettings->_fVScanlineDark);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE], s_pPostProcessSettings->_fVScanlineDark);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS], s_pCRTSettings->_fPixelBias);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS], s_pPostProcessSettings->_fPixelBias);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BRIGHTNESS], s_pCRTSettings->_fBrightness);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BRIGHTNESS], s_pPostProcessSettings->_fBrightness);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_CONTRAST], s_pCRTSettings->_fContrast);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_CONTRAST], s_pPostProcessSettings->_fContrast);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_ADDITIVE], s_pCRTSettings->_fAdditiveStrength);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_ADDITIVE], s_pPostProcessSettings->_fAdditiveStrength);
 		GL_ERROR;
 	}
 
@@ -328,11 +329,11 @@ namespace Neutrino {
 		GL_ERROR;
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMALPHA], s_pCRTSettings->_fBloomAlpha);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMALPHA], s_pPostProcessSettings->_fBloomAlpha);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMCONTRAST], s_pCRTSettings->_fBloomContrast);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMCONTRAST], s_pPostProcessSettings->_fBloomContrast);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMBRIGHT], s_pCRTSettings->_fBloomBright);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMBRIGHT], s_pPostProcessSettings->_fBloomBright);
 		GL_ERROR;
 	}
 
@@ -344,9 +345,9 @@ namespace Neutrino {
 		GL_ERROR;
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESHOLD], s_pCRTSettings->_fThreshold);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESHOLD], s_pPostProcessSettings->_fThreshold);
 		GL_ERROR;
-		glUniform1f(s_pCRTSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESBRIGHTSCALER], s_pCRTSettings->_fThresholdBrightScaler);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESBRIGHTSCALER], s_pPostProcessSettings->_fThresholdBrightScaler);
 		GL_ERROR;
 	}
 

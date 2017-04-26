@@ -6,6 +6,7 @@
 #include "Types.h"
 #include "Assert.h"
 #include "Colour.h"
+#include "ShaderUtils.h"
 
 // Macros for glError Wrapper
 //
@@ -52,6 +53,12 @@ namespace Neutrino
 		//		viewport. "Internal" refers to the low res render texture dimensions used. 
 		void SetDimensions(const int iViewportWidth, const int iViewportHeight, const int iInternalWidth, const int iInternalHeight);
 
+		// SetPostProcessSettings
+		//		The final render composite needs to check the flags on which effects to process. This
+		//		function is called from ShaderUtils to pass the current settings pointer to a local
+		//		that FinishOffScreenRendering will check against. 
+		void SetPostProcessSettings(const PostProcessSettings_t* pSettings);
+
 		// GetViewportDimensions
 		//		Returns a vector2 for the width and height of the active viewport
 		const glm::vec2 GetViewportDimensions();
@@ -74,8 +81,13 @@ namespace Neutrino
 		// 	 Use the GL_ERROR / ASSERT_GL_ERROR for simplicity
 		bool LogGlError(const char *pFile, int iLine);
 
+		// AllocateFBOs
+		//		An FBO and several offscreen render targets are used to render all sprite output and then 
+		//		composite the final screen. This function handles the setup for these. 
 		bool AllocateFBOs();
 
+		// DeallocateFBOs
+		//		Frees any allocated memory for render targets and deletes previously created FBOs
 		void DeallocateFBOs();
 
 		// CreateDynamicVBOSet
@@ -137,8 +149,14 @@ namespace Neutrino
 		// 		Bind the a Tilemap VBO and call GLDrawArrays
 		void RenderTilemapVBO(const uint32 iTilemapSize, GLuint iTextureID, const int iStaticVBO_Index);
 
+		// StartOffScreenRender
+		//		This will redirect all OGL draw calls to an off screen FBO. Normally containing a low 
+		//		resolution render target to suit the pixel style. 
 		void StartOffscreenRender();
 
+		// FinishOffScreenRender
+		//		Once all sprites, tilemaps etc, have been drawn to the offscreen render target, this function 
+		//		handles the compositing and post processing of the image to the screen. 
 		void FinishOffScreenRender();
 
 		// SetClearColour

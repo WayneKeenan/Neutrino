@@ -347,6 +347,10 @@ namespace Neutrino {
 			glDeleteTextures(1, &s_iFBO_PixelRenderTarget);
 			glDeleteTextures(1, &s_iFBO_BloomThresholdTexture);
 			glDeleteTextures(1, &s_iFBO_BlurHorizTexture);
+			glDeleteTextures(1, &s_iFBO_BlurVertTexture);
+			glDeleteBuffers(1, &s_iFullScreenQuadVBO);
+			GL_ERROR;
+			LOG_INFO("FBOs and render textures Deallocated");
 		}
 
 

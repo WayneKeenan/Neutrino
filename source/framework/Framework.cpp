@@ -181,7 +181,7 @@ namespace Neutrino
 		}
 
 
-		// Create an SDL window with an OGL 3 Context and compile standard shaders
+		// Create an SDL window, with audio mixer and an OGL 3 Context and compile standard shaders
 		// 
 		{
 			LOG_INFO("Screen dimensions: %d x %d", s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight);
@@ -189,6 +189,9 @@ namespace Neutrino
 
 
 			if( !SDLCreateWindowAndContext(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight) )
+				return false;
+
+			if(!SDLInitialiseAudio()) 
 				return false;
 
 			if( !AttachShaders() )

@@ -1,4 +1,5 @@
 #include "sdl_wrapper.h"
+#include "SDL_mixer.h"
 #include "../Log.h"
 #include "../GLUtils.h"
 #include "../Input.h"
@@ -15,6 +16,10 @@ namespace Neutrino
 {
 	SDL_Window* pSDL_WindowHandle = NULL;
 	SDL_GLContext SDL_GLContext;
+
+	static const int s_iSDL_MIXER_FLAGS = MIX_INIT_FLAC | MIX_INIT_OGG;
+	static const int s_iAUDIO_BUFFER_SIZE = 1024;
+	static const int s_iAUDIO_CHANNELS = 32;
 
 	static const char* s_pBasePath;
 	static const char* s_pPrefsPath;
@@ -185,6 +190,63 @@ namespace Neutrino
 
 
 
+	bool SDLInitialiseAudio()
+	{
+		// Set up the audio stream
+    int iResult = Mix_OpenAudio(44100, AUDIO_S16SYS, 2, s_iAUDIO_BUFFER_SIZE);
+    if( iResult < 0 )
+    {
+        LOG_ERROR("Unable to open audio: %s\n", Mix_GetError());
+				return false;
+    }
+
+		int iOpenFormat = Mix_Init(s_iSDL_MIXER_FLAGS);
+		if((iOpenFormat&s_iSDL_MIXER_FLAGS) != s_iSDL_MIXER_FLAGS) 
+		{
+    	LOG_ERROR("Audio Init: Failed to initialise required OGG / FLAC support.\n");
+    	LOG_ERROR("Audio Init: %s\n", Mix_GetError());
+			return false;
+		}
+
+    iResult = Mix_AllocateChannels(s_iAUDIO_CHANNELS);
+    if( iResult < 0 )
+    {
+        LOG_ERROR("Unable to allocate mixing channels: %s\n", Mix_GetError());
+				return false;
+    }
+
+		int iAudioRate, iAudioChannels;
+		uint16 iAudioFormat;
+		Mix_QuerySpec(&iAudioRate, &iAudioFormat, &iAudioChannels);
+		int iBits=iAudioFormat&0xFF;
+		LOG_INFO("Opened audio at %d Hz %d bit %s, %d bytes audio buffer. %d mix channels currently allocated.\n", iAudioRate, iBits, iAudioChannels>1?"stereo":"mono", s_iAUDIO_BUFFER_SIZE, s_iAUDIO_CHANNELS );
+		LOG_INFO("There are %d sample chunk deocoders available:\n", Mix_GetNumChunkDecoders());
+		int i,max=Mix_GetNumChunkDecoders();
+		for(i=0; i<max; ++i)
+			LOG_INFO("- Sample chunk decoder %d is for %s",i, Mix_GetChunkDecoder(i));
+
+
+		Mix_Chunk* pSample = Mix_LoadWAV("gameboy_startup.wav");
+		if(NULL==pSample) 
+    {
+    	LOG_ERROR("Unable to load wav file: %s\n","gameboy_startup.wav"); 
+    }
+
+		if(Mix_PlayChannel(-1, pSample,0)==-1)
+		{
+			LOG_ERROR("Play channel: %s", Mix_GetError());
+		}
+		return true;
+	}
+
+
+	void SDLDeinitialiseAudio()
+	{
+		// TODO: Free up any used memory and unload all samples
+		Mix_CloseAudio();
+		Mix_Quit();
+		LOG_INFO("Audio sub-system deinitialised.");
+	}
 
 
 	void SDLPresent()
@@ -594,6 +656,7 @@ namespace Neutrino
 		ImGui_ImplSdlGL3_Shutdown();
 		SDL_GL_DeleteContext(SDL_GLContext);
 		SDL_DestroyWindow(pSDL_WindowHandle);
+		SDLDeinitialiseAudio();
 		UnassignGameControllers();
 		SDL_Quit();
 

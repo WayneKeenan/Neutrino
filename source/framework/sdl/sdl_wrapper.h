@@ -22,6 +22,11 @@ namespace Neutrino
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight); 	
 
 
+	bool SDLInitialiseAudio();
+
+	void SDLDeinitialiseAudio();
+
+
 	// SDLPresent()
 	// 		Swap buffer...
 	void SDLPresent();

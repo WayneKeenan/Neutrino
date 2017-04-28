@@ -65,6 +65,9 @@ namespace Neutrino
 	//				SDL_FULLSCREEN_DESKTOP. Then use the internal coord system for rendering
 	//				game elements (editors should be unaffected)
 
+	// For the Audio Wave Form in the inspector
+
+
 	// ------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------
 
@@ -204,7 +207,7 @@ namespace Neutrino
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Audio Stuff
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------
-
+	static uint16 iAudioFormat;
 	bool SDLInitialiseAudio()
 	{
 		// Set up the audio stream
@@ -231,7 +234,6 @@ namespace Neutrino
 		}
 
 		int iAudioRate, iAudioChannels;
-		uint16 iAudioFormat;
 		Mix_QuerySpec(&iAudioRate, &iAudioFormat, &iAudioChannels);
 		int iBits = iAudioFormat & 0xFF;
 		LOG_INFO("Opened audio at %d Hz %d bit %s, %d bytes audio buffer. %d mix channels currently allocated.", iAudioRate, iBits, iAudioChannels > 1 ? "stereo" : "mono", s_iAUDIO_BUFFER_SIZE, s_iAUDIO_CHANNELS);

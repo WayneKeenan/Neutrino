@@ -16,6 +16,5 @@ namespace Neutrino {
 			virtual bool LoadMusic(const int iID, const char* pFilename) = 0;
 			virtual bool PlaySample(const int iID) =0;
 			virtual bool PlayMusic(const int iID) = 0;
-		
 	};
 };

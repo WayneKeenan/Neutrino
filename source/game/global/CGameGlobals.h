@@ -27,7 +27,13 @@ public:
 
 	// Setters
 	//
-	void SetGameDefaults(const NeutrinoPreferences_t* const pPreferences);
+	void SetPlayerPreferences(const NeutrinoPreferences_t* const pPreferences);
+	void SetGameDefaults();
+
+	// TODO:
+	// void WriteGameDefaults()		-> Save to the player's preferences file (This needs to be added to the framework)
+	// void WriteSaveSlot()				-> Save game etc. 
+	
 
 private:
 	// Internal dimensions, used for rendering to the low res texture and clamping movements
@@ -43,4 +49,15 @@ private:
 
 	// Game 'managers'
 	Neutrino::CAudioInterface* m_pAudioInterface = NULL;
+
+
+	// In Debug builds GameGlobals can output an ImGUI inspector for its settings, DebugOverlayUpdate() will 
+	// call it as part of the update loop;
+#if defined DEBUG
+public:
+	void DebugUpdate();
+#else
+	void DebugUpdate() = 0;
+#endif
 };
+

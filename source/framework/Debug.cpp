@@ -9,11 +9,14 @@
 #include "Input.h"
 #include "File.h"
 
+#include "../game/global/CGameGlobals.h"
+
 namespace Neutrino
 {
 	static bool s_bDebugOverlayActive = true;
 	static bool s_bOutputLogActive = true;
-	static bool s_bPostProcessActive = true;
+	static bool s_bPostProcessActive = false;
+	static bool s_bGameGlobalsActive = true;
 
 	static const ImVec2* s_pOverlayPosition = NEWX ImVec2(37.0f, 10.0f);
 	static const ImVec2* s_pLogPosition = NEWX ImVec2(1100.0f, 850.0f);
@@ -159,6 +162,7 @@ namespace Neutrino
 				if (ImGui::CollapsingHeader("Tweak Tools:", iFlags))
 				{
 					ImGui::Checkbox("Post Process Settings", &s_bPostProcessActive);
+					ImGui::Checkbox("Game Globals Inspector", &s_bGameGlobalsActive);
 				}
 
 				ImGui::End();
@@ -216,6 +220,9 @@ namespace Neutrino
 
 			// Draw the log window
 			s_pDebugLog->Draw("Output Log", &s_bOutputLogActive, s_pLogPosition);
+
+			// Draw the GameGlobals inspector
+			if (s_bGameGlobalsActive) CGameGlobals::Instance().DebugUpdate();
 		}
 	}	
 };

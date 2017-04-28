@@ -18,7 +18,7 @@ namespace Neutrino
 	//
 	// Static allocated arrays for the sprite settings
 	// 
-	static SpriteRenderInfo_t* s_aSpriteRenderInfo[iMAX_TEXTURES];
+	static SpriteRenderInfo_t* s_aSpriteRenderInfo[_iMAX_TEXTURES];
 	static uint8 s_iAllocatedSets = 0;
 
 #if defined DEBUG
@@ -27,7 +27,7 @@ namespace Neutrino
 
 	void AllocateSpriteArrays(const GLuint iTextureID)
 	{
-		ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
+		ASSERT(s_iAllocatedSets < _iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
 
 		s_aSpriteRenderInfo[s_iAllocatedSets] = NEWX(SpriteRenderInfo_t);
 
@@ -37,23 +37,23 @@ namespace Neutrino
 
 		// Allocate the memory for our sprite settings arrays...
 		{
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_S = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_SnS = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_TnT = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
-			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers = NEWX Sprite_t[iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_S = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_SnS = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_TnT = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfWidth = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afHalfHeight = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteRotDegrees = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afSpriteScale = NEWX float[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprColours = NEWX glm::vec4[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._avSprPositions = NEWX glm::vec3[_iMAX_SPRITES];
+			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers = NEWX Sprite_t[_iMAX_SPRITES];
 		}
 
 		// Setup the pointers in the sprite_t to the correct locations in the arrays. 
 		// TO DO: Is this actually useful through the framework? Could easily remove this...
 		// 
-		for(int i = 0; i < (int)iMAX_SPRITES; i ++)
+		for(int i = 0; i < (int)_iMAX_SPRITES; i ++)
 		{
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fX_S = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afX_S[i];
 			s_aSpriteRenderInfo[s_iAllocatedSets]->_SpriteBasePointers[i]._fY_T = &s_aSpriteRenderInfo[s_iAllocatedSets]->_SprArrayBase._afY_T[i];
@@ -99,7 +99,7 @@ namespace Neutrino
 		{
 			if ( s_aSpriteRenderInfo[i]->_iTextureID == iTextureID)
 			{
-				if ( s_aSpriteRenderInfo[i]->_iActiveSpriteCount < iMAX_SPRITES)
+				if ( s_aSpriteRenderInfo[i]->_iActiveSpriteCount < _iMAX_SPRITES)
 				{
 					pRet = &s_aSpriteRenderInfo[i]->_SpriteBasePointers[ s_aSpriteRenderInfo[i]->_iActiveSpriteCount ]; 
 					s_aSpriteRenderInfo[i]->_iActiveSpriteCount++;
@@ -409,21 +409,21 @@ namespace Neutrino
 #if defined DEBUG
 	void AllocateUntexturedSpriteArrays()
 	{
-		ASSERT(s_iAllocatedSets < iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
+		ASSERT(s_iAllocatedSets < _iMAX_TEXTURES, "Call to AllocateSpriteArrays made when max textures has been reached.");
 		s_aUntexturedSpriteRenderInfo = NEWX(UntexturedSpriteRenderInfo_t);
 		s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount = 0;
 
 		{
-			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth = NEWX float[iMAX_SPRITES];
-			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight = NEWX float[iMAX_SPRITES];
-			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees = NEWX float[iMAX_SPRITES];
-			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteScale = NEWX float[iMAX_SPRITES];
-			s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprColours = NEWX glm::vec4[iMAX_SPRITES];
-			s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprPositions = NEWX glm::vec3[iMAX_SPRITES];
-			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers = NEWX UntexturedSprite_t[iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth = NEWX float[_iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight = NEWX float[_iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteRotDegrees = NEWX float[_iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._afSpriteScale = NEWX float[_iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprColours = NEWX glm::vec4[_iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SprArrayBase._avSprPositions = NEWX glm::vec3[_iMAX_SPRITES];
+			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers = NEWX UntexturedSprite_t[_iMAX_SPRITES];
 		}
 
-		for (int i = 0; i < (int)iMAX_SPRITES; i++)
+		for (int i = 0; i < (int)_iMAX_SPRITES; i++)
 		{
 			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fHalfWidth = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfWidth[i];
 			s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[i]._fHalfHeight = &s_aUntexturedSpriteRenderInfo->_SprArrayBase._afHalfHeight[i];
@@ -451,8 +451,8 @@ namespace Neutrino
 	UntexturedSprite_t* GetActiveDebugSprite()
 	{
 		UntexturedSprite_t* pRet = NULL;
-		ASSERT(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES, "GetActiveDebugSprite iMAX_SPRITES limit reached");
-		if ( s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < iMAX_SPRITES)
+		ASSERT(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < _iMAX_SPRITES, "GetActiveDebugSprite iMAX_SPRITES limit reached");
+		if ( s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount < _iMAX_SPRITES)
 		{
 			pRet = &s_aUntexturedSpriteRenderInfo->_SpriteBasePointers[ s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount ]; 
 			s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount++;

@@ -2,6 +2,8 @@
 
 #include <inttypes.h>
 
+#define _SDL_MIXER_AUDIO 1														// We may include BASS and FMOD options later?
+
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
@@ -22,16 +24,18 @@ static const float fHALF_PI = fPI / 2.0f;
 static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
 static const float fTILEMAP_ZPOS = 5.0f;								// Ortho far distance is 10 so tilemaps effectively sit in the middle of our z-range
-static const int iMAX_TEXTURES = 4;											// The intention is for these textures to be 4k ;)
-static const int iMAX_LEVELS = 16;											// Arbitrary, just picked that out of my arse. 
-static const uint32 iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick by the looks of things
-static const uint32 iMAX_TILEMAP_SPRITES = 1024 * 256;	// These are static draw, so pushed to the GPU once. No real limit needed
-static const uint8 iMAX_TILEMAPS = 32;									// We're statically allocating the GLuint VBO IDs, so can have more (static GLuint s_pTilemapVBOs[iMAX_TILEMAPS])
+static const int _iMAX_TEXTURES = 4;											// The intention is for these textures to be 4k ;)
+static const int _iMAX_LEVELS = 16;											// Arbitrary, just picked that out of my arse. 
+static const uint32 _iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick by the looks of things
+static const uint32 _iMAX_TILEMAP_SPRITES = 1024 * 256;	// These are static draw, so pushed to the GPU once. No real limit needed
+static const uint8 _iMAX_TILEMAPS = 32;									// We're statically allocating the GLuint VBO IDs, so can have more (static GLuint s_pTilemapVBOs[iMAX_TILEMAPS])
+static const uint8 _iMAX_SAMPLES = 255;
+static const uint8 _iMAX_MUSIC = 32;
 
-static const int iDEFAULT_VIEWPORT_WIDTH = 1920;				// TODO: When we go FULLSCREEN_WINDOW, this shouldn't matter. No need to open at a fixed resolution?
-static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;
-static const int iDEFAULT_INTERNAL_WIDTH = 480;					// TODO: This will be used by the FBO, and game logic should scale to it [320(Div6) - 384(Div5)]
-static const int iDEFAULT_INTERNAL_HEIGHT = 270;				// 180 - 216
+static const int _iDEFAULT_VIEWPORT_WIDTH = 1920;				// TODO: When we go FULLSCREEN_WINDOW, this shouldn't matter. No need to open at a fixed resolution?
+static const int _iDEFAULT_VIEWPORT_HEIGHT = 1080;
+static const int _iDEFAULT_INTERNAL_WIDTH = 480;					// TODO: This will be used by the FBO, and game logic should scale to it [320(Div6) - 384(Div5)]
+static const int _iDEFAULT_INTERNAL_HEIGHT = 270;				// 180 - 216
 
 // Debug builds will check for function keys to flip the framework into specific editor modes. 
 // Bit flags are tested in CoreUpdate()
@@ -50,6 +54,9 @@ typedef struct NeutrinoPreferences_t {
 	int _iInternalHeight;
 	float _InternalPixelWidth;
 	float _InternalPixelHeight;
+	float _fMasterVolume = 1.0f;
+	float _fSampleVolume = 1.0f;
+	float _fMusicVolume = 1.0f;
 	const char* _pResourcePath;		// Packfile locations
 	const char* _pPrefsPath;				// Player prefs file location
 } NeutrinoPreferences_t;

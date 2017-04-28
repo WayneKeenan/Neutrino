@@ -1,5 +1,8 @@
 #pragma once
 #include "../../framework/GameState.h"
+#include "../../framework/audio/CAudioInterface.h"
+#include "../global/CGameGlobals.h"
+#include "../global/AudioFiles.h"
 
 
 // Splash screen IN game state. 
@@ -15,4 +18,7 @@ class CSplashScreenIn : public CGameState
 		void Init();
 		void Update();
 		void Kill();
+
+private:
+	Neutrino::CAudioInterface* m_pAudioInterface = NULL;
 };

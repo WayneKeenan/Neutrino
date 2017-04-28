@@ -1,5 +1,4 @@
-#ifndef SDL_WRAPPER
-#define SDL_WRAPPER
+#pragma once
 #include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -46,12 +45,5 @@ namespace Neutrino
 	// 		Polls all SDL input events. Passes events on to IMGUI ad should - eventually - set our input mappings
 	bool SDLProcessInput(uint8* iEditorFlags);
 
-
-	// TestIMGUI()
-	// 		Output the IMGUI test window
-	void TestIMGUI();
-
-	int** GetKeysArray();
 }
 
-#endif

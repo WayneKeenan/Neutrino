@@ -21,8 +21,8 @@ namespace Neutrino
 		bool PlayMusic(const int iID);
 
 	private:
-		Mix_Chunk* m_aLoadedSamples[iMAX_SAMPLES];
-		Mix_Music* m_aLoadedMusic[iMAX_MUSIC];
+		Mix_Chunk* m_aLoadedSamples[_iMAX_SAMPLES];
+		Mix_Music* m_aLoadedMusic[_iMAX_MUSIC];
 
 		float m_fMasterVolume = 1.0f;
 		float m_fMusicVolume = 1.0f;

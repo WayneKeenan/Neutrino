@@ -7,13 +7,31 @@ namespace Neutrino
 
 	CSDLMixer::CSDLMixer()
 	{
-		// FreeAll();
+		for (int i = 0; i < _iMAX_SAMPLES; ++i)
+		{
+			m_aLoadedSamples[i] = NULL;
+		}
 
+		for (int i = 0; i < _iMAX_MUSIC; ++i)
+		{
+			m_aLoadedMusic[i] = NULL;
+		}
 	}
 
 	CSDLMixer::~CSDLMixer()
 	{
-		// FreeAll();
+		for (int i = 0; i < _iMAX_SAMPLES; ++i)
+		{
+			if (NULL != m_aLoadedSamples[i])
+				Mix_FreeChunk(m_aLoadedSamples[i]);
+		}
+
+		for (int i = 0; i < _iMAX_MUSIC; ++i)
+		{
+			if (NULL != m_aLoadedMusic[i])
+				Mix_FreeMusic(m_aLoadedMusic[i]);
+		}
+		LOG_INFO("Music and Samples Deallocated");
 	}
 
 	void CSDLMixer::SetGlobalVolume(const float iVolume)

@@ -75,6 +75,8 @@ void CGameGlobals::DebugUpdate()
 	ImGui::Begin("Game Globals Inspector", &s_bDebugOverlayActive);
 	if (ImGui::CollapsingHeader("Audio:", iFlags))
 	{
+		static int iActiveMusic = eMusic::_TITLE;
+		if (ImGui::Combo("Music Selector", &iActiveMusic, s_aMusicNames, ((int)(sizeof(s_aMusicNames) / sizeof(*s_aMusicNames))))) m_pAudioInterface->PlayMusic(iActiveMusic);
 		if (ImGui::SliderFloat("Master Vol.", &m_fGlobalVolume, 0.0f, 1.0f, "%2f")) m_pAudioInterface->SetGlobalVolume(m_fGlobalVolume);
 		if (ImGui::SliderFloat("Sample Vol.", &m_fSampleVolume, 0.0f, 1.0f, "%2f")) m_pAudioInterface->SetSampleVolume(m_fSampleVolume);
 		if (ImGui::SliderFloat("Music Vol.", &m_fMusicVolume, 0.0f, 1.0f, "%2f")) m_pAudioInterface->SetMusicVolume(m_fMusicVolume);

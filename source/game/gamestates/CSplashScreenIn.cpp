@@ -22,6 +22,12 @@ void CSplashScreenIn::Init()
 	// TODO: move this into the update loop with a loading bar...
 	m_pAudioInterface->LoadSample(eSFX::_STARTUP_CHIME, s_sStartUpChime);
 	m_pAudioInterface->LoadMusic(eMusic::_TITLE, s_sTITLEMUSIC);
+	m_pAudioInterface->LoadMusic(eMusic::_LEVELA, s_sLEVELA);
+	m_pAudioInterface->LoadMusic(eMusic::_LEVELB, s_sLEVELB);
+	m_pAudioInterface->LoadMusic(eMusic::_LEVELC, s_sLEVELC);
+	m_pAudioInterface->LoadMusic(eMusic::_COMPLETION, s_sCOMPLETION);
+	m_pAudioInterface->LoadMusic(eMusic::_LOADING, s_sLOADING);
+	m_pAudioInterface->LoadMusic(eMusic::_GAMEOVER, s_sGAMEOVER);
 	m_pAudioInterface->PlaySample(eSFX::_STARTUP_CHIME);
 	m_pAudioInterface->PlayMusic(eMusic::_TITLE);
 }

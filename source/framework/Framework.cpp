@@ -14,11 +14,12 @@
 namespace Neutrino 
 {
 	NeutrinoPreferences_t* s_pNeutrinoPreferences = NULL; 
-	CGameGlobals* pGameGlobals;		// Remove this, just a test...
+	CGameGlobals* pGameGlobals;		
 
 	static bool s_bRunningStatus = true;
 	static uint8 s_iEditorModeFlag = 0x00;
 	static uint8 s_iIsInMode = 0x00;
+
 	static const int s_iFilepathLength = 4096;
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
@@ -107,6 +108,7 @@ namespace Neutrino
 					return false;
 				}
 
+				// TODO: Parse the audio volume preferences
 
 				//	Now parse the player's input preferences
 				if(!InputInit(&cfg))
@@ -257,6 +259,7 @@ namespace Neutrino
 		{
 			CGameGlobals::Create();
 			pGameGlobals = CGameGlobals::InstancePtr(); // TODO: Remove this, just a test...
+			pGameGlobals->SetPlayerPreferences(s_pNeutrinoPreferences);
 		}
 
 		// Enter Initial Gamestate

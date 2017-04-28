@@ -1,6 +1,20 @@
 #include "CGameGlobals.h"
 #include "../../framework/Log.h"
+#include "../../framework/Types.h"
 
+#if defined _SDL_MIXER_AUDIO
+	#include "../../framework/audio/CSDLMixer.h"
+#endif
+
+
+
+CGameGlobals::CGameGlobals() 
+{
+	if(_SDL_MIXER_AUDIO)
+		m_pAudioInterface = NEWX Neutrino::CSDLMixer();
+
+	LOG_INFO("Game Globals created"); 
+};
 
 void CGameGlobals::SetGameDefaults(const NeutrinoPreferences_t* pPreferences)
 {

@@ -6,7 +6,6 @@
 //  Copyright Ruffian Games 2010. All rights reserved.
 //
 
-
 //Normal Shader!
 
 //precision lowp float;

@@ -2,6 +2,8 @@
 
 #include <inttypes.h>
 
+#define _SDL_MIXER_AUDIO 1														// We may include BASS and FMOD options later?
+
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
@@ -27,6 +29,8 @@ static const int iMAX_LEVELS = 16;											// Arbitrary, just picked that out 
 static const uint32 iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick by the looks of things
 static const uint32 iMAX_TILEMAP_SPRITES = 1024 * 256;	// These are static draw, so pushed to the GPU once. No real limit needed
 static const uint8 iMAX_TILEMAPS = 32;									// We're statically allocating the GLuint VBO IDs, so can have more (static GLuint s_pTilemapVBOs[iMAX_TILEMAPS])
+static const uint8 iMAX_SAMPLES = 255;
+static const uint8 iMAX_MUSIC = 32;
 
 static const int iDEFAULT_VIEWPORT_WIDTH = 1920;				// TODO: When we go FULLSCREEN_WINDOW, this shouldn't matter. No need to open at a fixed resolution?
 static const int iDEFAULT_VIEWPORT_HEIGHT = 1080;

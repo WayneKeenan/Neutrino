@@ -71,7 +71,7 @@ namespace Neutrino
 
 	bool SDLInit(const char* const pOrgName, const char * const pGameName)
 	{
-		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
 			LOG_ERROR("Unable to initialise SDL systems, exiting...");
 			return false;
@@ -118,54 +118,54 @@ namespace Neutrino
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 
-// 		if (SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1"))
-// 		{
-// 			LOG_INFO("SDL_HINT_VIDEO_HIGHDPI_DISABLED set OK.");
-// 		}
+		// 		if (SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1"))
+		// 		{
+		// 			LOG_INFO("SDL_HINT_VIDEO_HIGHDPI_DISABLED set OK.");
+		// 		}
 
 
-		// Create SDL window
-		pSDL_WindowHandle = SDL_CreateWindow( 
-				s_pGameName, 
-				SDL_WINDOWPOS_CENTERED, 
-				SDL_WINDOWPOS_CENTERED, 
-				iScreenWidth, 
-				iScreenHeight, 
+				// Create SDL window
+		pSDL_WindowHandle = SDL_CreateWindow(
+			s_pGameName,
+			SDL_WINDOWPOS_CENTERED,
+			SDL_WINDOWPOS_CENTERED,
+			iScreenWidth,
+			iScreenHeight,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI); // | SDL_WINDOW_FULLSCREEN);
 
 
-		if( NULL == pSDL_WindowHandle )
+		if (NULL == pSDL_WindowHandle)
 		{
-			LOG_ERROR( "Game window could not be created. SDL Error: %s\n", SDL_GetError() );
+			LOG_ERROR("Game window could not be created. SDL Error: %s\n", SDL_GetError());
 			return false;
 		}
 
 
 		// Create GL context
-		SDL_GLContext = SDL_GL_CreateContext( pSDL_WindowHandle );
+		SDL_GLContext = SDL_GL_CreateContext(pSDL_WindowHandle);
 
-		if( NULL == SDL_GLContext )
+		if (NULL == SDL_GLContext)
 		{
-			LOG_ERROR( "OpenGL context could not be created. SDL Error: %s\n", SDL_GetError() );
+			LOG_ERROR("OpenGL context could not be created. SDL Error: %s\n", SDL_GetError());
 			return false;
 		}
-		SDL_GL_MakeCurrent( pSDL_WindowHandle, SDL_GLContext);
+		SDL_GL_MakeCurrent(pSDL_WindowHandle, SDL_GLContext);
 
 
 		// Initialize GLEW
-		glewExperimental = GL_TRUE; 
+		glewExperimental = GL_TRUE;
 		GLenum glewError = glewInit();
-		if( glewError != GLEW_OK )
+		if (glewError != GLEW_OK)
 		{
-			LOG_ERROR( "Error initializing GLEW! %s\n", glewGetErrorString( glewError ) );
+			LOG_ERROR("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
 			return false;
 		}
 		GL_ERROR; // see: https://www.opengl.org/wiki/OpenGL_Loading_Library
 
 		// Use Vsync
-		if( SDL_GL_SetSwapInterval( 1 ) < 0 )
+		if (SDL_GL_SetSwapInterval(1) < 0)
 		{
-			LOG_ERROR( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+			LOG_ERROR("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 		}
 
 		SDL_StartTextInput();
@@ -176,7 +176,7 @@ namespace Neutrino
 			LOG_ERROR("ImGUI Init failed, exiting");
 			return false;
 		}
-		
+
 		if (!ImGui_ImplSdlGL3_CreateDeviceObjects())
 		{
 			LOG_ERROR("ImGUI Create Device failed, exiting...");
@@ -190,54 +190,71 @@ namespace Neutrino
 
 
 
+	void SDLPresent()
+	{
+		ImGui::Render();
+		SDL_GL_SwapWindow(pSDL_WindowHandle);
+	}
+
+
+
+
+
+
+	// -------------------------------------------------------------------------------------------------------------------------------------------------------
+	// Audio Stuff
+	// -------------------------------------------------------------------------------------------------------------------------------------------------------
+
 	bool SDLInitialiseAudio()
 	{
 		// Set up the audio stream
-    int iResult = Mix_OpenAudio(44100, AUDIO_S16SYS, 2, s_iAUDIO_BUFFER_SIZE);
-    if( iResult < 0 )
-    {
-        LOG_ERROR("Unable to open audio: %s\n", Mix_GetError());
-				return false;
-    }
-
-		int iOpenFormat = Mix_Init(s_iSDL_MIXER_FLAGS);
-		if((iOpenFormat&s_iSDL_MIXER_FLAGS) != s_iSDL_MIXER_FLAGS) 
+		int iResult = Mix_OpenAudio(44100, AUDIO_S16SYS, 2, s_iAUDIO_BUFFER_SIZE);
+		if (iResult < 0)
 		{
-    	LOG_ERROR("Audio Init: Failed to initialise required OGG / FLAC support.\n");
-    	LOG_ERROR("Audio Init: %s\n", Mix_GetError());
+			LOG_ERROR("Unable to open audio: %s\n", Mix_GetError());
 			return false;
 		}
 
-    iResult = Mix_AllocateChannels(s_iAUDIO_CHANNELS);
-    if( iResult < 0 )
-    {
-        LOG_ERROR("Unable to allocate mixing channels: %s\n", Mix_GetError());
-				return false;
-    }
+		int iOpenFormat = Mix_Init(s_iSDL_MIXER_FLAGS);
+		if ((iOpenFormat&s_iSDL_MIXER_FLAGS) != s_iSDL_MIXER_FLAGS)
+		{
+			LOG_ERROR("Audio Init: Failed to initialise required OGG / FLAC support.\n");
+			LOG_ERROR("Audio Init: %s\n", Mix_GetError());
+			return false;
+		}
+
+		iResult = Mix_AllocateChannels(s_iAUDIO_CHANNELS);
+		if (iResult < 0)
+		{
+			LOG_ERROR("Unable to allocate mixing channels: %s\n", Mix_GetError());
+			return false;
+		}
 
 		int iAudioRate, iAudioChannels;
 		uint16 iAudioFormat;
 		Mix_QuerySpec(&iAudioRate, &iAudioFormat, &iAudioChannels);
-		int iBits=iAudioFormat&0xFF;
-		LOG_INFO("Opened audio at %d Hz %d bit %s, %d bytes audio buffer. %d mix channels currently allocated.\n", iAudioRate, iBits, iAudioChannels>1?"stereo":"mono", s_iAUDIO_BUFFER_SIZE, s_iAUDIO_CHANNELS );
-		LOG_INFO("There are %d sample chunk deocoders available:\n", Mix_GetNumChunkDecoders());
-		int i,max=Mix_GetNumChunkDecoders();
-		for(i=0; i<max; ++i)
-			LOG_INFO("- Sample chunk decoder %d is for %s",i, Mix_GetChunkDecoder(i));
+		int iBits = iAudioFormat & 0xFF;
+		LOG_INFO("Opened audio at %d Hz %d bit %s, %d bytes audio buffer. %d mix channels currently allocated.", iAudioRate, iBits, iAudioChannels > 1 ? "stereo" : "mono", s_iAUDIO_BUFFER_SIZE, s_iAUDIO_CHANNELS);
+		LOG_INFO("There are %d sample chunk deocoders available:", Mix_GetNumChunkDecoders());
+		int i, max = Mix_GetNumChunkDecoders();
+		for (i = 0; i < max; ++i)
+			LOG_INFO("- Sample chunk decoder %d is for %s", i, Mix_GetChunkDecoder(i));
 
-
-		Mix_Chunk* pSample = Mix_LoadWAV("gameboy_startup.wav");
-		if(NULL==pSample) 
-    {
-    	LOG_ERROR("Unable to load wav file: %s\n","gameboy_startup.wav"); 
-    }
-
-		if(Mix_PlayChannel(-1, pSample,0)==-1)
-		{
-			LOG_ERROR("Play channel: %s", Mix_GetError());
-		}
+ 
+// 		Mix_Chunk* pSample = Mix_LoadWAV("gameboy_startup.wav");
+// 		if (NULL == pSample)
+// 		{
+// 			LOG_ERROR("Unable to load wav file: %s\n", "gameboy_startup.wav");
+// 		}
+// 
+// 		if (Mix_PlayChannel(-1, pSample, 0) == -1)
+// 		{
+// 			LOG_ERROR("Play channel: %s", Mix_GetError());
+// 		}
 		return true;
 	}
+
+
 
 
 	void SDLDeinitialiseAudio()
@@ -246,13 +263,6 @@ namespace Neutrino
 		Mix_CloseAudio();
 		Mix_Quit();
 		LOG_INFO("Audio sub-system deinitialised.");
-	}
-
-
-	void SDLPresent()
-	{
-		ImGui::Render();
-		SDL_GL_SwapWindow( pSDL_WindowHandle );
 	}
 
 
@@ -272,7 +282,7 @@ namespace Neutrino
 			s_iKeyDown[SDLK_RETURN & ~SDLK_SCANCODE_MASK] = 0;
 
 			if (!s_bIsFullscreen)
-				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN); 
+				SDL_SetWindowFullscreen(pSDL_WindowHandle, SDL_WINDOW_FULLSCREEN);
 			// TODO: Switch to --> SDL_WINDOW_FULLSCREEN_DESKTOP);
 			// And re-open a new window as the desktop resolution...
 			else
@@ -486,7 +496,7 @@ namespace Neutrino
 		}
 	}
 
-	
+
 
 
 	bool SDLProcessInput(uint8* iEditorFlags)
@@ -494,7 +504,7 @@ namespace Neutrino
 		ImGui_ImplSdlGL3_NewFrame(pSDL_WindowHandle);
 
 		// NOTE: Don't clear any of the pad inputs as we'll only be getting changes through the event queue!
-		
+
 		// Clear the mouse wheel - TODO: This should roll back to zero...
 		s_pMouseInput->_MOUSE_WHEEL = 0.0f;
 
@@ -559,7 +569,7 @@ namespace Neutrino
 				break;
 
 			case SDL_CONTROLLERAXISMOTION:
-				if(fabs(event.caxis.value) > s_iAxisDeadZone)
+				if (fabs(event.caxis.value) > s_iAxisDeadZone)
 					OnGameControllerAxis(event.caxis);
 				break;
 

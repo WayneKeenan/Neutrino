@@ -1,5 +1,4 @@
-#ifndef NEUTRINO_FRAMEWORK
-#define NEUTRINO_FRAMEWORK
+#pragma once
 
 #include "sdl/sdl_wrapper.h"
 #include "Log.h"
@@ -28,4 +27,3 @@ namespace Neutrino {
 }
 
 
-#endif

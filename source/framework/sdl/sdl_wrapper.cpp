@@ -625,7 +625,7 @@ namespace Neutrino
 		ASSERT_GL_ERROR;
 		glBindTexture(GL_TEXTURE_2D, *pTextureID);
 		ASSERT_GL_ERROR;
-		glTexImage2D(GL_TEXTURE_2D, 0, pSurf->format->BytesPerPixel, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels);
+		glTexImage2D(GL_TEXTURE_2D, 0, iMode, pSurf->w, pSurf->h, 0, iMode, GL_UNSIGNED_BYTE, pSurf->pixels);
 		ASSERT_GL_ERROR;
 
 		if (bFiltered)

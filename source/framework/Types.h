@@ -54,6 +54,9 @@ typedef struct NeutrinoPreferences_t {
 	int _iInternalHeight;
 	float _InternalPixelWidth;
 	float _InternalPixelHeight;
+	float _fMasterVolume = 1.0f;
+	float _fSampleVolume = 1.0f;
+	float _fMusicVolume = 1.0f;
 	const char* _pResourcePath;		// Packfile locations
 	const char* _pPrefsPath;				// Player prefs file location
 } NeutrinoPreferences_t;

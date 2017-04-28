@@ -7,7 +7,7 @@ of the framework/2D engine that will be used for this and future games from Trip
 
 Neutrino requires the following code to build and run:
 
-- SDL2, SDLImage
+- SDL2, SDLImage, SDLMixer
 - The GLM math library
 - IMGUI, immediate mode GUI 
 - Libconfig, C Library to parse config files. 
@@ -30,7 +30,7 @@ The external dependencies folder can be emptied by running:
 
 `./external_dependencies/RemoveDeps.sh`
 
-SDL2, SDLImage, Libconfig and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
+SDL2, SDLImage, SDLMixer, Libconfig and PhysFS are package dependencies that should be installed via your package manager prior to running CMake generation. 
 
 ##Building
 
@@ -64,8 +64,7 @@ After manually installing the dependencies (you may have to compile Glew) you'll
 compile. (Release config has had no work done on it so far, so there will be compilation errors) and also flag the correct DPI Awareness setting in "Project->Neutrino Properties->Manifest->Input & Output".
 "Per monitor DPI Awareness" will probably do what you expect. 
 
-On first run Visual Studio will most likely have ALL_BUILD set as the start-up project. Right click on "Neutrino" and choose "Set as StartUp project" and you'll be able to run 
-and debug from within VS.
+On first run Visual Studio will most likely have ALL_BUILD set as the start-up project. Right click on "Neutrino" and choose "Set as StartUp project" and you'll be able to run and debug from within VS.
 
 ##Status And licensing
 

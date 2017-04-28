@@ -11,6 +11,7 @@
 
 #include "../game/global/CGameGlobals.h"
 
+#if defined DEBUG
 namespace Neutrino
 {
 	static bool s_bDebugOverlayActive = true;
@@ -226,3 +227,4 @@ namespace Neutrino
 		}
 	}	
 };
+#endif

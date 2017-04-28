@@ -531,6 +531,7 @@ namespace Neutrino
 			case SDL_KEYDOWN:
 			{
 				// F1 toggles the default debug overlays (perf tracker, fly cam, etc.)
+#if defined DEBUG
 				if (event.key.keysym.sym == SDLK_F1)
 					ToggleDebugOverlay();
 
@@ -543,6 +544,7 @@ namespace Neutrino
 					if (event.key.keysym.sym == SDLK_F4)
 						*iEditorFlags |= _PARTICLE_ED;
 				}
+#endif
 			}	// Note there's no break here!
 			case SDL_KEYUP:
 			{

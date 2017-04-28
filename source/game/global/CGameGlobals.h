@@ -57,7 +57,7 @@ private:
 public:
 	void DebugUpdate();
 #else
-	void DebugUpdate() = 0;
+	void DebugUpdate() {};
 #endif
 };
 

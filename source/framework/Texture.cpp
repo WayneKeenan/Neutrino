@@ -224,7 +224,7 @@ namespace Neutrino {
 		// Allocate the TPage_t array
 		// TPageSpriteInfo_t arrays inside each of these will need to be allocated after parsing the tpage<n>.txt file
 		{
-			s_aTexturePages = NEWX TPage_t[iMAX_TEXTURES];
+			s_aTexturePages = NEWX TPage_t[_iMAX_TEXTURES];
 			s_iLoadedTextureCount = 0;				
 		}
 

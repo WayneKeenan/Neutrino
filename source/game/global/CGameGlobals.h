@@ -15,7 +15,7 @@ public:
 	uint32 m_iPlayer1Score = 0;
 	
 	CGameGlobals();
-	~CGameGlobals() { LOG_INFO("Game Globals destroyed"); };
+	~CGameGlobals();
 
 	// Getters
 	//

@@ -5,6 +5,7 @@ namespace Neutrino {
 	class CAudioInterface {
 		
 		public:
+			virtual ~CAudioInterface() {};
 			virtual void SetGlobalVolume(const float iVolume) =0;
 			virtual void SetMusicVolume(const float iVolume) = 0;
 			virtual void SetSampleVolume(const float iVolume) = 0;

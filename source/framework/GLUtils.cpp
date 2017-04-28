@@ -43,9 +43,9 @@ namespace Neutrino {
 		static const int s_iSizeOfVertex = sizeof(Vertex_t);
 
 		// Static allocated arrays for the buffered VBOs
-		static DynamicVBO_t* s_pVBOArrays[iMAX_TEXTURES];
+		static DynamicVBO_t* s_pVBOArrays[_iMAX_TEXTURES];
 		static DynamicVBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
-		static GLuint s_pTilemapVBOs[iMAX_TILEMAPS];
+		static GLuint s_pTilemapVBOs[_iMAX_TILEMAPS];
 		static GLuint s_iFullScreenQuadVBO;
 
 		// FBO / RBO pointers
@@ -363,7 +363,7 @@ namespace Neutrino {
 
 		void AllocateDynamicVBOSet()
 		{
-			ASSERT(s_iAllocatedDynamicVBOSets < iMAX_TEXTURES, "Call to AllocateDynamicVBOSet made when max textures has been reached.");
+			ASSERT(s_iAllocatedDynamicVBOSets < _iMAX_TEXTURES, "Call to AllocateDynamicVBOSet made when max textures has been reached.");
 
 			s_pVBOArrays[s_iAllocatedDynamicVBOSets] = NEWX(DynamicVBO_t);
 			s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_iVBOCounter = 0;
@@ -372,21 +372,21 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[0]);
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_STREAM_DRAW);
 			ASSERT_GL_ERROR;
 
 			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[1]);
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[1]);
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_STREAM_DRAW);
 			ASSERT_GL_ERROR;
 
 			glGenBuffers(1, &s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[2]);
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pVBOArrays[s_iAllocatedDynamicVBOSets]->_aVBOs[2]);
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_STREAM_DRAW);
 			ASSERT_GL_ERROR;
 
 			++s_iAllocatedDynamicVBOSets;
@@ -413,7 +413,7 @@ namespace Neutrino {
 
 		uint8 CreateTilemapVBO(const uint32 iTilemapSize)
 		{
-			ASSERT(s_iAllocatedTilemapVBOs < iMAX_TILEMAPS, "Call to CreateTilemapVBO made when max tilemaps has been reached.");
+			ASSERT(s_iAllocatedTilemapVBOs < _iMAX_TILEMAPS, "Call to CreateTilemapVBO made when max tilemaps has been reached.");
 			glGenBuffers(1, &s_pTilemapVBOs[s_iAllocatedTilemapVBOs]);
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pTilemapVBOs[s_iAllocatedTilemapVBOs]);
@@ -495,7 +495,7 @@ namespace Neutrino {
 			bool bIsScaled,
 			bool bIsTilemap)
 		{
-			if (!bIsTilemap)	ASSERT(iCount < iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
+			if (!bIsTilemap)	ASSERT(iCount < _iMAX_SPRITES, "Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
 			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1012,21 +1012,21 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[0]);
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
 			ASSERT_GL_ERROR;
 
 			glGenBuffers(1, &s_pDebugVBOs->_aVBOs[1]);
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[1]);
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
 			ASSERT_GL_ERROR;
 
 			glGenBuffers(1, &s_pDebugVBOs->_aVBOs[2]);
 			ASSERT_GL_ERROR;
 			glBindBuffer(GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[2]);
 			ASSERT_GL_ERROR;
-			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
 			ASSERT_GL_ERROR;
 		}
 
@@ -1056,7 +1056,7 @@ namespace Neutrino {
 			glm::vec3* pPos,
 			const uint32 iCount, bool bIsScaled)
 		{
-			ASSERT(iCount < iMAX_SPRITES, "PopulateDebugVBO: Sprite count is greater than VBO limits, something's gone very horribly wrong...");
+			ASSERT(iCount < _iMAX_SPRITES, "PopulateDebugVBO: Sprite count is greater than VBO limits, something's gone very horribly wrong...");
 
 			glm::vec4* vQuadBL_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			glm::vec4* vQuadBR_Pos = NEWX glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);

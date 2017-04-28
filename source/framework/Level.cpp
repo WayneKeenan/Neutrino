@@ -12,7 +12,7 @@
 
 namespace Neutrino {
 
-	static FrameworkLevelData_t* s_pFrameworkLevels[iMAX_LEVELS];
+	static FrameworkLevelData_t* s_pFrameworkLevels[_iMAX_LEVELS];
 	static uint16 s_iNumLevelsLoaded = 0;
 
 
@@ -39,7 +39,7 @@ namespace Neutrino {
 				return false;
 			}
 
-			if (iNumLevels > iMAX_LEVELS)
+			if (iNumLevels > _iMAX_LEVELS)
 			{
 				LOG_ERROR("There are more levels defined in GameConfig.txt than the framework supports. Adjust iMAX_LEVELS!");
 				return false;

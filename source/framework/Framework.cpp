@@ -138,10 +138,10 @@ namespace Neutrino
 #endif
 				{
 
-					s_pNeutrinoPreferences->_iScreenWidth = iDEFAULT_VIEWPORT_WIDTH;
-					s_pNeutrinoPreferences->_iScreenHeight = iDEFAULT_VIEWPORT_HEIGHT;
-					s_pNeutrinoPreferences->_iInternalWidth = iDEFAULT_INTERNAL_WIDTH;
-					s_pNeutrinoPreferences->_iInternalHeight = iDEFAULT_INTERNAL_HEIGHT;
+					s_pNeutrinoPreferences->_iScreenWidth = _iDEFAULT_VIEWPORT_WIDTH;
+					s_pNeutrinoPreferences->_iScreenHeight = _iDEFAULT_VIEWPORT_HEIGHT;
+					s_pNeutrinoPreferences->_iInternalWidth = _iDEFAULT_INTERNAL_WIDTH;
+					s_pNeutrinoPreferences->_iInternalHeight = _iDEFAULT_INTERNAL_HEIGHT;
 
 					const char* pInputMappingsText = GetInputMappingsString();
 					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 320\ninternalheight: 180\n";

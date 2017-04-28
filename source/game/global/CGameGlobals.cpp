@@ -18,7 +18,14 @@ CGameGlobals::CGameGlobals()
 	LOG_INFO("Game Globals created"); 
 };
 
-
+CGameGlobals::~CGameGlobals()
+{
+	if (_SDL_MIXER_AUDIO)
+	{
+		DELETEX m_pAudioInterface;
+	}
+	LOG_INFO("Game Globals destroyed");
+}
 
 void CGameGlobals::SetPlayerPreferences(const NeutrinoPreferences_t* const pPreferences)
 {

@@ -40,9 +40,20 @@ void CGameGlobals::SetPlayerPreferences(const NeutrinoPreferences_t* const pPref
 	m_fSampleVolume = pPreferences->_fSampleVolume;
 	m_fMusicVolume = pPreferences->_fMusicVolume;
 
-	m_pAudioInterface->SetGlobalVolume(m_fGlobalVolume);
-	m_pAudioInterface->SetMusicVolume(m_fMusicVolume);
-	m_pAudioInterface->SetSampleVolume(m_fSampleVolume);
+	if (NULL != m_pAudioInterface)
+	{
+		m_pAudioInterface->SetGlobalVolume(m_fGlobalVolume);
+		m_pAudioInterface->SetMusicVolume(m_fMusicVolume);
+		m_pAudioInterface->SetSampleVolume(m_fSampleVolume);
+	}
+	else 
+	{
+		// Incredibly likely that I'm going to end up supporting OpenAL and/or FMOD as well as SDL_Mixer
+		// But for now just assert as _SDL_MIXER_AUDIO needs to be defined so there's an audio system 
+		// running!
+		if (!_SDL_MIXER_AUDIO)
+			ASSERT(false, "No audio output type has been defined! set _SDL_MIXER_AUDIO in Types.h!");
+	}
 }
 
 

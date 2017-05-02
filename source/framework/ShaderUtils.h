@@ -50,7 +50,7 @@ namespace Neutrino {
 		DEBUG_BOX2D_POINT,
 		DEBUG_BOX2D_LINE,
 		DEBUG_BOX2D_TRIANGLE,
-#endif;
+#endif
 		NUM_SHADERS
 	};
 

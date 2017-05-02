@@ -23,9 +23,6 @@ enum eMusic
 // Filenames of the samples we're using
 static const char* const s_sStartUpChime = "gameboy_startup.wav";
 
-// Nice names of the music
-static const char* s_aMusicNames[] = { "Game Over", "Title", "Level A", "Level B", "Level C", "Loading", "Completion" };
-
 // Filenames of the music to load
 static const char* const s_sGAMEOVER = "GAMEOVER.MOD";
 static const char* const s_sTITLEMUSIC = "KILLER.XM";

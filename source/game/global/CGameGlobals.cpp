@@ -67,6 +67,8 @@ static const ImVec2* s_pDimensions = NEWX ImVec2(280.0f, 380.0f);
 static const ImGuiTreeNodeFlags iFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
 static bool s_bDebugOverlayActive = true;
 
+// Nice names of the music
+static const char* s_aMusicNames[] = { "Game Over", "Title", "Level A", "Level B", "Level C", "Loading", "Completion" };
 
 void CGameGlobals::DebugUpdate() 
 {

@@ -78,7 +78,6 @@ namespace Neutrino
 		ASSERT(NULL != m_aLoadedSamples[iID], "LoadSample: loading file failed: %s", pFilename);
 		// TODO: should this assert here? We could just ignore it, and continue...
 
-		LOG_INFO("-- OK. Size %dk",iFileSize / 1024);
 		DELETEX[] pFileBytes;
 		return true;
 	}

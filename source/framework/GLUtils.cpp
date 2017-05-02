@@ -11,6 +11,10 @@ namespace Neutrino {
 
 	namespace GLUtils {
 
+		// Transform matrices
+		static GLfloat s_mTransformationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
+		static GLfloat s_mScaleMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
+		static GLfloat s_mRotationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
 		static glm::mat4 s_mCameraMatrix;
 		static glm::mat4 s_mFinalOutputCameraMatrix;
 		static glm::mat4 s_mModelViewMatrix;
@@ -23,49 +27,58 @@ namespace Neutrino {
 		static float s_fOGL_X_RANGE;
 		static float s_fOGL_Y_RANGE;
 
+		// Internal and External Viewport dimensions. 
 		static float s_fViewportWidth;
 		static float s_fViewportHeight;
 		static GLsizei s_iInternalWidth;
 		static GLsizei s_iInternalHeight;
-		static float s_fBlurWidth;
-		static float s_fBlurHeight;
-		static const float s_fBlurDivisor = 4.0f;
 
 		// Pixel scaler for low res render output 
 		static float s_fScaledPixelWidth;
 		static float s_fScaledPixelHeight;
 
+		// Dimensions for the blur render texture
+		static float s_fBlurWidth;
+		static float s_fBlurHeight;
+		static const float s_fBlurDivisor = 4.0f;
+
 		// Pixel scaler for editor modes
 		static float s_fUnscaledPixelWidth;
 		static float s_fUnscaledPixelHeight;
 
+		// Constants referenced when drawing arrays
 		static const int s_iSizeOfSprite = 6 * sizeof(Vertex_t);
 		static const int s_iSizeOfVertex = sizeof(Vertex_t);
 
 		// Static allocated arrays for the buffered VBOs
 		static DynamicVBO_t* s_pVBOArrays[_iMAX_TEXTURES];
-		static DynamicVBO_t* s_pDebugVBOs = NULL;						// Debug Builds only. 
+		static DynamicVBO_t* s_pDebugVBOs = NULL;
 		static GLuint s_pTilemapVBOs[_iMAX_TILEMAPS];
 		static GLuint s_iFullScreenQuadVBO;
 
-		// FBO / RBO pointers
+		// Debug builds can render the physics world, but require slightly 
+		// custom VBOs and shaders for output. 
+#if defined DEBUG
+		static GLuint s_iBox2DDebugLineVBO;
+		static GLuint s_iBox2DDebugPointVBO;
+		static GLuint s_iBox2DDebugTriangleVBO;
+#endif
+
+		// FBO / RBO pointers for the final compositing stages
 		static GLuint s_iFBO_PixelRenderTarget;
 		static GLuint s_iFBO_BloomThresholdTexture;
 		static GLuint s_iFBO_BlurHorizTexture;
 		static GLuint s_iFBO_BlurVertTexture;
 		static GLuint s_iFBOID;
 
+		// Controls for the shaders when doing the final composit. These are loaded
+		// from a file during Init and can be tweaked in Debug builds. 
+		static const Neutrino::PostProcessSettings_t* s_pPostProcessSettings;
 
 		// Counters
 		static uint8 s_iAllocatedDynamicVBOSets = 0;
 		static uint8 s_iAllocatedTilemapVBOs = 0;
 
-		// Transform matrices
-		static GLfloat s_mTransformationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
-		static GLfloat s_mScaleMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
-		static GLfloat s_mRotationMatrix[9] = { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f };
-
-		static const Neutrino::PostProcessSettings_t* s_pPostProcessSettings;
 
 		float* GetCameraMatrix()
 		{
@@ -1005,6 +1018,7 @@ namespace Neutrino {
 #ifdef DEBUG 
 		void AllocateDebugVBOs()
 		{
+			// Allocate the set for the debug, untextured sprites, used by some of the editors
 			s_pDebugVBOs = NEWX(DynamicVBO_t);
 			s_pDebugVBOs->_iVBOCounter = 0;
 
@@ -1028,6 +1042,9 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfSprite * _iMAX_SPRITES, NULL, GL_DYNAMIC_DRAW);
 			ASSERT_GL_ERROR;
+
+			// Allocate the set used by Box2D's world debug rendering. 
+
 		}
 
 
@@ -1209,7 +1226,7 @@ namespace Neutrino {
 		}
 
 
-		void RenderDebugVBO(const uint32 iSpriteCount)
+		void RenderDebugVBOs(const uint32 iSpriteCount)
 		{
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glBindBuffer(GL_ARRAY_BUFFER, s_pDebugVBOs->_aVBOs[s_pDebugVBOs->_iVBOCounter]);

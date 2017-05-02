@@ -498,7 +498,7 @@ namespace Neutrino
 				s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount,
 				bIsScaled);
 
-			GLUtils::RenderDebugVBO(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount);
+			GLUtils::RenderDebugVBOs(s_aUntexturedSpriteRenderInfo->_iActiveSpriteCount);
 		}
 	}
 #endif

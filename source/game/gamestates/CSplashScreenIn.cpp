@@ -1,8 +1,8 @@
 #include "CSplashScreenIn.h"
 #include "CSplashScreenExit.h"
 #include "../../framework/GameStateManager.h"
+#include "../global/CGameGlobals.h"
 #include "../global/AudioFiles.h"
-
 
 CSplashScreenIn::CSplashScreenIn()
 {

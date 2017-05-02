@@ -33,6 +33,7 @@ namespace Neutrino
 			GLfloat _position[3];
 		} Vertex_t; 
 
+
 		// VBOs are triple buffered for dynamically drawn sprites, this structure wraps the 
 		// assigned VBOs for each texture, and holds the counter for the VBO to be rendered in 
 		// a given frame
@@ -170,6 +171,22 @@ namespace Neutrino
 		void ClearBuffers();
 
 #if defined DEBUG
+		// Definitions for content placed into the Box2D Debug VBOs, when drawing the physics world. 
+		typedef struct Box2D_DebugPoint_t
+		{
+			uint32 	_colour;
+			GLfloat _position[2];
+			GLfloat _size;
+		} Box2D_DebugPoint_t;
+
+		// Reused by Line and Triangle VBOs
+		typedef struct Box2D_Vertex_t
+		{
+			uint32 	_colour;
+			GLfloat _position[2];
+		} Box2D_Vertex_t;
+
+
 		// CreateDebugVBOs()
 		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
 		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
@@ -195,7 +212,7 @@ namespace Neutrino
 
 		// RenderVBO
 		// 		Bind the DEBUG VBO and render it. 
-		void RenderDebugVBO(const uint32 iSpriteCount);
+		void RenderDebugVBOs(const uint32 iSpriteCount);
 #endif
 	};
 }

@@ -42,9 +42,15 @@ namespace Neutrino
 		LOG_INFO("Game Config File loaded...");
 		s_bConfigLoaded = true;
 
+		DELETEX[] pFileBytes;
 		return s_bConfigLoaded;
 	}
 
+	void UnloadConfigFile()
+	{
+		config_destroy(&s_Config);
+		LOG_INFO("Game Config File Destroyed.");
+	}
 
 	bool GameConfigGetInt( const char* pParam, int* iValueStore )
 	{

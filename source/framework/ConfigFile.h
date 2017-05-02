@@ -24,6 +24,8 @@ namespace Neutrino
 	// 		parts of the game to grab what they need as and when.
 	bool LoadConfigFile();
 
+	void UnloadConfigFile();
+
 	// GameConfigGetInt()
 	// 		Utility function, get an int value from the game config file, and store in iValueStore. Calling 
 	// 		function should check the return status for success/fail

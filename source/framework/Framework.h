@@ -18,6 +18,7 @@
 #include "Level.h"
 #include "ConfigFile.h"
 #include "Level.h"
+#include "Box2D/Box2D.h"
 
 namespace Neutrino {
 	bool CoreInit(const char* const pGameName);

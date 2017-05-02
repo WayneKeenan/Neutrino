@@ -7,10 +7,10 @@
 	#include "editor/CMapEditorIn.h"
 #endif
 
-
 #if defined _WIN32
 	#define sprintf sprintf_s
 #endif
+
 namespace Neutrino 
 {
 	NeutrinoPreferences_t* s_pNeutrinoPreferences = NULL; 
@@ -31,9 +31,7 @@ namespace Neutrino
 	static CGameState* s_pEditorState = NULL;
 #endif
 
-
-	// TODO: This is temporary, should be retrieved from the active game state.
-	//       Should framework have a set of camera functionality?
+	// TODO: Framework should have a set of camera functions
 	static glm::vec3 s_pvCameraPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
@@ -60,7 +58,7 @@ namespace Neutrino
 			char pPlayerPrefsFilename[4096]={'\0'};
 			sprintf(pPlayerPrefsFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsFilename);
 
-			if( FileExists(pPlayerPrefsFilename) )
+			if(FileExists(pPlayerPrefsFilename))
 			{
 				// Parse existing player preferences file...
 				//
@@ -144,14 +142,14 @@ namespace Neutrino
 					s_pNeutrinoPreferences->_iInternalHeight = _iDEFAULT_INTERNAL_HEIGHT;
 
 					const char* pInputMappingsText = GetInputMappingsString();
-					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 320\ninternalheight: 180\n";
+					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 480\ninternalheight: 270\n";	
+					// TODO: This isn't picking up the static consts from Types.h!
 
 					fprintf(pPlayerPrefsFile, "%s", pPrefsText);
 					fprintf(pPlayerPrefsFile, "%s", pInputMappingsText);
 
 					fflush(pPlayerPrefsFile);
 					fclose(pPlayerPrefsFile);
-
 				}
 				else
 				{
@@ -190,13 +188,13 @@ namespace Neutrino
 			LOG_INFO("Internal dimensions: %d x %d", s_pNeutrinoPreferences->_iInternalWidth, s_pNeutrinoPreferences->_iInternalHeight);
 
 
-			if( !SDLCreateWindowAndContext(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight) )
+			if(!SDLCreateWindowAndContext(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight))
 				return false;
 
 			if(!SDLInitialiseAudio()) 
 				return false;
 
-			if( !AttachShaders() )
+			if(!AttachShaders())
 				return false;
 		}
 
@@ -285,18 +283,10 @@ namespace Neutrino
 		GameStateUpdate();																											// Process whatever is the active game state
 							
 		GLUtils::ClearBuffers();																								// This doesn't clear the FBOs!
+		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 
 		if(0 == s_iIsInMode)  // We're in the normal game mode, do the full render path
 		{
-			// Clamp Camera Movement to a Texel
-			{
-// 				int fXPixels = (int)roundf(s_pvCameraPosition.x / GLUtils::GetInternalPixelScale().x);
-// 				int fYPixels = (int)roundf(s_pvCameraPosition.y / GLUtils::GetInternalPixelScale().y);
-// 				s_pvCameraPosition.x = (float)fXPixels * GLUtils::GetInternalPixelScale().x;
-// 				s_pvCameraPosition.y = (float)fYPixels * GLUtils::GetInternalPixelScale().y;
-				GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
-			}
-
 			// Set shader for rendering to a texture
 			SetActiveShader(DEFAULT_SHADER);
 
@@ -311,8 +301,6 @@ namespace Neutrino
 		}
 		else  // We're in an editor mode, so do a simplified render path
 		{
-			
-			GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 			SetActiveShader(DEFAULT_SHADER);
 			DrawSprites(false);
 		}
@@ -357,7 +345,8 @@ namespace Neutrino
 		GLUtils::DeallocateFBOs();
 		DetachShaders();
 		InputKill();
-		
+		UnloadConfigFile();
+
 #if defined DEBUG
 		DebugOverlayKill();
 		GLUtils::DeallocateDebugVBOs();

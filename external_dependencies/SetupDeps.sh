@@ -10,10 +10,10 @@ fi
 #	cp ./tdi-cmake-modules/FindLibConfig.cmake ./cmake-modules/FindLIBCONFIG.cmake
 #fi
 
-if [ ! -d ./imgui ]; then
-	echo "IMGUI not found, cloning: "
-	git clone https://github.com/ocornut/imgui.git ./imgui
-fi
+#if [ ! -d ./imgui ]; then
+#	echo "IMGUI not found, cloning: "
+#	git clone https://github.com/ocornut/imgui.git ./imgui
+#fi
 
 
 if [ ! -d ./glew ]; then 

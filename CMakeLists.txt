@@ -34,10 +34,12 @@ endif()
 find_package(SDL2 REQUIRED)
 find_package(SDL2IMAGE REQUIRED)
 find_package(SDL2_Mixer REQUIRED)
+find_package(BOX2D REQUIRED)
 include_directories(
     ${SDL2_INCLUDE_DIR}
     ${SDL2_IMAGE_INCLUDE_DIR}
 		${SDL2_MIXER_INCLUDE_DIRS}
+		${BOX2D_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}/external_dependencies/glm/
     ${PROJECT_SOURCE_DIR}/external_dependencies/imgui/
     ${PROJECT_SOURCE_DIR}/external_dependencies/inih/
@@ -52,6 +54,11 @@ endif()
 if(SDL2_MIXER_FOUND)
 		MESSAGE("-- SDL2 Mixer found...")
 		link_libraries(${SDL2_MIXER_LIBRARIES})
+endif()
+ 
+if(BOX2D_FOUND)
+	MESSAGE("-- Box2D Found...")
+	link_libraries(${BOX2D_LIBRARY})
 endif()
 
 find_package(GLEW REQUIRED)
@@ -75,6 +82,7 @@ if(PHYSFS_FOUND)
     include_directories(${PHYSFS_INCLUDE_DIR})
     link_libraries(${PHYSFS_LIBRARY})
 endif()
+
 
 # Add source files (this means regenerating CMake files every time we add new source files)
 FILE( GLOB_RECURSE NEUTRINO_HEADERS source/*.h )

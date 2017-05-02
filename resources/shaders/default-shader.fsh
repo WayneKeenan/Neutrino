@@ -1,13 +1,3 @@
-//
-//  Shader.fsh
-//  BulletPoint
-//
-//  Created by Korruptor on 15/08/2010.
-//  Copyright Ruffian Games 2010. All rights reserved.
-//
-
-//Normal Shader!
-
 //precision lowp float;
 
 uniform sampler2D texture;

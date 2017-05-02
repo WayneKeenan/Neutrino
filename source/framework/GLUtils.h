@@ -171,23 +171,7 @@ namespace Neutrino
 		void ClearBuffers();
 
 #if defined DEBUG
-		// Definitions for content placed into the Box2D Debug VBOs, when drawing the physics world. 
-		typedef struct Box2D_DebugPoint_t
-		{
-			uint32 	_colour;
-			GLfloat _position[2];
-			GLfloat _size;
-		} Box2D_DebugPoint_t;
-
-		// Reused by Line and Triangle VBOs
-		typedef struct Box2D_Vertex_t
-		{
-			uint32 	_colour;
-			GLfloat _position[2];
-		} Box2D_Vertex_t;
-
-
-		// CreateDebugVBOs()
+		// AllocateDebugVBOs()
 		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
 		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
 		// 		buffered in the same way the main render path is. 

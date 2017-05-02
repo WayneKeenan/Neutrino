@@ -56,14 +56,6 @@ namespace Neutrino {
 		static GLuint s_pTilemapVBOs[_iMAX_TILEMAPS];
 		static GLuint s_iFullScreenQuadVBO;
 
-		// Debug builds can render the physics world, but require slightly 
-		// custom VBOs and shaders for output. 
-#if defined DEBUG
-		static GLuint s_iBox2DDebugLineVBO;
-		static GLuint s_iBox2DDebugPointVBO;
-		static GLuint s_iBox2DDebugTriangleVBO;
-#endif
-
 		// FBO / RBO pointers for the final compositing stages
 		static GLuint s_iFBO_PixelRenderTarget;
 		static GLuint s_iFBO_BloomThresholdTexture;
@@ -1016,6 +1008,57 @@ namespace Neutrino {
 
 
 #ifdef DEBUG 
+		// Box2D supports callbacks for drawing the physics world, which are exposed in DEBUG builds. 
+		// This allocates the Point, Line and Triangle VBOs used by Box2D_DebugDraw. Called by 
+		// AllocateDebugVBOs...
+		// Debug builds can render the physics world, but require slightly 
+		// custom VBOs and shaders for output. 
+
+		static GLuint s_iBox2DDebugLineVBO;
+		static GLuint s_iBox2DDebugPointVBO;
+		static GLuint s_iBox2DDebugTriangleVBO;
+
+		typedef struct Box2D_DebugPoint_t
+		{
+			uint32 	_colour;
+			GLfloat _position[2];
+			GLfloat _size;
+		} Box2D_DebugPoint_t;
+
+		// Reused by Line and Triangle VBOs
+		typedef struct Box2D_Vertex_t
+		{
+			uint32 	_colour;
+			GLfloat _position[2];
+		} Box2D_Vertex_t;
+
+		static const int s_iSizeOfDebugPoint = sizeof(Box2D_DebugPoint_t);
+		static const int s_iSizeOfDebugVertex = sizeof(Box2D_Vertex_t);
+
+		void AllocateB2D_DebugVBOs()
+		{
+			glGenBuffers(1, &s_iBox2DDebugLineVBO);
+			ASSERT_GL_ERROR;
+			glBindBuffer(GL_ARRAY_BUFFER, s_iBox2DDebugLineVBO);
+			ASSERT_GL_ERROR;
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfDebugVertex * _iMAX_BOX2D_SPRITES, NULL, GL_DYNAMIC_DRAW);
+			ASSERT_GL_ERROR;
+
+			glGenBuffers(1, &s_iBox2DDebugTriangleVBO);
+			ASSERT_GL_ERROR;
+			glBindBuffer(GL_ARRAY_BUFFER, s_iBox2DDebugTriangleVBO);
+			ASSERT_GL_ERROR;
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfDebugVertex * _iMAX_BOX2D_SPRITES, NULL, GL_DYNAMIC_DRAW);
+			ASSERT_GL_ERROR;
+
+			glGenBuffers(1, &s_iBox2DDebugPointVBO);
+			ASSERT_GL_ERROR;
+			glBindBuffer(GL_ARRAY_BUFFER, s_iBox2DDebugPointVBO);
+			ASSERT_GL_ERROR;
+			glBufferData(GL_ARRAY_BUFFER, s_iSizeOfDebugPoint * _iMAX_BOX2D_SPRITES, NULL, GL_DYNAMIC_DRAW);
+			ASSERT_GL_ERROR;
+		}
+
 		void AllocateDebugVBOs()
 		{
 			// Allocate the set for the debug, untextured sprites, used by some of the editors
@@ -1044,9 +1087,19 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 
 			// Allocate the set used by Box2D's world debug rendering. 
-
+			if(_BOX2D_DEBUG_RENDER) AllocateB2D_DebugVBOs();
 		}
 
+		void DeallocateB2D_DebugVBOs()
+		{
+			glDeleteBuffers(1, &s_iBox2DDebugLineVBO);
+			GL_ERROR;
+			glDeleteBuffers(1, &s_iBox2DDebugPointVBO);
+			GL_ERROR;
+			glDeleteBuffers(1, &s_iBox2DDebugTriangleVBO);
+			GL_ERROR;
+			LOG_INFO("Box2D Debug VBOs Deallocated.");
+		}
 
 		void DeallocateDebugVBOs()
 		{
@@ -1059,9 +1112,10 @@ namespace Neutrino {
 
 			DELETEX s_pDebugVBOs;
 			LOG_INFO("Debug VBOs Deallocated.");
+
+			// TODO: Make this a compile time option?
+			if (_BOX2D_DEBUG_RENDER) DeallocateB2D_DebugVBOs();
 		}
-
-
 
 		// This is an untextured variant of the Populate VBO function with hardcoded UV to maintain the vertext_t structure in the VBO
 		// It's not really worth generalising between the two  as this is only used in the editor modes and not the main RELEASE runtime. 

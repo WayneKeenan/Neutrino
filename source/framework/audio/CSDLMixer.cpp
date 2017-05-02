@@ -95,9 +95,7 @@ namespace Neutrino
 
 		m_aLoadedMusic[iID] = Mix_LoadMUS_RW(pOps, 1);
 		ASSERT(NULL != m_aLoadedMusic[iID], "LoadMusic: loading file failed: %s", pFilename);
-		// TODO: should this assert here? We could just ignore it, and continue...
 
-		LOG_INFO("-- OK. Size %dk", iFileSize / 1024);
 		DELETEX[] pFileBytes;
 		return true;
 		return true;

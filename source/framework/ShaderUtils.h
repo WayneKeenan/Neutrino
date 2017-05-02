@@ -12,7 +12,7 @@ namespace Neutrino {
 		NUM_ATTRIBUTES
 	};
 
-	enum eShaderUniforms
+	enum eGameShaderUniforms
 	{
 		UNIFORM_TRANSLATE,
 		UNIFORM_MATRIX,
@@ -20,7 +20,7 @@ namespace Neutrino {
 		NUM_UNIFORMS
 	};
 
-	enum eCRTShaderUniforms
+	enum eCompositeShaderUniforms
 	{
 		UNIFORM_SCANLINE,
 		UNIFORM_VSCANLINE,
@@ -33,25 +33,48 @@ namespace Neutrino {
 		UNIFORM_BLOOMALPHA, 
 		UNIFORM_BLOOMCONTRAST,
 		UNIFORM_BLOOMBRIGHT,
-		NUM_CRTUNIFORMS
+		NUM_COMPOSITE_UNIFORMS
 	};
 
-	enum eStandardShaders
+	enum eShader
 	{
-	 	DEFAULT_SHADER,
+		DEFAULT_SHADER,
 		DEFAULT_UNTEXTURED,
 		BLUR_HORIZ,
 		BLUR_VERT,
 		OUTPUT_CRT,
 		THRESHOLD,
 		ALPHA_SCALED,
+#if defined DEBUG	
+		// Physics world debug shaders aren't loaded in release builds. 
+		DEBUG_BOX2D_POINT,
+		DEBUG_BOX2D_LINE,
+		DEBUG_BOX2D_TRIANGLE,
+#endif;
 		NUM_SHADERS
 	};
 
-	// The scanline shader used for one of the final render passes has a set of custom 
-	// settings that control the RGB split and scanline darkness. These can be adjusted
-	// in realtime from the debug overlay, saved and loaded in as a preference. 
+	// Shader defines for the Debug rendering of the physics world
+#if defined DEBUG
+	enum
+	{
+		ATTRIB_BOX2D_DEBUG_POSITION,
+		ATTRIB_BOX2D_DEBUG_COLOR,
+		ATTRIB_BOX2D_DEBUG_SIZE,
+		NUM_BOX2D_DEBUG_ATTRIBUTES,
+	};
+	enum
+	{
+		BOX2D_POINT,
+		BOX2D_LINE,
+		BOX2D_TRIANGLE,
+	};
+#endif
 
+
+	// The shaders used for one of the final composition have a set of custom 
+	// settings that control various aspects of the rendering. These can be adjusted
+	// in realtime from the debug overlay, saved and loaded in as a preference. 
 	static const float s_fPPS_Version = 0.1f;
 	typedef struct PostProcessSettings_t
 	{
@@ -68,9 +91,8 @@ namespace Neutrino {
 		float _fBloomBright = 0.75f;
 		bool _bDoScanlines = true;
 		bool _bDoBloom = true;
-		GLuint _aUniforms[(int)eCRTShaderUniforms::NUM_CRTUNIFORMS];
+		GLuint _aUniforms[(int)eCompositeShaderUniforms::NUM_COMPOSITE_UNIFORMS];
 	} PostProcessSettings_t;
-
 
 	// TO_DO: Shaders to load should be read from GameConfig.txt
 	// TO_DO: imgui implementation should have it's shaders loaded in this batch as well...
@@ -88,6 +110,15 @@ namespace Neutrino {
 	const char* const s_pThresholdVertFilename = "threshold.vsh";
 	const char* const s_pAlphaScaledFragFilename = "default-alphascaled.fsh";
 	const char* const s_pAlphaScaledVertFilename = "default-alphascaled.vsh";
+#if defined DEBUG
+	const char* const s_pDebugBox2DLineFragFilename = "Box2D_LineDebug.fsh";
+	const char* const s_pDebugBox2DLineVertFilename = "Box2D_LineDebug.vsh";
+	const char* const s_pDebugBox2DTriangleFragFilename = "Box2D_TriangleDebug.fsh";
+	const char* const s_pDebugBox2DTriangleVertFilename = "Box2D_TriangleDebug.vsh";
+	const char* const s_pDebugBox2DPointFragFilename = "Box2D_PointDebug.fsh";
+	const char* const s_pDebugBox2DPointVertFilename = "Box2D_PointDebug.vsh";
+	const int s_iNUM_BOX2D_DEBUG_SHADERS = 3;
+#endif
 
 	// LoadEngineShaders()
 	//		Framework init function to load the standard shaders (predefined) and validate them. 
@@ -101,7 +132,7 @@ namespace Neutrino {
 
 	// SetActiveShader
 	// 		Set shader pair for current OGL state from list of standard shaders defined in enum above
-	void SetActiveShader(eStandardShaders iIndex);
+	void SetActiveShader(eShader iIndex);
 
 	// SetOutputShader
 	// 		Final output of the lowres render target needs to have its own static camera matrix and custom
@@ -122,7 +153,7 @@ namespace Neutrino {
 	//		Sets the shader pair from the list of standard shaders, but sets the shader's matrix uniform 
 	//		to be the parameter passed, rather than the internal camera matrix. Used when rendering the
 	//		final composite to the screen. 
-	void SetActiveShaderWithMatrix(eStandardShaders iIndex, float* pCameraMatrix);
+	void SetActiveShaderWithMatrix(eShader iIndex, float* pCameraMatrix);
 
 	// GetActiveUniforms
 	// 		Returns the address of the current shader uniforms (see: struct _ShaderSettings_t in cpp file)

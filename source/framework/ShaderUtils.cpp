@@ -13,13 +13,19 @@ namespace Neutrino {
 		GLint _ProgramID;
 	};
 
-
 	static ShaderSettings_t* s_pActiveShader = NULL;
-	static PostProcessSettings_t* s_pPostProcessSettings = NULL; 
 	static ShaderSettings_t* s_aLoadedShaders = NEWX ShaderSettings_t[NUM_SHADERS];
-
+	static PostProcessSettings_t* s_pPostProcessSettings = NULL; 
 	static uint8 s_iNumShadersLoaded = 0;
 
+#if defined DEBUG
+	struct Box2DDebugShaderSettings_t
+	{
+		GLint _Uniform;
+		GLint _ProgramID;
+	};
+	static Box2DDebugShaderSettings_t* s_aBox2DDebugShaders = NEWX Box2DDebugShaderSettings_t[s_iNUM_BOX2D_DEBUG_SHADERS];
+#endif 
 
 	void LogShader(GLuint iID)
 	{
@@ -218,6 +224,7 @@ namespace Neutrino {
 		return true;
 	}
 
+
 	void DetachShaders()
 	{
 		GLsizei iCount = 0;
@@ -261,18 +268,35 @@ namespace Neutrino {
 			*s_pPostProcessSettings = *pCRTSettings;
 		}
 
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "ScanlineDark");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "VScanlineDark");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "PixelBias");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BRIGHTNESS] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "Brightness");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_CONTRAST] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "Contrast");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_ADDITIVE] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::OUTPUT_CRT]._ProgramID, "AdditiveStrength");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESHOLD] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::THRESHOLD]._ProgramID, "Threshold");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESBRIGHTSCALER] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::THRESHOLD]._ProgramID, "ThresholdBrightScaler");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMALPHA] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomAlpha");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMCONTRAST] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomContrast");
-		s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMBRIGHT] = glGetUniformLocation(s_aLoadedShaders[eStandardShaders::ALPHA_SCALED]._ProgramID, "BloomBrightness");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_SCANLINE] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "ScanlineDark");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_VSCANLINE] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "VScanlineDark");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_PIXELBIAS] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "PixelBias");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BRIGHTNESS] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "Brightness");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_CONTRAST] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "Contrast");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_ADDITIVE] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "AdditiveStrength");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_THRESHOLD] = glGetUniformLocation(s_aLoadedShaders[eShader::THRESHOLD]._ProgramID, "Threshold");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_THRESBRIGHTSCALER] = glGetUniformLocation(s_aLoadedShaders[eShader::THRESHOLD]._ProgramID, "ThresholdBrightScaler");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMALPHA] = glGetUniformLocation(s_aLoadedShaders[eShader::ALPHA_SCALED]._ProgramID, "BloomAlpha");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMCONTRAST] = glGetUniformLocation(s_aLoadedShaders[eShader::ALPHA_SCALED]._ProgramID, "BloomContrast");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMBRIGHT] = glGetUniformLocation(s_aLoadedShaders[eShader::ALPHA_SCALED]._ProgramID, "BloomBrightness");
 		GLUtils::SetPostProcessSettings(s_pPostProcessSettings);
+
+#if defined DEBUG
+		// Load the Box2D DebugDraw Shaders and set their matrix uniform
+		{
+			LoadShader(s_pDebugBox2DPointFragFilename, s_pDebugBox2DPointVertFilename);
+			LoadShader(s_pDebugBox2DLineFragFilename, s_pDebugBox2DLineVertFilename);
+			LoadShader(s_pDebugBox2DTriangleFragFilename, s_pDebugBox2DTriangleVertFilename);
+
+			s_aBox2DDebugShaders[BOX2D_POINT]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_POINT]._ProgramID;
+			s_aBox2DDebugShaders[BOX2D_POINT]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_POINT]._ProgramID, "matrix");
+			s_aBox2DDebugShaders[BOX2D_LINE]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_LINE]._ProgramID;
+			s_aBox2DDebugShaders[BOX2D_LINE]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_LINE]._ProgramID, "matrix");
+			s_aBox2DDebugShaders[BOX2D_TRIANGLE]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_TRIANGLE]._ProgramID;
+			s_aBox2DDebugShaders[BOX2D_TRIANGLE]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_TRIANGLE]._ProgramID, "matrix");
+		}
+#endif
+
 		// Just in case. 
 		SetActiveShader(DEFAULT_UNTEXTURED);
 		return true;
@@ -284,12 +308,14 @@ namespace Neutrino {
 		return s_pActiveShader->_Uniforms;
 	};
 
+
 	PostProcessSettings_t* GetCRTSettings()
 	{
 		return s_pPostProcessSettings;
 	}
 
-	void SetActiveShader(eStandardShaders iIndex)
+
+	void SetActiveShader(eShader iIndex)
 	{
 		s_pActiveShader = &s_aLoadedShaders[iIndex];
 		GL_ERROR;
@@ -299,6 +325,7 @@ namespace Neutrino {
 		GL_ERROR;
 	}
 
+
 	void SetOutputScanlines(float* pCameraMatrix)
 	{
 		s_pActiveShader = &s_aLoadedShaders[OUTPUT_CRT];
@@ -307,19 +334,20 @@ namespace Neutrino {
 		GL_ERROR;
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_SCANLINE], s_pPostProcessSettings->_fScanlineDark);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_SCANLINE], s_pPostProcessSettings->_fScanlineDark);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_VSCANLINE], s_pPostProcessSettings->_fVScanlineDark);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_VSCANLINE], s_pPostProcessSettings->_fVScanlineDark);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_PIXELBIAS], s_pPostProcessSettings->_fPixelBias);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_PIXELBIAS], s_pPostProcessSettings->_fPixelBias);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BRIGHTNESS], s_pPostProcessSettings->_fBrightness);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BRIGHTNESS], s_pPostProcessSettings->_fBrightness);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_CONTRAST], s_pPostProcessSettings->_fContrast);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_CONTRAST], s_pPostProcessSettings->_fContrast);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_ADDITIVE], s_pPostProcessSettings->_fAdditiveStrength);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_ADDITIVE], s_pPostProcessSettings->_fAdditiveStrength);
 		GL_ERROR;
 	}
+
 
 	void SetOutputBloom(float* pCameraMatrix)
 	{
@@ -329,13 +357,14 @@ namespace Neutrino {
 		GL_ERROR;
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMALPHA], s_pPostProcessSettings->_fBloomAlpha);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMALPHA], s_pPostProcessSettings->_fBloomAlpha);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMCONTRAST], s_pPostProcessSettings->_fBloomContrast);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMCONTRAST], s_pPostProcessSettings->_fBloomContrast);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_BLOOMBRIGHT], s_pPostProcessSettings->_fBloomBright);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMBRIGHT], s_pPostProcessSettings->_fBloomBright);
 		GL_ERROR;
 	}
+
 
 	void SetOutputThreshold(float* pCameraMatrix)
 	{
@@ -345,14 +374,14 @@ namespace Neutrino {
 		GL_ERROR;
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESHOLD], s_pPostProcessSettings->_fThreshold);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_THRESHOLD], s_pPostProcessSettings->_fThreshold);
 		GL_ERROR;
-		glUniform1f(s_pPostProcessSettings->_aUniforms[eCRTShaderUniforms::UNIFORM_THRESBRIGHTSCALER], s_pPostProcessSettings->_fThresholdBrightScaler);
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_THRESBRIGHTSCALER], s_pPostProcessSettings->_fThresholdBrightScaler);
 		GL_ERROR;
 	}
 
 
-	void SetActiveShaderWithMatrix(eStandardShaders iIndex, float* pCameraMatrix)
+	void SetActiveShaderWithMatrix(eShader iIndex, float* pCameraMatrix)
 	{
 		s_pActiveShader = &s_aLoadedShaders[iIndex];
 		GL_ERROR;
@@ -361,5 +390,4 @@ namespace Neutrino {
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
 	}
-
 }

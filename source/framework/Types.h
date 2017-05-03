@@ -3,6 +3,7 @@
 #include <inttypes.h>
 
 #define _SDL_MIXER_AUDIO 1																// Predicting support for FMOD/OpenAL will end up being around the corner...
+#define _SILENT_RUNNING 1																	// Set music volume to zero on startup 
 #define _BOX2D_DEBUG_RENDER 1															// Enable/Disable support for Box2D debug draw of the physics world
 
 typedef unsigned char uint8;

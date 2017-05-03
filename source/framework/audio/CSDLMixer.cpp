@@ -16,6 +16,9 @@ namespace Neutrino
 		{
 			m_aLoadedMusic[i] = NULL;
 		}
+
+		if (_SILENT_RUNNING)
+			m_fMusicVolume = 0.0f;
 	}
 
 	CSDLMixer::~CSDLMixer()
@@ -43,6 +46,8 @@ namespace Neutrino
 
 	void CSDLMixer::SetMusicVolume(const float iVolume)
 	{
+		if (_SILENT_RUNNING)
+			return;
 		m_fMusicVolume = iVolume;
 		Mix_VolumeMusic((int)((128.0f * m_fMusicVolume)*m_fMasterVolume));
 	}

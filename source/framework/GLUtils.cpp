@@ -1018,20 +1018,6 @@ namespace Neutrino {
 		static GLuint s_iBox2DDebugPointVBO;
 		static GLuint s_iBox2DDebugTriangleVBO;
 
-		typedef struct Box2D_DebugPoint_t
-		{
-			uint32 	_colour;
-			GLfloat _position[2];
-			GLfloat _size;
-		} Box2D_DebugPoint_t;
-
-		// Reused by Line and Triangle VBOs
-		typedef struct Box2D_Vertex_t
-		{
-			uint32 	_colour;
-			GLfloat _position[2];
-		} Box2D_Vertex_t;
-
 		static const int s_iSizeOfDebugPoint = sizeof(Box2D_DebugPoint_t);
 		static const int s_iSizeOfDebugVertex = sizeof(Box2D_Vertex_t);
 
@@ -1313,6 +1299,113 @@ namespace Neutrino {
 			s_pDebugVBOs->_iVBOCounter++;
 			if (s_pDebugVBOs->_iVBOCounter == 3) s_pDebugVBOs->_iVBOCounter = 0;
 		}
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// THESE FUNCTIONS ARE ONLINE NEEDED FOR MAINLINE DEVELOPMENT. SHOULD NOT BE PORTED
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		void RenderBox2DWorld(const uint32 iLineCount, const int iPointCount, const int iTriangleCount)
+		{
+			// Render any debug lines Box2D has sent to the VBO
+			{
+				SetBox2DShader(BOX2D_LINE);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBindBuffer(GL_ARRAY_BUFFER, s_iBox2DDebugLineVBO);
+				ASSERT_GL_ERROR;
+
+				if (iLineCount != 0)
+				{
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_POSITION, 3, GL_FLOAT, 0, s_iSizeOfDebugVertex, (void*)offsetof(Box2D_Vertex_t, _position));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_POSITION);
+					ASSERT_GL_ERROR;
+
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfDebugVertex, (void*)offsetof(Box2D_Vertex_t, _colour));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_COLOR);
+					ASSERT_GL_ERROR;
+
+					glDrawArrays(GL_LINES, 0, iLineCount);
+					ASSERT_GL_ERROR;
+				}
+			}
+
+			// Render any triangles
+			{
+				SetBox2DShader(BOX2D_TRIANGLE);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBindBuffer(GL_ARRAY_BUFFER, s_iBox2DDebugTriangleVBO);
+				ASSERT_GL_ERROR;
+
+				if (iTriangleCount != 0)
+				{
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_POSITION, 3, GL_FLOAT, 0, s_iSizeOfDebugVertex, (void*)offsetof(Box2D_Vertex_t, _position));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_POSITION);
+					ASSERT_GL_ERROR;
+
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfDebugVertex, (void*)offsetof(Box2D_Vertex_t, _colour));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_COLOR);
+					ASSERT_GL_ERROR;
+
+					glDrawArrays(GL_TRIANGLES, 0, iTriangleCount*3);
+					ASSERT_GL_ERROR;
+				}
+			}
+
+			// And finally render the point sprites
+			{
+				SetBox2DShader(BOX2D_POINT);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBindBuffer(GL_ARRAY_BUFFER, s_iBox2DDebugPointVBO);
+				ASSERT_GL_ERROR;
+
+				if (iPointCount != 0)
+				{
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_POSITION, 3, GL_FLOAT, 0, s_iSizeOfDebugPoint, (void*)offsetof(Box2D_DebugPoint_t, _position));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_POSITION);
+					ASSERT_GL_ERROR;
+
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_COLOR, 4, GL_UNSIGNED_BYTE, 1, s_iSizeOfDebugPoint, (void*)offsetof(Box2D_DebugPoint_t, _colour));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_COLOR);
+					ASSERT_GL_ERROR;
+
+					glVertexAttribPointer(ATTRIB_BOX2D_DEBUG_SIZE, 1, GL_FLOAT, 1, s_iSizeOfDebugPoint, (void*)offsetof(Box2D_DebugPoint_t, _size));
+					ASSERT_GL_ERROR;
+
+					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_SIZE);
+					ASSERT_GL_ERROR;
+
+					glEnable(GL_PROGRAM_POINT_SIZE);
+					ASSERT_GL_ERROR;
+					glDrawArrays(GL_POINTS, 0, iPointCount);
+					ASSERT_GL_ERROR;
+					glDisable(GL_PROGRAM_POINT_SIZE);
+					ASSERT_GL_ERROR;
+				}
+			}
+		}
+
+		void SetBox2DVBOPtrs(GLuint * pLine, GLuint * pPoint, GLuint * pTriangle)
+		{
+			*pLine = s_iBox2DDebugLineVBO;
+			*pPoint = s_iBox2DDebugPointVBO;
+			*pTriangle = s_iBox2DDebugTriangleVBO;
+		}
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #endif
 	} // GLUtils
 }	// Neutrino

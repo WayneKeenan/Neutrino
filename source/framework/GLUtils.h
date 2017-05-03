@@ -22,7 +22,6 @@ namespace Neutrino
 {
 	namespace GLUtils 
 	{
-
 		// Vertex structure defines content order for quad data placed in the current VBO. 
 		// Colour is a AABBGGRR packed
 		// 
@@ -44,7 +43,7 @@ namespace Neutrino
 			uint8  _iVBOCounter;
 		} DynamicVBO_t;
 	
-		
+
 		// SetViewport
 		//		Attempts to setup the OGL viewport for given dimensions and calcs the associated matrices
 		void SetViewport(const int iViewportWidth, const int iViewportHeight);
@@ -171,6 +170,22 @@ namespace Neutrino
 		void ClearBuffers();
 
 #if defined DEBUG
+		// Box2D_DebugPoint_t defines the structure of the VBO used to Debug Draw the Box2D world
+		typedef struct Box2D_DebugPoint_t
+		{
+			uint32 	_colour;
+			GLfloat _position[3];
+			GLfloat _size;
+		} Box2D_DebugPoint_t;
+
+		// Reused by Line and Triangle VBOs
+		typedef struct Box2D_Vertex_t
+		{
+			uint32 	_colour;
+			GLfloat _position[3];
+		} Box2D_Vertex_t;
+
+
 		// AllocateDebugVBOs()
 		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
 		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
@@ -197,6 +212,17 @@ namespace Neutrino
 		// RenderVBO
 		// 		Bind the DEBUG VBO and render it. 
 		void RenderDebugVBOs(const uint32 iSpriteCount);
+
+
+		// RenderBox2DWorld
+		//		If Box2D has been setup with with a BOX2D_DebugDraw instance, it'll attempt to render physics
+		//		Debug output to 3 VBOs that have been setup in DEBUG builds. 
+		void RenderBox2DWorld(const uint32 iLineCount, const int iPointCount, const int iTriangleCount);
+
+		// SetBox2DVBOPtrs
+		//		Box2D_DebugDraw needs access to the output VBOs, so this function will set those
+		//		IDs. 
+		void SetBox2DVBOPtrs(GLuint *pLine, GLuint *pPoint, GLuint *pTriangle);
 #endif
 	};
 }

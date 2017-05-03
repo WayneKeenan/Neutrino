@@ -55,21 +55,7 @@ namespace Neutrino {
 	};
 
 	// Shader defines for the Debug rendering of the physics world
-#if defined DEBUG
-	enum
-	{
-		ATTRIB_BOX2D_DEBUG_POSITION,
-		ATTRIB_BOX2D_DEBUG_COLOR,
-		ATTRIB_BOX2D_DEBUG_SIZE,
-		NUM_BOX2D_DEBUG_ATTRIBUTES,
-	};
-	enum
-	{
-		BOX2D_POINT,
-		BOX2D_LINE,
-		BOX2D_TRIANGLE,
-	};
-#endif
+
 
 
 	// The shaders used for one of the final composition have a set of custom 
@@ -172,4 +158,23 @@ namespace Neutrino {
 	// LogProgram()
 	// 		Simple function to output linking errors for a shader programm. IMGUI implementation will use this
 	void LogProgram ( GLuint iProg );
+
+#if defined DEBUG
+	enum
+	{
+		ATTRIB_BOX2D_DEBUG_POSITION,
+		ATTRIB_BOX2D_DEBUG_COLOR,
+		ATTRIB_BOX2D_DEBUG_SIZE,
+		NUM_BOX2D_DEBUG_ATTRIBUTES,
+	};
+	
+	enum Box2DShader
+	{
+		BOX2D_POINT,
+		BOX2D_LINE,
+		BOX2D_TRIANGLE,
+	};
+
+	void SetBox2DShader(Box2DShader iIndex);
+#endif
 }

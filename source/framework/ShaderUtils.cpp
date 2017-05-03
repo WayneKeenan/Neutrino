@@ -204,6 +204,7 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 
 			// Get uniform locations
+			// TODO: Translate is not used, and position should be a vec3 in the shaders
 			s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "translate");
 			s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "texture");
 			s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "matrix");
@@ -288,12 +289,12 @@ namespace Neutrino {
 			LoadShader(s_pDebugBox2DLineFragFilename, s_pDebugBox2DLineVertFilename);
 			LoadShader(s_pDebugBox2DTriangleFragFilename, s_pDebugBox2DTriangleVertFilename);
 
-			s_aBox2DDebugShaders[BOX2D_POINT]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_POINT]._ProgramID;
-			s_aBox2DDebugShaders[BOX2D_POINT]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_POINT]._ProgramID, "matrix");
-			s_aBox2DDebugShaders[BOX2D_LINE]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_LINE]._ProgramID;
-			s_aBox2DDebugShaders[BOX2D_LINE]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_LINE]._ProgramID, "matrix");
-			s_aBox2DDebugShaders[BOX2D_TRIANGLE]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_TRIANGLE]._ProgramID;
-			s_aBox2DDebugShaders[BOX2D_TRIANGLE]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_TRIANGLE]._ProgramID, "matrix");
+			s_aBox2DDebugShaders[Box2DShader::BOX2D_POINT]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_POINT]._ProgramID;
+			s_aBox2DDebugShaders[Box2DShader::BOX2D_POINT]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_POINT]._ProgramID, "matrix");
+			s_aBox2DDebugShaders[Box2DShader::BOX2D_LINE]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_LINE]._ProgramID;
+			s_aBox2DDebugShaders[Box2DShader::BOX2D_LINE]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_LINE]._ProgramID, "matrix");
+			s_aBox2DDebugShaders[Box2DShader::BOX2D_TRIANGLE]._ProgramID = s_aLoadedShaders[eShader::DEBUG_BOX2D_TRIANGLE]._ProgramID;
+			s_aBox2DDebugShaders[Box2DShader::BOX2D_TRIANGLE]._Uniform = glGetUniformLocation(s_aLoadedShaders[eShader::DEBUG_BOX2D_TRIANGLE]._ProgramID, "matrix");
 		}
 #endif
 
@@ -390,4 +391,16 @@ namespace Neutrino {
 		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
 		GL_ERROR;
 	}
+
+#if defined DEBUG
+
+	void SetBox2DShader(Box2DShader iIndex)
+	{
+		GL_ERROR;
+		glUseProgram(s_aBox2DDebugShaders[iIndex]._ProgramID);
+		GL_ERROR;
+		glUniformMatrix4fv(s_aBox2DDebugShaders[iIndex]._Uniform, 1, GL_FALSE, GLUtils::GetCameraMatrix());
+		GL_ERROR;
+	}
+#endif
 }

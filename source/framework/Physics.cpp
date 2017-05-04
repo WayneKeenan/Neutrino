@@ -10,10 +10,24 @@ namespace Neutrino
 {
 #if defined DEBUG
 	static BOX2D_Debug::Box2D_DebugDraw* s_pPhysicsDebug = NULL;
+	static void TestDebugDraw(const int bDrawState)
+	{
+		if (bDrawState)
+		{
+			s_pPhysicsDebug->TestLineDraw();
+			s_pPhysicsDebug->TestFilledPolyDraw();
+			s_pPhysicsDebug->TestCircleDraw();
+			s_pPhysicsDebug->TestFilledCircleDraw();
+			s_pPhysicsDebug->TestPoint();
+			s_pPhysicsDebug->TestDrawSegment();
+			s_pPhysicsDebug->TestDrawTransform();
+		}
+	}
 #endif
 
-	static bool s_bDebugDrawWorld = false;
+	static bool s_bDebugDrawWorld = true;
 	static bool s_bWorldIsDefined = false;
+
 
 	void PhysicsInit()
 	{
@@ -27,12 +41,7 @@ namespace Neutrino
 	{
 		if (s_bWorldIsDefined)
 		{
-			#if defined DEBUG
-				s_pPhysicsDebug->TestLineDraw();
-				s_pPhysicsDebug->TestFilledPolyDraw();
-				s_pPhysicsDebug->TestCircleDraw();
-				s_pPhysicsDebug->TestPoint();
-			#endif
+			//TestDebugDraw(s_bDebugDrawWorld);
 		}
 	}
 

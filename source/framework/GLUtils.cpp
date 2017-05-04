@@ -1353,7 +1353,7 @@ namespace Neutrino {
 					glEnableVertexAttribArray(ATTRIB_BOX2D_DEBUG_COLOR);
 					ASSERT_GL_ERROR;
 
-					glDrawArrays(GL_TRIANGLES, 0, iTriangleCount*3);
+					glDrawArrays(GL_TRIANGLES, 0, iTriangleCount);
 					ASSERT_GL_ERROR;
 				}
 			}

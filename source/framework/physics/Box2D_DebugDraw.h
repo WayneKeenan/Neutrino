@@ -5,6 +5,18 @@
 #if defined DEBUG
 namespace BOX2D_Debug
 {
+	// Box2D_DebugDraw is a port of the reference renderer from Box2D's test bed example
+	// It provides debug draw functions to Box2D that can be toggled from the DEBUG 
+	// overlay that the framework provides. 
+	// 
+	// See Physics.h for how this is passed and to call the test render functions. 
+	// 
+	// Absolutely zero fucks given as to how this performs. 
+	// 
+	// NOT IMPLEMENTED:
+	//		1.	The scaling from screen space to physics world space has not been done, 
+	//				meaning one of the DrawString overrides will not function at present
+
 	class Box2D_DebugDraw : public b2Draw
 	{
 	public:
@@ -28,15 +40,21 @@ namespace BOX2D_Debug
 		void TestLineDraw();
 		void TestFilledPolyDraw();
 		void TestCircleDraw();
+		void TestFilledCircleDraw();
 		void TestPoint();
+		void TestDrawSegment();
+		void TestDrawTransform();
 
 	private:
+		// These are grabbed from the framework on construction
 		GLuint m_iBox2DDebugLineVBO;
 		GLuint m_iBox2DDebugPointVBO;
 		GLuint m_iBox2DDebugTriangleVBO;
+
+		// Counters are passed to the framework when DrawPhysicsWorld is called;
 		uint16 m_iDebugLinesVertexCount;
 		uint16 m_iDebugPointCount;
-		uint16 m_iDebugTrianglesCount;
+		uint16 m_iDebugTriangleVertexCount;
 	};
 }
 #endif

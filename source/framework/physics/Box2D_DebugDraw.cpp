@@ -10,15 +10,13 @@ using namespace GLUtils;
 
 // TODO: Get rid of these #defines once this class is finished and the physics world stuff has been implemented
 // This is all test stuff for implementation... This wont be compiled into release builds at all...
-// 
+#if defined DEBUG
 namespace BOX2D_Debug
 {
 	Box2D_DebugDraw::Box2D_DebugDraw()
 	{
-#if defined DEBUG
 		SetBox2DVBOPtrs(&m_iBox2DDebugLineVBO, &m_iBox2DDebugPointVBO, &m_iBox2DDebugTriangleVBO);
 		m_iDebugLinesVertexCount = 0; m_iDebugPointCount = 0; m_iDebugTrianglesCount = 0;
-#endif
 	}
 
 	Box2D_DebugDraw::~Box2D_DebugDraw()
@@ -28,7 +26,6 @@ namespace BOX2D_Debug
 
 	void Box2D_DebugDraw::DrawPolygon(const b2Vec2 * pVertices, int32 vertexCount, const b2Color & colour)
 	{
-#if defined DEBUG
 		ASSERT(m_iDebugLinesVertexCount < _iMAX_BOX2D_SPRITES, "Call to Box2D Draw polygon when VBO is full");
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_iBox2DDebugLineVBO);
@@ -58,12 +55,10 @@ namespace BOX2D_Debug
 			++m_iDebugLinesVertexCount;
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-#endif
 	}
 
 	void Box2D_DebugDraw::DrawSolidPolygon(const b2Vec2 * pVertices, int32 iVertexCount, const b2Color & colour)
 	{
-#if defined DEBUG
 		// Draw triangles from the passed verts
 		ASSERT(m_iDebugTrianglesCount < _iMAX_BOX2D_SPRITES, "Call to Box2D DrawSolidPolygon when VBO is full");
 
@@ -99,12 +94,10 @@ namespace BOX2D_Debug
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 
 		DrawPolygon(pVertices, iVertexCount, colour);
-#endif
 	}
 
 	void Box2D_DebugDraw::DrawCircle(const b2Vec2 & center, float32 radius, const b2Color & colour)
 	{
-#if defined DEBUG
 		const float32 k_segments = 16.0f;
 		const float32 k_increment = 2.0f * b2_pi / k_segments;
 		float32 sinInc = sinf(k_increment);
@@ -146,7 +139,6 @@ namespace BOX2D_Debug
 			v1 = v2;
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-#endif
 	}
 
 	void Box2D_DebugDraw::DrawSolidCircle(const b2Vec2 & center, float32 radius, const b2Vec2 & axis, const b2Color & color)
@@ -163,7 +155,6 @@ namespace BOX2D_Debug
 
 	void Box2D_DebugDraw::DrawPoint(const b2Vec2 & p, float32 size, const b2Color & colour)
 	{
-#if defined DEBUG
 		ASSERT(m_iDebugPointCount < _iMAX_BOX2D_SPRITES, "Call to Box2D Draw polygon when VBO is full");
 		glBindBuffer(GL_ARRAY_BUFFER, m_iBox2DDebugPointVBO);
 		ASSERT(!LogGlError(__FILE__, __LINE__), );
@@ -178,12 +169,10 @@ namespace BOX2D_Debug
 		pVertex->_size = size;
 		++m_iDebugPointCount;
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-#endif
 	}
 
 	void Box2D_DebugDraw::DrawString(int x, int y, const char * string, ...)
 	{
-#if defined DEBUG
 		va_list arg;
 		va_start(arg, string);
 		ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar);
@@ -191,7 +180,6 @@ namespace BOX2D_Debug
 		ImGui::TextColoredV(ImColor(230, 153, 153, 255), string, arg);
 		ImGui::End();
 		va_end(arg);
-#endif
 	}
 
 	void Box2D_DebugDraw::DrawString(const b2Vec2 & p, const char * string, ...)
@@ -204,48 +192,39 @@ namespace BOX2D_Debug
 
 	void Box2D_DebugDraw::DrawPhysicsWorld()
 	{
-#if defined DEBUG
 		RenderBox2DWorld(m_iDebugLinesVertexCount, m_iDebugPointCount, m_iDebugTrianglesCount);
 		m_iDebugLinesVertexCount = 0; m_iDebugPointCount = 0; m_iDebugTrianglesCount = 0;
-#endif
 	}
 
 	void Box2D_DebugDraw::TestLineDraw()
 	{
-#if defined DEBUG
 		b2Vec2* pVertices = NEWX b2Vec2[4];
 		pVertices[0] = b2Vec2(0.5f, 0.5f);
 		pVertices[1] = b2Vec2(0.7f, 0.5f);
 		pVertices[2] = b2Vec2(0.7f, 0.7f);
 		pVertices[3] = b2Vec2(0.5f, 0.7f);
 		this->DrawPolygon(pVertices, 4, b2Color(1.0f, 1.0f, 1.0f, 1.0f));
-#endif
 	}
 
 	void Box2D_DebugDraw::TestFilledPolyDraw()
 	{
-#if defined DEBUG
 		b2Vec2* pVertices = NEWX b2Vec2[6];
 		pVertices[0] = b2Vec2(0.1f, 0.3f);
 		pVertices[1] = b2Vec2(0.3f, 0.3f);
 		pVertices[2] = b2Vec2(0.3f, 0.1f);
 		pVertices[3] = b2Vec2(0.1f, 0.1f);
 		this->DrawSolidPolygon(pVertices, 4, b2Color(0.0f, 1.0f, 0.0f, 1.0f));
-#endif
 	}
 
 	void Box2D_DebugDraw::TestCircleDraw()
 	{
-#if defined DEBUG
 		b2Vec2 vPos = b2Vec2(0.6f, 0.3f);
 		this->DrawCircle(vPos, 0.05f, b2Color(1.0f, 1.0f, 0.0f, 1.0f));
-#endif
 	}
 
 	void Box2D_DebugDraw::TestPoint()
 	{
-#if defined DEBUG
 		this->DrawPoint(b2Vec2(0.8f, 0.3f),10.0f, b2Color(1.0f, 1.0f, 0.0f, 1.0f));
-#endif
 	}
 }
+#endif

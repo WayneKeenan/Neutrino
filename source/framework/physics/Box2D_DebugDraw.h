@@ -2,6 +2,7 @@
 #include "Box2D/Box2D.h"
 #include "../GLUtils.h"
 
+#if defined DEBUG
 namespace BOX2D_Debug
 {
 	class Box2D_DebugDraw : public b2Draw
@@ -38,3 +39,4 @@ namespace BOX2D_Debug
 		uint16 m_iDebugTrianglesCount;
 	};
 }
+#endif

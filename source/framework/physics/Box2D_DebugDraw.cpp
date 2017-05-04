@@ -116,7 +116,7 @@ namespace BOX2D_Debug
 
 		uint32 iColour = GetPackedColour(colour.r, colour.g, colour.b, colour.a);
 
-		for (int32 i = 0; i < k_segments; ++i)
+		for (int32 i = 0; i < (int)k_segments; ++i)
 		{
 			// Perform rotation to avoid additional trigonometry.
 			b2Vec2 r2;

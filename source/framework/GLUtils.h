@@ -141,7 +141,7 @@ namespace Neutrino
 											bool bIsTilemap);
 
 		// RenderVBO
-		// 		Bind the current VBO and call GLDrawArrays
+		// 		Bind the current sprite VBO and call GLDrawArrays
 		//   	TO_DO: If there's not a lot of shader changes, merge this and Populate VBO above...
 		void RenderVBO(const uint32 iSpriteCount, GLuint iTextureID, const int iVBOSet);
 
@@ -185,7 +185,6 @@ namespace Neutrino
 			GLfloat _position[3];
 		} Box2D_Vertex_t;
 
-
 		// AllocateDebugVBOs()
 		// 		In DEBUG builds, editor modes are able to output untextured sprites for information 
 		//		to the user. These use a separate set of VBOs, that for consistency, are still triple 
@@ -212,7 +211,6 @@ namespace Neutrino
 		// RenderVBO
 		// 		Bind the DEBUG VBO and render it. 
 		void RenderDebugVBOs(const uint32 iSpriteCount);
-
 
 		// RenderBox2DWorld
 		//		If Box2D has been setup with with a BOX2D_DebugDraw instance, it'll attempt to render physics

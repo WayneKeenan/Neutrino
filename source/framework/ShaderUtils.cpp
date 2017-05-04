@@ -68,6 +68,7 @@ namespace Neutrino {
 #if defined(DEBUG)
 		LogProgram(iProg);
 #endif
+
 		glGetProgramiv(iProg, GL_LINK_STATUS, &iStatus);
 		ASSERT_GL_ERROR;
 		if (iStatus != GL_TRUE)
@@ -327,6 +328,17 @@ namespace Neutrino {
 	}
 
 
+	void SetActiveShaderWithMatrix(eShader iIndex, float* pCameraMatrix)
+	{
+		s_pActiveShader = &s_aLoadedShaders[iIndex];
+		GL_ERROR;
+		glUseProgram(s_pActiveShader->_ProgramID);
+		GL_ERROR;
+		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
+		GL_ERROR;
+	}
+
+
 	void SetOutputScanlines(float* pCameraMatrix)
 	{
 		s_pActiveShader = &s_aLoadedShaders[OUTPUT_CRT];
@@ -381,21 +393,12 @@ namespace Neutrino {
 		GL_ERROR;
 	}
 
-
-	void SetActiveShaderWithMatrix(eShader iIndex, float* pCameraMatrix)
-	{
-		s_pActiveShader = &s_aLoadedShaders[iIndex];
-		GL_ERROR;
-		glUseProgram(s_pActiveShader->_ProgramID);
-		GL_ERROR;
-		glUniformMatrix4fv(s_pActiveShader->_Uniforms[UNIFORM_MATRIX], 1, GL_FALSE, pCameraMatrix);
-		GL_ERROR;
-	}
-
 #if defined DEBUG
-
 	void SetBox2DShader(Box2DShader iIndex)
 	{
+		// TODO: The box2D world will need a custom camera matrix that takes into account the pixel to meters ratio
+		// TODO: Define pixel to meters ratio. Somewhere around 32pixels to 1 meter? (That would make the screen 15 meters long)
+		//			 Maybe 16 would be better... (30m)
 		GL_ERROR;
 		glUseProgram(s_aBox2DDebugShaders[iIndex]._ProgramID);
 		GL_ERROR;

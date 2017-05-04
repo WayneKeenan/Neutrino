@@ -92,6 +92,8 @@ namespace Neutrino
 					return false;
 				}
 
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// TODO: REMOVE THESE; They should be part of the game config, not the framework config!
 				if(!config_lookup_int(&cfg, "internalheight", &s_pNeutrinoPreferences->_iInternalHeight))
 				{
 					config_destroy(&cfg);
@@ -105,6 +107,8 @@ namespace Neutrino
 					LOG_ERROR("Unable to parse internalwidth from Player Prefs file, exiting...");
 					return false;
 				}
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 				// TODO: Parse the audio volume preferences
 
@@ -135,7 +139,7 @@ namespace Neutrino
 				if((pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")))
 #endif
 				{
-
+					// TODO: This should pick up the current desktop resolution
 					s_pNeutrinoPreferences->_iScreenWidth = _iDEFAULT_VIEWPORT_WIDTH;
 					s_pNeutrinoPreferences->_iScreenHeight = _iDEFAULT_VIEWPORT_HEIGHT;
 					s_pNeutrinoPreferences->_iInternalWidth = _iDEFAULT_INTERNAL_WIDTH;
@@ -256,7 +260,7 @@ namespace Neutrino
 		// Create GameGlobals and set the dimensions parsed from the preferences file. 
 		{
 			CGameGlobals::Create();
-			pGameGlobals = CGameGlobals::InstancePtr(); // TODO: Remove this, just a test...
+			pGameGlobals = CGameGlobals::InstancePtr(); 
 			pGameGlobals->SetPlayerPreferences(s_pNeutrinoPreferences);
 		}
 

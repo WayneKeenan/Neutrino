@@ -77,6 +77,7 @@ namespace Neutrino {
 			return glm::value_ptr(s_mCameraMatrix);
 		}
 
+		// TODO: Get Box2DDebugWorldMatrix
 
 		void SetClearColour(const float fR, const float fG, const float fB, const float fA)
 		{
@@ -1099,7 +1100,6 @@ namespace Neutrino {
 			DELETEX s_pDebugVBOs;
 			LOG_INFO("Debug VBOs Deallocated.");
 
-			// TODO: Make this a compile time option?
 			if (_BOX2D_DEBUG_RENDER) DeallocateB2D_DebugVBOs();
 		}
 

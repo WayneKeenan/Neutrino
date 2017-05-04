@@ -9,10 +9,6 @@
 #include "Texture.h"
 #include "Level.h"
 
-// TODO: Remove this, just for testing the INPUT axis...
-#include "Input.h"
-
-
 namespace Neutrino 
 {
 	//
@@ -309,8 +305,6 @@ namespace Neutrino
 
 	void TestSprite()
 	{
-		vPos += *GetInputAxisGameDeltaScaled(0) * 100.0f;
-
 		Sprite_t* mySprite = NULL;
 		mySprite = GetActiveSprite(s_aSpriteRenderInfo[0]->_iTextureID);
 		ASSERT(mySprite, "TestSprite, GetActiveSprite returned NULL");
@@ -471,7 +465,6 @@ namespace Neutrino
 			return NULL;
 
 		// Populate defaults
-		// TODO: Delete this after you've tested it. '
 		{
 			*(pSprite->_vColour) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			*(pSprite->_vPosition) = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

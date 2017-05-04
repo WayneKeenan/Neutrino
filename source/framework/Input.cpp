@@ -45,6 +45,7 @@ namespace Neutrino
 	}
 
 
+	// TODO: Defaults for this needs to actually get written somewhere
 	static void GenerateMappingsString()
 	{
 		// TODO: This is only tracking 2 players on the keyboard atm...
@@ -71,6 +72,7 @@ namespace Neutrino
 			);
 	}	
 
+
 	static bool SetMapping(config_t* cfg, const char* sAction, int* mapping)
 	{
 		if( !config_lookup_int(cfg, sAction, mapping))
@@ -82,6 +84,14 @@ namespace Neutrino
 		return true;
 	}
 
+
+	const int GetInputMapping(const int iIndex) 
+	{ 
+		return s_pInputMappings->_aKeyboardMappings[iIndex]; 
+	}
+
+
+	// TODO: This needs to be re-written
 	bool InputInit(config_t* cfg)
 	{
 		Init();

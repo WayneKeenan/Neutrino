@@ -48,6 +48,27 @@ namespace Neutrino
 		_NUM_INPUTS,
 	};
 
+	// These must be zero terminated for the Ini file to write correctly on initial run. 
+	static const char* s_aKeyboard_InputID[eKeyboard_GameInputs::_NUM_INPUTS] =
+	{
+		"player1_up\0",
+		"player1_down\0",
+		"player1_left\0",
+		"player1_right\0",
+		"player1_action1\0",
+		"player1_action2\0",
+		"player1_action3\0",
+		"player1_action4\0",
+		"player2_up\0",
+		"player2_down\0",
+		"player2_left\0",
+		"player2_right\0",
+		"player2_action1\0",
+		"player2_action2\0",
+		"player2_action3\0",
+		"player2_action4\0"
+	};
+
 	// This enum masks the SDL_KEYCODE so the rest of the framework doesn't care that SDL is under the hood. 
 	enum eKeyboard_EditorInputs
 	{
@@ -131,6 +152,16 @@ namespace Neutrino
 	//	GetInputMappingsString()
 	// 		Return a human readable string of current input mappings that we can save to the PlayerPrefs file...
 	char* GetInputMappingsString();
+
+	inline const char** GetInputIDs() { return s_aKeyboard_InputID; };
+
+
+	const int GetInputMapping(const int iIndex);
+
+	// GetNumInputs
+	//		Returns the number of inputs defined in the eKeyboard_GameInputs enum. The default PlayerPrefs.ini file 
+	//		will iterate through these to create a basic ini file on first run.
+	inline int GetNumInputs() { return eKeyboard_GameInputs::_NUM_INPUTS; };
 
 	// SetKeys()
 	// 		SDL creates the array of key states that we want to use in these files. This function will set up the static pointer

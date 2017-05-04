@@ -1,6 +1,9 @@
 #include "CTestLevelIn.h"
 #include "../../framework/GameStateManager.h"
+#include "../../framework/Physics.h"
 
+using namespace Neutrino;
+using namespace GLUtils;
 
 CTestLevelIn::CTestLevelIn()
 {
@@ -15,18 +18,18 @@ CTestLevelIn::~CTestLevelIn()
 
 void CTestLevelIn::Init()
 {
-	Neutrino::GLUtils::SetClearColour(0.0f, 0.0f, 0.1f, 1.0f);
+	SetClearColour(0.0f, 0.0f, 0.1f, 1.0f);
+	PhysicsInit();
 }
 
 void CTestLevelIn::Update()
 {
-//	CGameState* pNextGameState = NEWX CSplashScreenExit();
-//	Neutrino::GameStateChange(pNextGameState);
+	PhysicsUpdate();
 }
 
 void CTestLevelIn::Kill()
 {
-	// Nothing to do...
+	PhysicsKill();
 }
 
 bool CTestLevelIn::ForceKill()

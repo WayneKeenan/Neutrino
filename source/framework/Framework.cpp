@@ -35,9 +35,6 @@ namespace Neutrino
 	static glm::vec3 s_pvCameraPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
-	// TODO: Remove this, temporary for testing
-	static BOX2D_Debug::Box2D_DebugDraw* s_pPhysicsDebug = NULL;
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -266,9 +263,6 @@ namespace Neutrino
 		// Enter Initial Gamestate
 		GameStateInit();
 
-		// TODO: Remove this, for debug testing only
-		s_pPhysicsDebug = NEWX BOX2D_Debug::Box2D_DebugDraw();
-
 		// Init finished successfully 
 		return s_bRunningStatus;
 	}
@@ -316,13 +310,7 @@ namespace Neutrino
 		DebugOverlayUpdate();
 		SetActiveShader(DEFAULT_UNTEXTURED);
 		DrawDebugSprites(false);
-
-		// TODO: Remove these...
-		s_pPhysicsDebug->TestLineDraw();
-		s_pPhysicsDebug->TestFilledPolyDraw();
-		s_pPhysicsDebug->TestCircleDraw();
-		s_pPhysicsDebug->TestPoint();
-		s_pPhysicsDebug->DrawPhysicsWorld();
+		PhysicsDrawWorld();
 
 		// Process editor toggling
 		if(s_iEditorModeFlag & _SPLINE_ED) LOG_INFO("Spline Editor Not Implemented");

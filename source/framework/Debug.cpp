@@ -8,6 +8,7 @@
 #include <glm/glm.hpp> 
 #include "Input.h"
 #include "File.h"
+#include "Physics.h"
 
 #include "../game/global/CGameGlobals.h"
 
@@ -18,6 +19,8 @@ namespace Neutrino
 	static bool s_bOutputLogActive = true;
 	static bool s_bPostProcessActive = false;
 	static bool s_bGameGlobalsActive = true;
+	static bool s_bVisualisersActive = false;
+
 
 	static const ImVec2* s_pOverlayPosition = NEWX ImVec2(37.0f, 10.0f);
 	static const ImVec2* s_pLogPosition = NEWX ImVec2(1100.0f, 850.0f);
@@ -164,6 +167,12 @@ namespace Neutrino
 				{
 					ImGui::Checkbox("Post Process Settings", &s_bPostProcessActive);
 					ImGui::Checkbox("Game Globals Inspector", &s_bGameGlobalsActive);
+				}
+
+				// Toggles for debug draw 
+				if (ImGui::CollapsingHeader("Debug Visualisers:", iFlags))
+				{
+					ImGui::Checkbox("Draw Physics World", GetPhysicsDebugDrawState());
 				}
 
 				ImGui::End();

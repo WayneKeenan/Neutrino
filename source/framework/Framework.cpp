@@ -23,6 +23,7 @@ namespace Neutrino
 	static const int s_iFilepathLength = 4096;
 	static const char* const s_pOrganisation = "TripleEh";
 	static const char* const s_pPrefsFilename = "PlayerPrefs.tdi";
+	static const char* const s_pPrefsIniFilename = "PlayerPrefs.ini";
 	static const char* const s_pResourcesFilename = "NeutrinoData.tdi";
 
 	static char s_pResourcesPath[s_iFilepathLength] = { '\0' };
@@ -52,6 +53,17 @@ namespace Neutrino
 
 			LOG_INFO("Resource path: %s", s_pNeutrinoPreferences->_pResourcePath);
 			LOG_INFO("Userdata path: %s", s_pNeutrinoPreferences->_pPrefsPath);
+
+
+			char pPlayerPrefsIniFilename[4096] = { '\0' };
+			sprintf(pPlayerPrefsIniFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsIniFilename);
+			if (!FileExists(pPlayerPrefsIniFilename))
+			{
+				LOG_WARNING("No Player Prefs Ini file found, creating defaults");
+				InputInitWithDefaults();
+				CreateDefaultPlayerPrefsIni(pPlayerPrefsIniFilename);
+			}
+
 
 
 			FILE* pPlayerPrefsFile;

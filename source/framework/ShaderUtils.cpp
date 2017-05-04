@@ -241,6 +241,7 @@ namespace Neutrino {
 			}
 		}
 		DELETEX[] aShaders;
+		DELETEX[] s_pPostProcessSettings;
 		LOG_INFO("Shaders detached");
 	}
 

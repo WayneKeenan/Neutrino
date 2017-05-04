@@ -299,6 +299,19 @@ namespace Neutrino {
 		return pData;
 	}
 
+	void WriteToFile(const char* const pFilePathAndName, const char* const pBytes, const int iSize)
+	{
+#if defined _WIN32
+		FILE *pFile;
+		fopen_s(&pFile, pFilePathAndName, "w");
+#else	
+		FILE* pFile = fopen(pFilePathAndName, "w");
+#endif
+
+		fwrite(pBytes, 1, iSize, pFile);
+		fclose(pFile);
+	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

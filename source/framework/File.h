@@ -43,8 +43,15 @@ namespace Neutrino {
 	// 		resource bundle will be sufficient. 
 	const TileMapData_t* LoadTileMapData(const char* sFilePathAndName, const bool bFromResourceBundle = false);
 
-
+	//	LoadPostProcessSettings
+	//		Loads and parses a binary post process settings file and returns a populated PostProcessSettings_t struct. 
+	//		This struct needs to be freed by the caller. 
 	PostProcessSettings_t* LoadPostProcessSettings(const char* sFilePathAndName, const bool bFromResourceBundle = false);
+
+	// WriteToFile
+	//		This will output the passed pBytes string to a file with zero checking. Used for writing Ini files 
+	//		out during init and via editor modes. 
+	void WriteToFile(const char* const pFilePathAndName, const char* const pBytes, const int iSize);
 
 #if defined DEBUG
 	// SaveTileMapData()

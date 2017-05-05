@@ -19,7 +19,6 @@ namespace Neutrino
 	static bool s_bOutputLogActive = true;
 	static bool s_bPostProcessActive = false;
 	static bool s_bGameGlobalsActive = true;
-	static bool s_bVisualisersActive = false;
 
 
 	static const ImVec2* s_pOverlayPosition = NEWX ImVec2(37.0f, 10.0f);

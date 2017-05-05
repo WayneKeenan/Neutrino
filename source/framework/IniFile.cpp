@@ -1,7 +1,6 @@
 #include "IniFile.h"
 #include "File.h"
 #include "Log.h"
-#include "Types.h"
 #include "Input.h"
 
 #define INI_IMPLEMENTATION
@@ -63,6 +62,45 @@ namespace Neutrino
 		ini_destroy(s_pPlayerPrefsIni);
 		WriteToFile(pFilename, pData, iSize);
 		free(pData);
+		return true;
+	}
+
+	bool ParsePlayerPrefsIni(const char* const pFilename, NeutrinoPreferences_t* pPreferences)
+	{
+	  char* pFileBytes = LoadFromFile(pFilename);
+		ini_t* pIni = ini_load( pFileBytes, NULL );
+		free(pFileBytes);
+
+		int iDefaults = ini_find_section(pIni, "defaults\0", 0 );
+
+		int iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalWidth, 0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_iInternalWidth = atoi(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalHeight, 0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_iInternalHeight = atoi(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportWidth,0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_iScreenWidth = atoi(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportHeight, 0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_iScreenHeight = atoi(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		int iInputCount = GetNumInputs();
+		const char** pInputIDs = GetInputIDs();
+		char sID[32] = { '\0' };
+		for (int i = 0; i < iInputCount; ++i)
+		{
+			memset(sID, 0, 32);
+			snprintf(sID, 32, "%s", pInputIDs[i]);
+			iPropertyIndex = ini_find_property(pIni, iDefaults, sID, 0);		
+			if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+			int iMapping  = atoi(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+			SetInputMapping((Neutrino::eKeyboard_GameInputs)i, iMapping);
+		}
 		return true;
 	}
 }

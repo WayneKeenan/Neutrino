@@ -53,6 +53,14 @@ namespace Neutrino {
 	//		out during init and via editor modes. 
 	void WriteToFile(const char* const pFilePathAndName, const char* const pBytes, const int iSize);
 
+	// LoveFromFile
+	//		Basic wrapper to load raw bytes from a file
+	char* LoadFromFile(const char* const pFilename);
+
+	//	GetFileSize
+	//		Returns te file size in bytes of a file outside the resources bundle
+	long int GetFileSize(const char* const pFilename);
+
 #if defined DEBUG
 	// SaveTileMapData()
 	// 		Takes a TileMapData_t and writes it to a file at the given path. This is a destructive operation

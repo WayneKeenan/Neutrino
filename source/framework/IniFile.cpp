@@ -14,6 +14,9 @@ namespace Neutrino
 	static const char* const s_sInternalHeight = "internal_height\0";
 	static const char* const s_sViewportWidth = "viewport_width\0";
 	static const char* const s_sViewportHeight = "viewport_height\0";
+	static const char* const s_sMasterVolume = "master_volume\0";
+	static const char* const s_sMusicVolume = "music_volume\0";
+	static const char* const s_sSFXVolume = "sfx_volume\0";
 
 
 	bool CreateDefaultPlayerPrefsIni(const char* const pFilename)
@@ -42,6 +45,12 @@ namespace Neutrino
 		memset(sStr, 0, 6);
 		snprintf(sStr, 6, "%d", _iDEFAULT_VIEWPORT_HEIGHT);
 		ini_property_add(s_pPlayerPrefsIni, iDefaultsSection, s_sViewportHeight, 0, sStr, 0);
+
+		memset(sStr, 0, 6);
+		snprintf(sStr, 6, "%.1f", 1.0f);
+		ini_property_add(s_pPlayerPrefsIni, iDefaultsSection, s_sMasterVolume, 0, sStr, 0);
+		ini_property_add(s_pPlayerPrefsIni, iDefaultsSection, s_sMusicVolume, 0, sStr, 0);
+		ini_property_add(s_pPlayerPrefsIni, iDefaultsSection, s_sSFXVolume, 0, sStr, 0);
 
 		int iInputCount = GetNumInputs();
 		const char** pInputIDs = GetInputIDs();
@@ -88,6 +97,18 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportHeight, 0);		
 		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
 		pPreferences->_iScreenHeight = atoi(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sMasterVolume, 0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_fMasterVolume = (float)atof(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sMusicVolume, 0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_fMusicVolume = (float)atof(ini_property_value( pIni, iDefaults, iPropertyIndex ));
+
+		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sSFXVolume, 0);		
+		if(iPropertyIndex == INI_NOT_FOUND) { LOG_ERROR("Unable to parse Ini file"); return false; }
+		pPreferences->_fSampleVolume = (float)atof(ini_property_value( pIni, iDefaults, iPropertyIndex ));
 
 		int iInputCount = GetNumInputs();
 		const char** pInputIDs = GetInputIDs();

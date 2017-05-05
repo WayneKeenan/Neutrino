@@ -58,16 +58,16 @@ namespace Neutrino
 
 		// This will get updated with player preferences.
 		InputInitWithDefaults();
-
-		// If no player preferences .ini file exists, create a default one. This is probably the first run.
-		// If one exists, parse it and set the preferences for the framework. 
+		
 		if (!FileExists(pPlayerPrefsIniFilename))
 		{
+			// If no player preferences .ini file exists, create a default one. This is probably the first run.
 			LOG_WARNING("No Player Prefs Ini file found, creating defaults");
 			CreateDefaultPlayerPrefsIni(pPlayerPrefsIniFilename);
 		}
 		else 
 		{
+			// If one exists, parse it and set the preferences for the framework. 
 			LOG_INFO("Loading %s", pPlayerPrefsIniFilename);
 			if(!ParsePlayerPrefsIni(pPlayerPrefsIniFilename, s_pNeutrinoPreferences))
 			{

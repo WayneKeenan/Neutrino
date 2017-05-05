@@ -793,7 +793,7 @@ int ini_section_add( ini_t* ini, char const* name, int length )
             }
 
         ini->sections[ ini->section_count ].name_large = 0;
-        if( length + 1 >= sizeof( ini->sections[ 0 ].name ) )
+        if( length + 1 >= (int)sizeof( ini->sections[ 0 ].name ) )
             {
             ini->sections[ ini->section_count ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
             INI_MEMCPY( ini->sections[ ini->section_count ].name_large, name, (size_t) length );
@@ -835,7 +835,7 @@ void ini_property_add( ini_t* ini, int section, char const* name, int name_lengt
         ini->properties[ ini->property_count ].name_large = 0;
         ini->properties[ ini->property_count ].value_large = 0;
 
-        if( name_length + 1 >= sizeof( ini->properties[ 0 ].name ) )
+        if( name_length + 1 >= (int)sizeof( ini->properties[ 0 ].name ) )
             {
             ini->properties[ ini->property_count ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) name_length + 1 );
             INI_MEMCPY( ini->properties[ ini->property_count ].name_large, name, (size_t) name_length );
@@ -847,7 +847,7 @@ void ini_property_add( ini_t* ini, int section, char const* name, int name_lengt
             ini->properties[ ini->property_count ].name[ name_length ] = '\0';
             }
 
-        if( value_length + 1 >= sizeof( ini->properties[ 0 ].value ) )
+        if( value_length + 1 >= (int)sizeof( ini->properties[ 0 ].value ) )
             {
             ini->properties[ ini->property_count ].value_large = (char*) INI_MALLOC( ini->memctx, (size_t) value_length + 1 );
             INI_MEMCPY( ini->properties[ ini->property_count ].value_large, value, (size_t) value_length );
@@ -918,7 +918,7 @@ void ini_section_name_set( ini_t* ini, int section, char const* name, int length
         if( ini->sections[ section ].name_large ) INI_FREE( ini->memctx, ini->sections[ section ].name_large );
         ini->sections[ section ].name_large = 0;
         
-        if( length + 1 >= sizeof( ini->sections[ 0 ].name ) )
+        if( length + 1 >= (int)sizeof( ini->sections[ 0 ].name ) )
             {
             ini->sections[ section ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
             INI_MEMCPY( ini->sections[ section ].name_large, name, (size_t) length );
@@ -946,7 +946,7 @@ void ini_property_name_set( ini_t* ini, int section, int property, char const* n
             if( ini->properties[ p ].name_large ) INI_FREE( ini->memctx, ini->properties[ p ].name_large );
             ini->properties[ ini->property_count ].name_large = 0;
 
-            if( length + 1 >= sizeof( ini->properties[ 0 ].name ) )
+            if( length + 1 >= (int)sizeof( ini->properties[ 0 ].name ) )
                 {
                 ini->properties[ p ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
                 INI_MEMCPY( ini->properties[ p ].name_large, name, (size_t) length );
@@ -975,7 +975,7 @@ void ini_property_value_set( ini_t* ini, int section, int property, char const* 
             if( ini->properties[ p ].value_large ) INI_FREE( ini->memctx, ini->properties[ p ].value_large );
             ini->properties[ ini->property_count ].value_large = 0;
 
-            if( length + 1 >= sizeof( ini->properties[ 0 ].value ) )
+            if( length + 1 >= (int)sizeof( ini->properties[ 0 ].value ) )
                 {
                 ini->properties[ p ].value_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
                 INI_MEMCPY( ini->properties[ p ].name_large, value, (size_t) length );

@@ -1,5 +1,4 @@
 #include "Framework.h"
-#include "libconfig.h"
 #include <stdio.h>
 
 #if defined DEBUG
@@ -10,6 +9,24 @@
 #if defined _WIN32
 	#define sprintf sprintf_s
 #endif
+
+
+#include "sdl/sdl_wrapper.h"
+#include "Log.h"
+#include "Types.h"
+#include "Time.h"
+#include "GL/glew.h"
+#include "GLUtils.h"
+#include "Sprite.h"
+#include "File.h"
+#include "ShaderUtils.h"
+#include "GameStateManager.h"
+#include "../game/global/CGameGlobals.h"
+#include "Texture.h"
+#include "Input.h"
+#include "Level.h"
+#include "Physics.h"
+#include "IniFile.h"
 
 namespace Neutrino 
 {
@@ -89,14 +106,10 @@ namespace Neutrino
 		}
 
 
-		// Now the resources file is mounted, load the Game Config file and keep it open for other 
-		// parts of the game to quickly grab whatever it is they need. 
-		if(!LoadConfigFile())
+		if(!LoadGameConfigIni())
 		{
-			LOG_ERROR("Unable to load Game Config file, exiting.");
-			return false;
+			LOG_ERROR("Unable to load the GameConfig.ini file, exiting.");
 		}
-
 
 		// Create an SDL window, with audio mixer and an OGL 3 Context and compile standard shaders
 		// 
@@ -268,7 +281,7 @@ namespace Neutrino
 		GLUtils::DeallocateFBOs();
 		DetachShaders();
 		InputKill();
-		UnloadConfigFile();
+		UnloadGameConfigIni();
 
 #if defined DEBUG
 		DebugOverlayKill();

@@ -1,6 +1,5 @@
 #include "Level.h"
 #include "Log.h"
-#include "ConfigFile.h"
 #include "Assert.h"
 #include "Types.h"
 #include "Memory.h"
@@ -9,6 +8,7 @@
 #include "Texture.h"
 #include "Sprite.h"
 #include "string.h"
+#include "IniFile.h"
 
 namespace Neutrino {
 
@@ -18,65 +18,28 @@ namespace Neutrino {
 
 	bool LoadLevelsFromConfig()
 	{
-		const config_setting_t* pLevels;
-		const config_setting_t* pLevel; 
-		int iNumLevels = 0;
-
-		// Do basic sanity checks before we parse the data
-		//
+		int iNumLevels = GetNumLevels();
+		if (0 == iNumLevels)
 		{
-			pLevels = GameConfigGetSetting("levels");
-			if (NULL == pLevels)
-			{
-				LOG_ERROR("Unable to get the levels group setting from the config file!");
-				return false;
-			}
-
-			iNumLevels = GetSettingLength(pLevels);
-			if (0 == iNumLevels)
-			{
-				LOG_ERROR("Zero levels are defined in GameConfig.txt's level setting group!");
-				return false;
-			}
-
-			if (iNumLevels > _iMAX_LEVELS)
-			{
-				LOG_ERROR("There are more levels defined in GameConfig.txt than the framework supports. Adjust iMAX_LEVELS!");
-				return false;
-			}
-
-			LOG_INFO("There are %d levels defined in GameConfig.txt", iNumLevels);
+			LOG_ERROR("Zero levels are defined in GameConfig.ini");
+			return false;
 		}
+		if (iNumLevels > _iMAX_LEVELS)
+		{
+			LOG_ERROR("There are more levels defined in GameConfig.txt than the framework supports. Adjust iMAX_LEVELS!");
+			return false;
+		}
+		LOG_INFO("There are %d levels defined in GameConfig.txt", iNumLevels);
 
-
-		// Parse the level name and tilemap filenames from GameConfig.txt
-		//
 		for (uint16 i = 0; i < iNumLevels; ++i)
 		{
 			s_pFrameworkLevels[i] = NEWX(FrameworkLevelData_t);
-			pLevel = GetSettingElement(pLevels, i);
-			if (NULL == pLevel)
-			{
-				LOG_ERROR("Unable to get group: %d from the Levels array in GameConfig.txt LoadLevelsFromConfig failed...");
-				return false;
-			}
 
 			// Get the level name
-			s_pFrameworkLevels[i]->_sLevelName = GetStringFromSetting(pLevel, "name");
-			if (strcmp(s_pFrameworkLevels[i]->_sLevelName,"") == 0)
-			{
-				LOG_ERROR("Unable to parse level name from GameConfig.txt... Is the latest config file in the resources bundle?");
-				return false;
-			}
-
+			//s_pFrameworkLevels[i]->_sLevelName = "TBD";"
 			// Get the filename of the tilemap binary file
-			s_pFrameworkLevels[i]->_sTilemapFilename = GetStringFromSetting(pLevel, "tilemap");
-			if (strcmp(s_pFrameworkLevels[i]->_sTilemapFilename, "") == 0)
-			{
-				LOG_ERROR("Unable to parse tilemap filename from GameConfig.txt... Is the latest config file in the resources bundle ?");
-				return false;
-			}
-
+			s_pFrameworkLevels[i]->_sTilemapFilename = GetLevel(i);
+			
 			// Load the Tilemap Data from the binary file in the resource bundle
 			{
 				s_pFrameworkLevels[i]->_pBackgroundTilemap = LoadTileMapData(s_pFrameworkLevels[i]->_sTilemapFilename, true);
@@ -110,7 +73,6 @@ namespace Neutrino {
 				LOG_INFO("Static VBO built and populated!");
 			}
 		}
-
 		// Finished!
  		return true;
 	}

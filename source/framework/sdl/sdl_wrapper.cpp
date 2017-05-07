@@ -264,7 +264,7 @@ namespace Neutrino
 		// TODO: Free up any used memory and unload all samples
 		Mix_CloseAudio();
 		Mix_Quit();
-		LOG_INFO("Audio sub-system deinitialised.");
+		LOG_INFO("Audio sub-system Deinitialised.");
 	}
 
 

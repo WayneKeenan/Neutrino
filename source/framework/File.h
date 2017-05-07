@@ -32,7 +32,7 @@ namespace Neutrino {
 	// LoadResourceBytes()
 	// 		'Load' a given file from the resource bundle, returning a pointer to alocated bytes
 	//   	Note: no allocation tracking is undertaken by this function. It's the responsibility
-	//    	of the calling function to free memory allocated by this load. 
+	//    of the calling function to free memory allocated by this load. 
 	const char* LoadResourceBytes(const char* pFilename);
 
 	// LoadTileMapData()

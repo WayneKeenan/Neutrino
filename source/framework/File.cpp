@@ -313,6 +313,29 @@ namespace Neutrino {
 	}
 
 
+  char* LoadFromFile(const char* const pFilename)
+	{
+		FILE* pFile = fopen( pFilename, "r" );
+		fseek(pFile, 0, SEEK_END);
+		long int iSize = ftell( pFile );
+		fseek(pFile, 0, SEEK_SET);
+		char* pBytes = (char*) malloc( iSize + 1 );
+		fread( pBytes, 1, iSize, pFile );
+		pBytes[ iSize ] = '\0';
+		fclose(pFile);
+		return pBytes;
+	}
+
+	long int GetFileSize(const char* const pFilename)
+	{
+		FILE* pFile = fopen( pFilename, "r" );
+		fseek(pFile, 0, SEEK_END);
+		long int iSize = ftell( pFile );
+		fclose(pFile);
+		return iSize;	
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 

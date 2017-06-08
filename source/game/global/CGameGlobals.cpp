@@ -24,7 +24,7 @@ CGameGlobals::~CGameGlobals()
 	{
 		DELETEX m_pAudioInterface;
 	}
-	LOG_INFO("Game Globals destroyed");
+	LOG_INFO("Game Globals Destroyed");
 }
 
 void CGameGlobals::SetPlayerPreferences(const NeutrinoPreferences_t* const pPreferences)

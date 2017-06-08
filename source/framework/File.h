@@ -32,7 +32,7 @@ namespace Neutrino {
 	// LoadResourceBytes()
 	// 		'Load' a given file from the resource bundle, returning a pointer to alocated bytes
 	//   	Note: no allocation tracking is undertaken by this function. It's the responsibility
-	//    	of the calling function to free memory allocated by this load. 
+	//    of the calling function to free memory allocated by this load. 
 	const char* LoadResourceBytes(const char* pFilename);
 
 	// LoadTileMapData()
@@ -52,6 +52,14 @@ namespace Neutrino {
 	//		This will output the passed pBytes string to a file with zero checking. Used for writing Ini files 
 	//		out during init and via editor modes. 
 	void WriteToFile(const char* const pFilePathAndName, const char* const pBytes, const int iSize);
+
+	// LoveFromFile
+	//		Basic wrapper to load raw bytes from a file
+	char* LoadFromFile(const char* const pFilename);
+
+	//	GetFileSize
+	//		Returns te file size in bytes of a file outside the resources bundle
+	long int GetFileSize(const char* const pFilename);
 
 #if defined DEBUG
 	// SaveTileMapData()

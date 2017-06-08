@@ -7,6 +7,7 @@
 #include "Types.h"
 #include "Sprite.h"
 #include "ConfigFile.h"
+#include "IniFile.h"
 
 #if defined _WIN32
 #define sprintf sprintf_s
@@ -78,8 +79,8 @@ namespace Neutrino {
 
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
 	{
-		if (!ResourceFileExists(pFilename)) { LOG_ERROR("Unable to find %s, exiting...", pFilename); return false; }
-		if (!ResourceFileExists(pTPageFilename)) { LOG_ERROR("Unable to find %s, exiting...", pTPageFilename); return false; }
+		if (!ResourceFileExists(pFilename)) { LOG_ERROR("%s does not exist in the resources bundle!", pFilename); return false; }
+		if (!ResourceFileExists(pTPageFilename)) { LOG_ERROR("%s does not exist in the resources bundle!", pTPageFilename); return false; }
 
 
 		// 
@@ -231,44 +232,36 @@ namespace Neutrino {
 		// Iterate over the possible textures
 		// 
 		{
-			int iTextureCount = 0;
-			if (GameConfigGetInt("textures.count", &iTextureCount))
+			int iTextureCount = GetNumTextures();
+			for(int i = 0; i<iTextureCount; i++)
 			{
-				for(int i = 0; i<iTextureCount; i++)
+				const char* pFilename = GetTextureFilename(i);
+				const char* pTPageFilename = GetTPageFilename(i);
+				if ( NULL == pFilename || NULL == pTPageFilename )
 				{
-					char sID[64]={'\0'};
-					char sTP[64]={'\0'};
-					sprintf(sID, "textures.texture%d", i);
-					sprintf(sTP, "textures.tpageinfo%d", i);
+					LOG_ERROR("Possible error in GameConfig.ini, one of the tpage parameters is null.");
+					return false;
+				}
 
-					const char* pFilename = GameConfigGetString(sID);			 // This is the texture binary
-					const char* pTPageFilename = GameConfigGetString(sTP); // TPage is the text file with sprite info
-
-				  if ( NULL != pFilename && NULL != pTPageFilename )
-					{
-						LOG_INFO("Found texture: %s\nINF: Found texture info: %s", pFilename, pTPageFilename);
-						if (LoadTexture(pFilename, pTPageFilename, s_iLoadedTextureCount))
-						{
-							AllocateSpriteArrays(s_aTexturePages[s_iLoadedTextureCount]._iTextureID);
-							GLUtils::AllocateDynamicVBOSet();
-							++s_iLoadedTextureCount;
-						}
-						else
-						{
-							LOG_ERROR("Failed to load %s, exiting...", pFilename);
-							return false;
-						}
-					}
-				}										
+				LOG_INFO("Found texture: %s\nINF: Found texture info: %s", pFilename, pTPageFilename);
+				if (LoadTexture(pFilename, pTPageFilename, s_iLoadedTextureCount))
+				{
+					AllocateSpriteArrays(s_aTexturePages[s_iLoadedTextureCount]._iTextureID);
+					GLUtils::AllocateDynamicVBOSet();
+					++s_iLoadedTextureCount;
+				}
+				else
+				{
+					LOG_ERROR("Failed to load %s, exiting...", pFilename);
+					return false;
+				}
 			}
 		}
 
+
 		LOG_INFO("Loaded %d textures.", s_iLoadedTextureCount);
 		return true;
-	}
-
-
-
+	}				
 
 	void DeallocateTextures()
 	{
@@ -279,6 +272,6 @@ namespace Neutrino {
 		}
 
 		DELETEX [] s_aTexturePages;
-		LOG_INFO("Textures deallocated.");
+		LOG_INFO("Textures Deallocated.");
 	}
 }

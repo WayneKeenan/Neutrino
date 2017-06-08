@@ -137,9 +137,6 @@ namespace Neutrino
 		float _MOUSE_WHEEL;
 	} MouseInput_t;
 
-	// InputInit()
-	// 		Allocates memory for the input mappings array and parses the Player's Prefs file for the current input mappings
-	bool InputInit(config_t* cfg);
 
 	// InputKill()
 	// 		Deallocates the input mappings array. 
@@ -149,14 +146,11 @@ namespace Neutrino
 	// 		If no player prefs file is found, this is called to setup the input mappings to a default set of WSAD/SPACE
 	void InputInitWithDefaults();
 
-	//	GetInputMappingsString()
-	// 		Return a human readable string of current input mappings that we can save to the PlayerPrefs file...
-	char* GetInputMappingsString();
-
 	inline const char** GetInputIDs() { return s_aKeyboard_InputID; };
 
+	void SetInputMapping(const eKeyboard_GameInputs iIndex, const int mapping);
 
-	const int GetInputMapping(const int iIndex);
+	int GetInputMapping(const int iIndex);
 
 	// GetNumInputs
 	//		Returns the number of inputs defined in the eKeyboard_GameInputs enum. The default PlayerPrefs.ini file 

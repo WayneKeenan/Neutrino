@@ -164,8 +164,11 @@ namespace Neutrino {
 			// glm::mat4 mRotationMatrix = glm::mat4();
 			// 
 			// We are going to move the camera:
-			glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(1.0f), *vPos);
 
+			// int iX = (int)(vPos->x / s_fScaledPixelWidth);
+			// int iY = (int)(vPos->y / s_fScaledPixelHeight);
+			// glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(iX*s_fScaledPixelWidth, iY*s_fScaledPixelHeight, 0.0f));
+			glm::mat4 mTranslationMatrix = glm::translate(glm::mat4(1.0f), *vPos);
 			s_mModelViewMatrix = mTranslationMatrix;    // * mRotationMatrix;  // Add in scale? Are we going to zoom in and out?
 			s_mCameraMatrix = s_mProjectionMatrix * s_mModelViewMatrix;
 		}
@@ -362,7 +365,7 @@ namespace Neutrino {
 			glDeleteTextures(1, &s_iFBO_BlurVertTexture);
 			glDeleteBuffers(1, &s_iFullScreenQuadVBO);
 			GL_ERROR;
-			LOG_INFO("FBOs and render textures Deallocated");
+			LOG_INFO("FBOs and Render Textures Deallocated");
 		}
 
 

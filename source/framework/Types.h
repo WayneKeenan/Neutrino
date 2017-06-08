@@ -50,11 +50,12 @@ static const uint8 _PARTICLE_ED = 0x04;
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)
 
+// This struct defines the framework wide preferences that can be saved by the user
 typedef struct NeutrinoPreferences_t {
-	int _iScreenWidth;						
-	int _iScreenHeight;
-	int _iInternalWidth;					
-	int _iInternalHeight;
+	int _iScreenWidth = _iDEFAULT_VIEWPORT_WIDTH;						
+	int _iScreenHeight = _iDEFAULT_VIEWPORT_HEIGHT;
+	int _iInternalWidth = _iDEFAULT_INTERNAL_WIDTH;				
+	int _iInternalHeight = _iDEFAULT_INTERNAL_HEIGHT;
 	float _InternalPixelWidth;
 	float _InternalPixelHeight;
 	float _fMasterVolume = 1.0f;

@@ -1,5 +1,4 @@
 #include "Framework.h"
-#include "libconfig.h"
 #include <stdio.h>
 
 #if defined DEBUG
@@ -10,6 +9,24 @@
 #if defined _WIN32
 	#define sprintf sprintf_s
 #endif
+
+
+#include "sdl/sdl_wrapper.h"
+#include "Log.h"
+#include "Types.h"
+#include "Time.h"
+#include "GL/glew.h"
+#include "GLUtils.h"
+#include "Sprite.h"
+#include "File.h"
+#include "ShaderUtils.h"
+#include "GameStateManager.h"
+#include "../game/global/CGameGlobals.h"
+#include "Texture.h"
+#include "Input.h"
+#include "Level.h"
+#include "Physics.h"
+#include "IniFile.h"
 
 namespace Neutrino 
 {
@@ -44,134 +61,35 @@ namespace Neutrino
 	{
 		if(	!SDLInit(s_pOrganisation, pGameName) ) return false;
 
-		// Get PlayerPrefs.tdi for this game, parse it and populate engine preferences
-		//
+
+		// Create a new prefs struct and populate the default paths
+		s_pNeutrinoPreferences = NEWX(NeutrinoPreferences_t);
+		s_pNeutrinoPreferences->_pPrefsPath = SDLGetPrefPath();
+		s_pNeutrinoPreferences->_pResourcePath = SDLGetBasePath();
+		LOG_INFO("Resource path: %s", s_pNeutrinoPreferences->_pResourcePath);
+		LOG_INFO("Userdata path: %s", s_pNeutrinoPreferences->_pPrefsPath);
+
+		char pPlayerPrefsIniFilename[4096] = { '\0' };
+		sprintf(pPlayerPrefsIniFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsIniFilename);
+	
+
+		// This will get updated with player preferences.
+		InputInitWithDefaults();
+		
+		if (!FileExists(pPlayerPrefsIniFilename))
 		{
-			s_pNeutrinoPreferences = NEWX(NeutrinoPreferences_t);
-			s_pNeutrinoPreferences->_pPrefsPath = SDLGetPrefPath();
-			s_pNeutrinoPreferences->_pResourcePath = SDLGetBasePath();
-
-			LOG_INFO("Resource path: %s", s_pNeutrinoPreferences->_pResourcePath);
-			LOG_INFO("Userdata path: %s", s_pNeutrinoPreferences->_pPrefsPath);
-
-
-			char pPlayerPrefsIniFilename[4096] = { '\0' };
-			sprintf(pPlayerPrefsIniFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsIniFilename);
-			if (!FileExists(pPlayerPrefsIniFilename))
+			// If no player preferences .ini file exists, create a default one. This is probably the first run.
+			LOG_WARNING("No Player Prefs Ini file found, creating defaults");
+			CreateDefaultPlayerPrefsIni(pPlayerPrefsIniFilename);
+		}
+		else 
+		{
+			// If one exists, parse it and set the preferences for the framework. 
+			LOG_INFO("Loading %s", pPlayerPrefsIniFilename);
+			if(!ParsePlayerPrefsIni(pPlayerPrefsIniFilename, s_pNeutrinoPreferences))
 			{
-				LOG_WARNING("No Player Prefs Ini file found, creating defaults");
-				InputInitWithDefaults();
-				CreateDefaultPlayerPrefsIni(pPlayerPrefsIniFilename);
-			}
-
-
-
-			FILE* pPlayerPrefsFile;
-			char pPlayerPrefsFilename[4096]={'\0'};
-			sprintf(pPlayerPrefsFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsFilename);
-
-			if(FileExists(pPlayerPrefsFilename))
-			{
-				// Parse existing player preferences file...
-				//
-				config_t cfg;
-				config_init(&cfg);
-
-
-				//
-				// Parse the dimensions for the game window and internal render buffer
-				// (This is for pixel games, so assumption is we'll always render to a smaller
-				// backbuffer and then present that scaled up in the final displayport)
-				//     
-				if(!config_read_file(&cfg, pPlayerPrefsFilename)) 
-				{
-					config_destroy(&cfg);
-					LOG_ERROR("Unable to parse Player Prefs file, exiting...");
-					return false;
-				}
-
-				if(!config_lookup_int(&cfg, "screenheight", &s_pNeutrinoPreferences->_iScreenHeight))
-				{
-					config_destroy(&cfg);
-					LOG_ERROR("Unable to parse screenhieght from Player Prefs file, exiting...");
-					return false;
-				}
-
-				if(!config_lookup_int(&cfg, "screenwidth", &s_pNeutrinoPreferences->_iScreenWidth ))
-				{
-					config_destroy(&cfg);
-					LOG_ERROR("Unable to parse screenwidth from Player Prefs file, exiting...");
-					return false;
-				}
-
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				// TODO: REMOVE THESE; They should be part of the game config, not the framework config!
-				if(!config_lookup_int(&cfg, "internalheight", &s_pNeutrinoPreferences->_iInternalHeight))
-				{
-					config_destroy(&cfg);
-					LOG_ERROR("Unable to parse internalhieght from Player Prefs file, exiting...");
-					return false;
-				}
-
-				if(!config_lookup_int(&cfg, "internalwidth", &s_pNeutrinoPreferences->_iInternalWidth ))
-				{
-					config_destroy(&cfg);
-					LOG_ERROR("Unable to parse internalwidth from Player Prefs file, exiting...");
-					return false;
-				}
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-				// TODO: Parse the audio volume preferences
-
-				//	Now parse the player's input preferences
-				if(!InputInit(&cfg))
-				{
-					config_destroy(&cfg);	
-					return false;
-				}
-				LOG_INFO("Input bindings parsed and set to the following:\n\n%s", GetInputMappingsString());				
-
-				// Think we've got what we need from the config file for now
-				config_destroy(&cfg);
-			}
-			else
-			{
-				LOG_WARNING("No player prefs file found, creating defaults...");
-
-				// This will create a default keyboard input mapping set (Mapped to SDL Keycodes)
-				InputInitWithDefaults();
-
-				// write out a default player prefs file since this is looks like the first run
-				//
-#if defined _WIN32
-				fopen_s(&pPlayerPrefsFile, pPlayerPrefsFilename, "w");
-				if(pPlayerPrefsFile)
-#else
-				if((pPlayerPrefsFile = fopen(pPlayerPrefsFilename, "w")))
-#endif
-				{
-					// TODO: This should pick up the current desktop resolution
-					s_pNeutrinoPreferences->_iScreenWidth = _iDEFAULT_VIEWPORT_WIDTH;
-					s_pNeutrinoPreferences->_iScreenHeight = _iDEFAULT_VIEWPORT_HEIGHT;
-					s_pNeutrinoPreferences->_iInternalWidth = _iDEFAULT_INTERNAL_WIDTH;
-					s_pNeutrinoPreferences->_iInternalHeight = _iDEFAULT_INTERNAL_HEIGHT;
-
-					const char* pInputMappingsText = GetInputMappingsString();
-					const char* pPrefsText = "screenheight: 1080\nscreenwidth: 1920\ninternalwidth: 480\ninternalheight: 270\n";	
-					// TODO: This isn't picking up the static consts from Types.h!
-
-					fprintf(pPlayerPrefsFile, "%s", pPrefsText);
-					fprintf(pPlayerPrefsFile, "%s", pInputMappingsText);
-
-					fflush(pPlayerPrefsFile);
-					fclose(pPlayerPrefsFile);
-				}
-				else
-				{
-					LOG_ERROR("Unable to write a default preferences file. Exiting...");
-					return false;
-				}
+				LOG_ERROR("Unable to parse %s. Delete this file and re-launch the game. A new set of player defaults will be created and the game should launch.");
+				return false;
 			}
 		}
 
@@ -188,14 +106,10 @@ namespace Neutrino
 		}
 
 
-		// Now the resources file is mounted, load the Game Config file and keep it open for other 
-		// parts of the game to quickly grab whatever it is they need. 
-		if(!LoadConfigFile())
+		if(!LoadGameConfigIni())
 		{
-			LOG_ERROR("Unable to load Game Config file, exiting.");
-			return false;
+			LOG_ERROR("Unable to load the GameConfig.ini file, exiting.");
 		}
-
 
 		// Create an SDL window, with audio mixer and an OGL 3 Context and compile standard shaders
 		// 
@@ -214,6 +128,7 @@ namespace Neutrino
 				return false;
 		}
 
+
 		// Set our internal / external dimensions
 		{
 			GLUtils::SetViewport(s_pNeutrinoPreferences->_iScreenWidth, s_pNeutrinoPreferences->_iScreenHeight);
@@ -225,6 +140,7 @@ namespace Neutrino
 			s_pNeutrinoPreferences->_InternalPixelHeight = vDims.y;
 		}
 
+
 		// Allocate FBOs and the render textures
 		if (!GLUtils::AllocateFBOs())
 		{
@@ -232,12 +148,14 @@ namespace Neutrino
 			return false;
 		}
 
+
 		// Init timing and logging facility
 		//
 		{
 			TimeInit();
 			GetSystemLog();
 		}
+
 
 		// Load all the textures defined in GameCofig.txt
 		// There's a current assumption that we can probably load all our textures on init 
@@ -275,6 +193,7 @@ namespace Neutrino
 			pGameGlobals = CGameGlobals::InstancePtr(); 
 			pGameGlobals->SetPlayerPreferences(s_pNeutrinoPreferences);
 		}
+
 
 		// Enter Initial Gamestate
 		GameStateInit();
@@ -362,7 +281,7 @@ namespace Neutrino
 		GLUtils::DeallocateFBOs();
 		DetachShaders();
 		InputKill();
-		UnloadConfigFile();
+		UnloadGameConfigIni();
 
 #if defined DEBUG
 		DebugOverlayKill();

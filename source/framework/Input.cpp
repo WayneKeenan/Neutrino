@@ -41,83 +41,18 @@ namespace Neutrino
 		// TODO: This will have to handle joypad mappings as well. Too small! 
 		s_pKeyboardMappingsString = NEWX char[25*16];
 		memset(s_pKeyboardMappingsString, '\0', sizeof(char) * (25*16));
+	}
 
+	void SetInputMapping(const eKeyboard_GameInputs iIndex, const int iMapping)
+	{
+		s_pInputMappings->_aKeyboardMappings[iIndex] = iMapping; 
 	}
 
 
-	// TODO: Defaults for this needs to actually get written somewhere
-	static void GenerateMappingsString()
-	{
-		// TODO: This is only tracking 2 players on the keyboard atm...
-		//       Needs to go up to 4...
-		snprintf(s_pKeyboardMappingsString, 25*16, 
-				"player1_up: %d\nplayer1_down: %d\nplayer1_left: %d\nplayer1_right: %d\nplayer1_action1: %d\nplayer1_action2: %d\nplayer1_action3: %d\nplayer1_action4: %d\nplayer2_up: %d\nplayer2_down: %d\nplayer2_left: %d\nplayer2_right: %d\nplayer2_action1: %d\nplayer2_action2: %d\nplayer2_action3: %d\nplayer2_action4: %d\n",
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION1],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION2],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION3],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION4],	
-
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION1],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION2],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION3],
-				s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION4]
-			);
-	}	
-
-
-	static bool SetMapping(config_t* cfg, const char* sAction, int* mapping)
-	{
-		if( !config_lookup_int(cfg, sAction, mapping))
-		{
-			config_destroy(cfg);
-			LOG_ERROR("Unable to parse %s from Player Prefs file, exiting...", sAction);
-			return false;
-		}
-		return true;
-	}
-
-
-	const int GetInputMapping(const int iIndex) 
+	int GetInputMapping(const int iIndex) 
 	{ 
 		return s_pInputMappings->_aKeyboardMappings[iIndex]; 
 	}
-
-
-	// TODO: This needs to be re-written
-	bool InputInit(config_t* cfg)
-	{
-		Init();
-
-		if (!SetMapping(cfg, "player1_up", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_UP]) ) return false;
-		if (!SetMapping(cfg, "player1_down", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_DOWN]) ) return false;
-		if (!SetMapping(cfg, "player1_left", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_LEFT]) ) return false;
-		if (!SetMapping(cfg, "player1_right", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_RIGHT]) ) return false;
-		if (!SetMapping(cfg, "player1_action1", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION1]) ) return false;
-		if (!SetMapping(cfg, "player1_action2", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION2]) ) return false;
-		if (!SetMapping(cfg, "player1_action3", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION3]) ) return false;
-		if (!SetMapping(cfg, "player1_action4", &s_pInputMappings->_aKeyboardMappings[_PLAYER1_ACTION4]) ) return false;
-
-		if (!SetMapping(cfg, "player2_up", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_UP]) ) return false;
-		if (!SetMapping(cfg, "player2_down", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_DOWN]) ) return false;
-		if (!SetMapping(cfg, "player2_left", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_LEFT]) ) return false;
-		if (!SetMapping(cfg, "player2_right", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_RIGHT]) ) return false;
-		if (!SetMapping(cfg, "player2_action1", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION1]) ) return false;
-		if (!SetMapping(cfg, "player2_action2", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION2]) ) return false;
-		if (!SetMapping(cfg, "player2_action3", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION3]) ) return false;
-		if (!SetMapping(cfg, "player2_action4", &s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION4]) ) return false;
-
-		GenerateMappingsString();
-		return true;
-	}
-
 
 	void InputInitWithDefaults()
 	{
@@ -139,10 +74,7 @@ namespace Neutrino
 		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION2] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
 		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION3] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
 		s_pInputMappings->_aKeyboardMappings[_PLAYER2_ACTION4] = SDLK_UNKNOWN & ~SDLK_SCANCODE_MASK;
-
-		GenerateMappingsString();
 	}
-
 
 	bool InputKill()
 	{
@@ -152,10 +84,6 @@ namespace Neutrino
 		return true;
 	}
 
-	char* GetInputMappingsString()
-	{
-		return s_pKeyboardMappingsString;
-	}
 
 	void SetControls(int* pKeys, JoypadInput_t* pPads[], MouseInput_t* pMouse)
 	{

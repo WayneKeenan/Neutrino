@@ -12,7 +12,7 @@ namespace BOX2D_Debug
 {
 	static Box2D_Vertex_t* MapVertex(const int iCount, const GLuint VBOID)
 	{
-		ASSERT(iCount < _iMAX_BOX2D_SPRITES, "Call to Box2D Draw polygon when VBO is full");
+		ASSERT(iCount < (int)_iMAX_BOX2D_SPRITES, "Call to Box2D Draw polygon when VBO is full");
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 		ASSERT(!LogGlError(__FILE__, __LINE__), );
@@ -142,7 +142,7 @@ namespace BOX2D_Debug
 
 		Box2D_Vertex_t* pVertex = MapVertex(m_iDebugTriangleVertexCount, m_iBox2DDebugTriangleVBO);
 		uint32 iColour = GetPackedColour(colour.r, colour.g, colour.b, 0.5f);
-		for (int32 i = 0; i < k_segments; ++i)
+		for (int32 i = 0; i <(int)k_segments; ++i)
 		{
 			// Perform rotation to avoid additional trigonometry.
 			b2Vec2 r2;
@@ -179,7 +179,7 @@ namespace BOX2D_Debug
 		v1 = center + radius * r1;
 		pVertex = MapVertex(m_iDebugLinesVertexCount, m_iBox2DDebugLineVBO);
 		iColour = GetPackedColour(colour.r, colour.g, colour.b, colour.a);
-		for (int32 i = 0; i < k_segments; ++i)
+		for (int32 i = 0; i < (int)k_segments; ++i)
 		{
 			b2Vec2 r2;
 			r2.x = cosInc * r1.x - sinInc * r1.y;
@@ -243,7 +243,7 @@ namespace BOX2D_Debug
 	{
 		const float32 k_axisScale = 0.4f;
 		uint32 red = GetPackedColour(1.0f, 0.0f, 0.0f, 1.0f);
-		uint32 green = GetPackedColour(0.0f, 1.0f, 0.0f, 1.0f); (0.0f, 1.0f, 0.0f);
+		uint32 green = GetPackedColour(0.0f, 1.0f, 0.0f, 1.0f);
 		b2Vec2 p1 = xf.p, p2;
 		Box2D_Vertex_t* pVertex = MapVertex(m_iDebugLinesVertexCount, m_iBox2DDebugLineVBO);
 
@@ -310,7 +310,7 @@ namespace BOX2D_Debug
 		va_end(arg);
 	}
 
-	void Box2D_DebugDraw::DrawString(const b2Vec2 & p, const char * string, ...)
+	void Box2D_DebugDraw::DrawString()//const b2Vec2 & p, const char * string, ...)
 	{
 		// Not implemented, requires scaling to and from screen space to the physics world space. 
 	}

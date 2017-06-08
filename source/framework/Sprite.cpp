@@ -85,7 +85,7 @@ namespace Neutrino
 			DELETEX [] s_aSpriteRenderInfo[i]->_SpriteBasePointers;			
 			DELETEX s_aSpriteRenderInfo[i];
 		}
-		LOG_INFO("Sprite Arrays deallocated.");
+		LOG_INFO("Sprite Arrays Deallocated.");
 	}
 
 	Sprite_t* GetActiveSprite(const GLuint iTextureID)

@@ -26,17 +26,18 @@ namespace Neutrino {
 		}
 		if (iNumLevels > _iMAX_LEVELS)
 		{
-			LOG_ERROR("There are more levels defined in GameConfig.txt than the framework supports. Adjust iMAX_LEVELS!");
+			LOG_ERROR("There are more levels defined in GameConfig than the framework supports. Adjust iMAX_LEVELS!");
 			return false;
 		}
-		LOG_INFO("There are %d levels defined in GameConfig.txt", iNumLevels);
+		LOG_INFO("There are %d levels defined in GameConfig", iNumLevels);
 
 		for (uint16 i = 0; i < iNumLevels; ++i)
 		{
 			s_pFrameworkLevels[i] = NEWX(FrameworkLevelData_t);
 
 			// Get the level name
-			//s_pFrameworkLevels[i]->_sLevelName = "TBD";"
+			s_pFrameworkLevels[i]->_sLevelName = "GNTODO";
+
 			// Get the filename of the tilemap binary file
 			s_pFrameworkLevels[i]->_sTilemapFilename = GetLevel(i);
 			

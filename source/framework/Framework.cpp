@@ -88,7 +88,7 @@ namespace Neutrino
 			LOG_INFO("Loading %s", pPlayerPrefsIniFilename);
 			if(!ParsePlayerPrefsIni(pPlayerPrefsIniFilename, s_pNeutrinoPreferences))
 			{
-				LOG_ERROR("Unable to parse %s. Delete this file and re-launch the game. A new set of player defaults will be created and the game should launch.");
+				LOG_ERROR("Unable to parse %s. Delete this file and re-launch the game. A new set of player defaults will be created and the game should launch.", pPlayerPrefsIniFilename);
 				return false;
 			}
 		}
@@ -108,7 +108,8 @@ namespace Neutrino
 
 		if(!LoadGameConfigIni())
 		{
-			LOG_ERROR("Unable to load the GameConfig.ini file, exiting.");
+			LOG_ERROR("Unable to load the GameConfig.ini file, is the resource bundle missing or corrupt?");
+			return false;
 		}
 
 		// Create an SDL window, with audio mixer and an OGL 3 Context and compile standard shaders

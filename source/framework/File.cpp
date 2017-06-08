@@ -315,7 +315,13 @@ namespace Neutrino {
 
   char* LoadFromFile(const char* const pFilename)
 	{
-		FILE* pFile = fopen( pFilename, "r" );
+#if defined _WIN32
+		FILE *pFile;
+		fopen_s( &pFile, pFilename, "r" );
+#else
+		FILE* pFile = fopen(pFilename, "r");
+#endif
+
 		fseek(pFile, 0, SEEK_END);
 		long int iSize = ftell( pFile );
 		fseek(pFile, 0, SEEK_SET);
@@ -328,7 +334,12 @@ namespace Neutrino {
 
 	long int GetFileSize(const char* const pFilename)
 	{
-		FILE* pFile = fopen( pFilename, "r" );
+#if defined _WIN32
+		FILE *pFile;
+		fopen_s(&pFile, pFilename, "r");
+#else
+		FILE* pFile = fopen(pFilename, "r");
+#endif
 		fseek(pFile, 0, SEEK_END);
 		long int iSize = ftell( pFile );
 		fclose(pFile);

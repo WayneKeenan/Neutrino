@@ -67,3 +67,5 @@ sh.exe.stackdump
 basename.exe.stackdump
 build/.vs/
 build/MinSizeRel/
+build/NeutrinoData.tdi
+build/NeutrinoData.tdi.tmp*

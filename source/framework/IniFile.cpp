@@ -112,12 +112,14 @@ namespace Neutrino
 		ini_t *pIni = ini_load(pFileBytes, NULL);
 		free(pFileBytes);
 
+		bool bIniParsed = true;
+
 		int iDefaults = ini_find_section(pIni, "defaults\0", 0);
 
 		int iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalWidth, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for defaults");
 			return false;
 		}
 		pPreferences->_iInternalWidth = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
@@ -125,7 +127,7 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalHeight, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for Internal Width");
 			return false;
 		}
 		pPreferences->_iInternalHeight = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
@@ -133,7 +135,7 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportWidth, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for Viewport Width");
 			return false;
 		}
 		pPreferences->_iScreenWidth = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
@@ -141,7 +143,7 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportHeight, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for Viewport Height");
 			return false;
 		}
 		pPreferences->_iScreenHeight = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
@@ -149,7 +151,7 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sMasterVolume, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for Master Volume");
 			return false;
 		}
 		pPreferences->_fMasterVolume = (float)atof(ini_property_value(pIni, iDefaults, iPropertyIndex));
@@ -157,7 +159,7 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sMusicVolume, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for Music Volume");
 			return false;
 		}
 		pPreferences->_fMusicVolume = (float)atof(ini_property_value(pIni, iDefaults, iPropertyIndex));
@@ -165,7 +167,7 @@ namespace Neutrino
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sSFXVolume, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)
 		{
-			LOG_ERROR("Unable to parse Ini file");
+			LOG_ERROR("Unable to find property index for SFX Volume");
 			return false;
 		}
 		pPreferences->_fSampleVolume = (float)atof(ini_property_value(pIni, iDefaults, iPropertyIndex));

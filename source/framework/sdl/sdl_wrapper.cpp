@@ -517,7 +517,10 @@ namespace Neutrino
 		SDL_Event event;
 		bool bRet = true;
 
-
+// I'm purposefully using fallthrough in this switch 
+// so disable the GCC warning for it...
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 		while (SDL_PollEvent(&event) != 0)
 		{
 			ImGui_ImplSdlGL3_ProcessEvent(&event);
@@ -582,7 +585,9 @@ namespace Neutrino
 				break;
 			}
 		}
-
+#pragma GCC diagnostic pop
+// Safe to turn the fallthrough warning back on. 
+	
 		// Set mouse pointer coords and button state
 		UpdateMouse();
 

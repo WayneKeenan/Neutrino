@@ -299,8 +299,19 @@ namespace Neutrino
 		return ini_section_count((ini_t*)pIni_t) - 2;
 	}
 	
-	bool GetSpriteDetailsFromTPageIni(void* pIni_t, int iSprCount, int iWidth, int iHeight, int iX, int iY, const char* sFilename)
+	bool GetSpriteDetailsFromTPageIni(void* pIni_t, int iSprCount, int* iWidth, int* iHeight, int* iX, int* iY, const char** sFilename)
 	{
+		int iSectionCount = iSprCount + 2;	// See above
+		int iProperty;
+		*sFilename = ini_section_name((ini_t*)pIni_t, iSectionCount);
+		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "x\0", 0);
+		*iX = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
+		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "y\0", 0);
+		*iY = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
+		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "width\0", 0);
+		*iWidth = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
+		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "width\0", 0);
+		*iHeight = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
 		return true;
 	}
 

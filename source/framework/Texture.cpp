@@ -113,19 +113,19 @@ namespace Neutrino {
 
 		// Allocate the TPageSpriteInfo array for this texture page and populate with each sprite's info
 		s_aTexturePages[iCount].aSprintInfo = NEWX TPageSpriteInfo_t[iSprs];
-		s_aTexturePages[iCount]._iMaxSprites = (uint16)(iSprs - 1);
-		LOG_INFO("Texture page contains %d sprites", iSprs - 1);
+		s_aTexturePages[iCount]._iMaxSprites = (uint16)(iSprs);
+		LOG_INFO("Texture page contains %d sprites", iSprs);
 
 
 		//
 		// Iterate over the sprites and parse their details
 		//
-		for (int i = 0; i < iSprs - 1; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
+		for (int i = 0; i < iSprs; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
 		{
-			int iWidth, iHeight, iX, iY;
-			const char* sFilename;
+			int iWidth = -1,iHeight = -1, iX = -1, iY = -1;
+			const char* sFilename="";
 
-			if(!GetSpriteDetailsFromTPageIni(pIni_t, i, iWidth, iHeight, iX, iY, sFilename))
+			if(!GetSpriteDetailsFromTPageIni(pIni_t, i, &iWidth, &iHeight, &iX, &iY, &sFilename))
 			{
 				LOG_ERROR("Parsing sprite %d failed", i);
 				return false;

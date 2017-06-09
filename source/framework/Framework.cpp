@@ -282,6 +282,7 @@ namespace Neutrino
 		GLUtils::DeallocateFBOs();
 		DetachShaders();
 		InputKill();
+		UnloadPlayerPrefsIni();
 		UnloadGameConfigIni();
 
 #if defined DEBUG

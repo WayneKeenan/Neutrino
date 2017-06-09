@@ -17,6 +17,10 @@ namespace Neutrino
 	//		This loads GameConfig.ini from the resources bundle and stores the relevant info for later retrival.
 	bool LoadGameConfigIni();
 
+	// LoadGameConfigIni
+	//		This loads GameConfig.ini from the resources bundle and stores the relevant info for later retrival.
+	void* LoadTPageIni(const char* const pFilename);
+
 	// GetNumTextures
 	//		Returns the number of textures defined in GameConfig.ini
 	int GetNumTextures();
@@ -38,7 +42,11 @@ namespace Neutrino
 	const char* GetLevel(const int iIndex);
 
 	// UnloadGameConfigIni
-	//		Calls the ini parser destroy to remove the stored GameConfig. 
+	//		Calls the ini parser destroy to remove the stored PlayerPrefs file. 
+	bool UnloadPlayerPrefsIni();
+
+	// UnloadGameConfigIni
+	//		Calls the ini parser destroy to remove the stored GameConfig file. 
 	bool UnloadGameConfigIni();
 }
 

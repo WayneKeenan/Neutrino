@@ -10,6 +10,7 @@
 namespace Neutrino
 {
 	static ini_t *s_pPlayerPrefsIni = NULL;
+	static ini_t *s_pGameConfigIni = NULL;
 	static const char *const s_sDefaultsSection = "defaults\0";
 	static const char *const s_sInternalWidth = "internal_width\0";
 	static const char *const s_sInternalHeight = "internal_height\0";
@@ -199,11 +200,11 @@ namespace Neutrino
 			return false;
 		}
 		const char *pFileBytes = LoadResourceBytes(s_sGameConfigFilename);
-		ini_t *pIni = ini_load(pFileBytes, NULL);
+		s_pGameConfigIni = ini_load(pFileBytes, NULL);
 		DELETEX[] pFileBytes;
 	
-		int iSection = ini_find_section(pIni, "textures\0", 0);
-		int iCount = ini_property_count(pIni, iSection);
+		int iSection = ini_find_section(s_pGameConfigIni, "textures\0", 0);
+		int iCount = ini_property_count(s_pGameConfigIni, iSection);
 		s_iNumTextures = iCount/2;	// (Spritemap and png file)
 
 		char sID[32] = { '\0' };
@@ -211,17 +212,17 @@ namespace Neutrino
 		{
 			memset(sID, 0, 32);
 			snprintf(sID, 32, "file%d", i+1);
-			int iPropertyIndex = ini_find_property(pIni, iSection, sID, 0);
-			s_aTextures[i] = ini_property_value(pIni, iSection, iPropertyIndex);
+			int iPropertyIndex = ini_find_property(s_pGameConfigIni, iSection, sID, 0);
+			s_aTextures[i] = ini_property_value(s_pGameConfigIni, iSection, iPropertyIndex);
 			
 			memset(sID, 0, 32);
 			snprintf(sID, 32, "info%d", i+1);
-			iPropertyIndex = ini_find_property(pIni, iSection, sID, 0);
-			s_aTilemaps[i] = ini_property_value(pIni, iSection, iPropertyIndex);
+			iPropertyIndex = ini_find_property(s_pGameConfigIni, iSection, sID, 0);
+			s_aTilemaps[i] = ini_property_value(s_pGameConfigIni, iSection, iPropertyIndex);
 		}
 
-		iSection = ini_find_section(pIni, "levels\0", 0);
-		iCount = ini_property_count(pIni, iSection);
+		iSection = ini_find_section(s_pGameConfigIni, "levels\0", 0);
+		iCount = ini_property_count(s_pGameConfigIni, iSection);
 		s_iNumLevels = iCount/2; // (Name and tilemap)
 
 		for (int i=0; i<iCount/2; ++i)
@@ -229,15 +230,40 @@ namespace Neutrino
 			// TODO. This isn't parsing the name yet. In fact the levels should be a struct of data in their own file?'
 			memset(sID, 0, 32);
 			snprintf(sID, 32, "tilemap%d", i+1);
-			int iPropertyIndex = ini_find_property(pIni, iSection, sID, 0);
-			s_aLevels[i] = ini_property_value(pIni, iSection, iPropertyIndex);
+			int iPropertyIndex = ini_find_property(s_pGameConfigIni, iSection, sID, 0);
+			s_aLevels[i] = ini_property_value(s_pGameConfigIni, iSection, iPropertyIndex);
 		}
+		return true;
+	}
+
+	void* LoadTPageIni(const char* const pFilename)
+	{
+		if (!ResourceFileExists(pFilename))
+		{
+			LOG_ERROR("Load TPage ini, unable to find %s in resources bundle", pFilename);
+			return false;
+		}
+
+		const char* pFileBytes = LoadResourceBytes(pFilename);
+		ini_t* pIni = ini_load(pFileBytes, NULL);
+		DELETEX[] pFileBytes;
+
+		if (nullptr == pIni)
+			LOG_ERROR("Unable to load %s, possible parsing error in the ini file", pFilename);
+
+		return (void*)pIni;
+	}
+
+	bool UnloadPlayerPrefsIni()
+	{
+		ini_destroy(s_pPlayerPrefsIni);
+		LOG_INFO("PlayerPrefs.ini Destroyed.");
 		return true;
 	}
 
 	bool UnloadGameConfigIni()
 	{
-		ini_destroy(s_pPlayerPrefsIni);
+		ini_destroy(s_pGameConfigIni);
 		LOG_INFO("GameConfig.ini Destroyed.");
 		return true;
 	}

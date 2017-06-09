@@ -1,8 +1,8 @@
 external_dependencies/glm
 external_dependencies/imgui/
+external_dependencies/glew/
 source/framework/imgui_copy/*.h
 source/framework/imgui_copy/*.cpp
-glm/
 build/*.exe
 build/Neutrino
 *.swp
@@ -23,7 +23,6 @@ Find Results
 .tags_sorted_by_file
 .sublime-build
 build/bin/
-external_dependencies/glew/
 build/imgui.ini
 build/Debug/
 build/ALL_BUILD.vcxproj
@@ -70,4 +69,3 @@ build/.vs/
 build/MinSizeRel/
 build/NeutrinoData.tdi
 build/NeutrinoData.tdi.tmp*
-external_dependencies/glm/

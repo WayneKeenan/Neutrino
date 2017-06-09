@@ -254,6 +254,56 @@ namespace Neutrino
 		return (void*)pIni;
 	}
 
+
+	int GetTPageWidth(void* pIni)
+	{
+		int iSection = ini_find_section((ini_t*)pIni, "tpage\0", 0);
+		if (iSection < 0)
+		{
+			LOG_ERROR("Unable to parse global section in TPage");
+			return -1;
+		}
+		int iProperty = ini_find_property((ini_t*)pIni, iSection, "width\0", 0);
+		if (iProperty < 0) 
+		{
+			LOG_ERROR("Unable to parse global section in TPage");
+			return -1;
+		}
+		return atoi(ini_property_value((ini_t*)pIni, iSection, iProperty));
+	}
+
+
+	int GetTPageHeight(void* pIni)
+	{
+		int iSection = ini_find_section((ini_t*)pIni, "tpage\0", 0);
+		if (iSection < 0)
+		{
+			LOG_ERROR("Unable to parse global section in TPage");
+			return -1;
+		}
+		int iProperty = ini_find_property((ini_t*)pIni, iSection, "Height\0", 0);
+		if (iProperty < 0)
+		{
+			LOG_ERROR("Unable to parse global section in TPage");
+			return -1;
+		}
+		return atoi(ini_property_value((ini_t*)pIni, iSection, iProperty));
+	}
+
+	int GetTPageSpriteCount(void* pIni_t)
+	{
+		// This is minus two because Ini.h assumes there's a global section so 
+		// indexes from 1. However, the TPage format's initial section starts as [tpage]
+		// which counts as a new section, so we've got an additional section before
+		// any sprites...
+		return ini_section_count((ini_t*)pIni_t) - 2;
+	}
+	
+	bool GetSpriteDetailsFromTPageIni(void* pIni_t, int iSprCount, int iWidth, int iHeight, int iX, int iY, const char* sFilename)
+	{
+		return true;
+	}
+
 	bool UnloadPlayerPrefsIni()
 	{
 		ini_destroy(s_pPlayerPrefsIni);

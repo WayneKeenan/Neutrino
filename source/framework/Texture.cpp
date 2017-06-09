@@ -29,6 +29,7 @@ namespace Neutrino {
 		return &pTpage->aSprintInfo[iSpriteCount];
 	}
 
+
 	uint16 GetTextureSet( const GLuint iTextureID )
 	{
 		for(uint16 i=0; i < s_iLoadedTextureCount; ++i)
@@ -41,6 +42,7 @@ namespace Neutrino {
 		ASSERT(true, "GetTextureSet: unable to find a loaded texture with this id: %d", iTextureID);
 		return 0;
 	}
+
 
 	GLuint GetTextureID(const char* sTextureFilename)
 	{
@@ -65,11 +67,13 @@ namespace Neutrino {
 		return s_iLoadedTextureCount;
 	}
 
+
 	uint16 GetSpriteCountForTexture(const uint8 iTextureSet)
 	{
 		ASSERT(iTextureSet < s_iLoadedTextureCount, "GetSpriteCountForTexture iTextureSetIndex out of range!");
 		return s_aTexturePages[iTextureSet]._iMaxSprites;
 	}
+
 
 	const TPage_t* GetTPage(const uint8 iTextureSet)
 	{
@@ -77,116 +81,78 @@ namespace Neutrino {
 		return &s_aTexturePages[iTextureSet];
 	}
 
+
 	bool LoadTexture( const char* pFilename, const char* pTPageFilename, int iCount )
 	{
 		if (!ResourceFileExists(pFilename)) { LOG_ERROR("%s does not exist in the resources bundle!", pFilename); return false; }
 		if (!ResourceFileExists(pTPageFilename)) { LOG_ERROR("%s does not exist in the resources bundle!", pTPageFilename); return false; }
 
-
+		//
+		// Load the Ini file 
 		// 
-		// Parse the Sprite Details file
-		// 
+		void* pIni_t = LoadTPageIni(pTPageFilename);
+		if (NULL == pIni_t)
 		{
-			config_t cfg;
-			config_init(&cfg);
+			LOG_ERROR("Loading the TPage info ini file failed: %s", pTPageFilename);
+			return false;
+		}
 
-			const char* pFileBytes = LoadResourceBytes(pTPageFilename);
-			ASSERT(NULL != pFileBytes, "LoadTexture: loading tpage info file failed: %s", pTPageFilename );
-			if(!config_read_string(&cfg, pFileBytes)) 
+		//
+		// Store the texture and tpage info filenames, so we can double check the tilemap data on load
+		//
+		s_aTexturePages[iCount]._sTextureFilename = NEWX char[strlen(pFilename) + 1];
+		s_aTexturePages[iCount]._sTPageFilename = NEWX char[strlen(pTPageFilename) + 1];
+		memcpy(s_aTexturePages[iCount]._sTextureFilename, pFilename, strlen(pFilename) + 1);
+		memcpy(s_aTexturePages[iCount]._sTPageFilename, pTPageFilename, strlen(pTPageFilename) + 1);
+
+		// Get the texture dimensions and sprite count
+		s_aTexturePages[iCount]._iWidth = GetTPageWidth(pIni_t);
+		s_aTexturePages[iCount]._iHeight = GetTPageHeight(pIni_t);
+		if (s_aTexturePages[iCount]._iWidth < 0 || s_aTexturePages[iCount]._iHeight < 0) return false;
+		int iSprs = GetTPageSpriteCount(pIni_t);
+
+		// Allocate the TPageSpriteInfo array for this texture page and populate with each sprite's info
+		s_aTexturePages[iCount].aSprintInfo = NEWX TPageSpriteInfo_t[iSprs];
+		s_aTexturePages[iCount]._iMaxSprites = (uint16)(iSprs - 1);
+		LOG_INFO("Texture page contains %d sprites", iSprs - 1);
+
+
+		//
+		// Iterate over the sprites and parse their details
+		//
+		for (int i = 0; i < iSprs - 1; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
+		{
+			int iWidth, iHeight, iX, iY;
+			const char* sFilename;
+
+			if(!GetSpriteDetailsFromTPageIni(pIni_t, i, iWidth, iHeight, iX, iY, sFilename))
 			{
-				const char* pErr =  config_error_text(&cfg);
-				int iErrLn = config_error_line(&cfg);
-				config_destroy(&cfg);
-
-				LOG_ERROR("Unable to parse tpage config: \'%s\' line: %d - exiting...", pErr, iErrLn);
+				LOG_ERROR("Parsing sprite %d failed", i);
 				return false;
 			}
 
-			if (config_lookup_int(&cfg, "tpage.width", (int*)&s_aTexturePages[iCount]._iWidth) != CONFIG_TRUE)
+			// Calculate this sprite's UV coords and dimensions
 			{
-				LOG_ERROR("Unable to find tpage width, exiting...");
-				config_destroy(&cfg);
-				return false;	
+				// Assume non power of 2 textures
+				float fTexelW = 1.0f / (float)s_aTexturePages[iCount]._iWidth;
+				float fTexelH = 1.0f / (float)s_aTexturePages[iCount]._iHeight;
+
+				// OpenGL samples from the middle of a texel, so we'll need to add an offset
+				//float fTexelMovementW = (fTexelW / 2.0f);
+				//float fTexelMovementH = (fTexelH / 2.0f);
+
+				// Store the UV coords
+				s_aTexturePages[iCount].aSprintInfo[i]._fX_S = ((float)iX * fTexelW);// -fTexelMovementW;
+				s_aTexturePages[iCount].aSprintInfo[i]._fY_T = ((float)iY * fTexelH);// - fTexelMovementH;
+				s_aTexturePages[iCount].aSprintInfo[i]._fX_SnS = (s_aTexturePages[iCount].aSprintInfo[i]._fX_S + ((float)iWidth * fTexelW));// + fTexelMovementW;
+				s_aTexturePages[iCount].aSprintInfo[i]._fY_TnT = (s_aTexturePages[iCount].aSprintInfo[i]._fY_T + ((float)iHeight * fTexelH));// + fTexelMovementH;
+
+			 // And half dimensions (Quad's origin is always at the centre)
+				s_aTexturePages[iCount].aSprintInfo[i]._fHalfWidth = (float)iWidth / 2.0f;
+				s_aTexturePages[iCount].aSprintInfo[i]._fHalfHeight = (float)iHeight / 2.0f;
 			}
 
-			if (config_lookup_int(&cfg, "tpage.height", (int*)&s_aTexturePages[iCount]._iHeight) != CONFIG_TRUE)
-			{
-				LOG_ERROR("Unable to find tpage height, exiting...");
-				config_destroy(&cfg);
-				return false;	
-			}
-
-			// Get the list of sprites in the tpage info file
-			config_setting_t* pSprSetting = config_lookup(&cfg, "tpage.sprites");
-			if(NULL == pSprSetting)
-			{
-				LOG_ERROR("Unable to find list of sprites, exiting...");
-				config_destroy(&cfg);
-				return false;	
-			}
-
-			//
-			// Store the texture and tpage info filenames, so we can double check the tilemap data on load
-			//
-			s_aTexturePages[iCount]._sTextureFilename = NEWX char[strlen(pFilename)+1];
-			s_aTexturePages[iCount]._sTPageFilename = NEWX char[strlen(pTPageFilename)+1];
-			memcpy(s_aTexturePages[iCount]._sTextureFilename, pFilename, strlen(pFilename)+1);
-			memcpy(s_aTexturePages[iCount]._sTPageFilename, pTPageFilename, strlen(pTPageFilename)+1);
-
-			//
-			// Allocate the TPageSpriteInfo array for this texture page and populate with each sprite's info
-			// 
-			int iSprs = config_setting_length(pSprSetting);
-			s_aTexturePages[iCount].aSprintInfo = NEWX TPageSpriteInfo_t[iSprs]; 
-			s_aTexturePages[iCount]._iMaxSprites = (uint16)(iSprs-1);   		   
-			LOG_INFO("Texture page contains %d sprites", iSprs-1); 			
-			//   	LOG_INFO("Allocated %d bytes [%dK] for sprite definitions", sizeof(TPageSpriteInfo_t) * iSprs, (sizeof(TPageSpriteInfo_t) * iSprs) / 1024 );
-
-
-			// 
-			// Iterate over each sprite in the tpage and parse it's meta data
-			//
-			for(int i = 0; i < iSprs-1; i++)	// -1 as there's always an empty group at the end of the list in tpagex.txt
-			{
-				config_setting_t* pSprite = config_setting_get_elem(pSprSetting, i);
-				int iWidth, iHeight, iX, iY;
-				const char* sFilename;
-
-				if(!(config_setting_lookup_int(pSprite, "x", &iX) &&
-							config_setting_lookup_int(pSprite, "y", &iY) &&
-							config_setting_lookup_int(pSprite, "width", &iWidth) && 
-							config_setting_lookup_int(pSprite, "height", &iHeight) && 
-							config_setting_lookup_string(pSprite, "filename", &sFilename)))	
-				{
-					LOG_ERROR("Parsing sprite %d failed", i);
-					return false;
-				}
-
-				// Calculate this sprite's UV coords and dimensions
-				{
-					// Assume non power of 2 textures
-					float fTexelW = 1.0f / (float)s_aTexturePages[iCount]._iWidth;
-					float fTexelH = 1.0f / (float)s_aTexturePages[iCount]._iHeight;
-
-					// OpenGL samples from the middle of a texel, so we'll need to add an offset
-					//float fTexelMovementW = (fTexelW / 2.0f);
-					//float fTexelMovementH = (fTexelH / 2.0f);
-
-					// Store the UV coords
-					s_aTexturePages[iCount].aSprintInfo[i]._fX_S = ((float)iX * fTexelW);// -fTexelMovementW;
-					s_aTexturePages[iCount].aSprintInfo[i]._fY_T = ((float)iY * fTexelH);// - fTexelMovementH;
-					s_aTexturePages[iCount].aSprintInfo[i]._fX_SnS = (s_aTexturePages[iCount].aSprintInfo[i]._fX_S + ((float)iWidth * fTexelW));// + fTexelMovementW;
-					s_aTexturePages[iCount].aSprintInfo[i]._fY_TnT = (s_aTexturePages[iCount].aSprintInfo[i]._fY_T + ((float)iHeight * fTexelH));// + fTexelMovementH;
-
-					// And half dimensions (Quad's origin is always at the centre)
-					s_aTexturePages[iCount].aSprintInfo[i]._fHalfWidth = (float)iWidth/2.0f;
-					s_aTexturePages[iCount].aSprintInfo[i]._fHalfHeight = (float)iHeight/2.0f;
-				}
-
-				LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, iX, iY );
-			}
-
-			config_destroy(&cfg);
+			LOG_INFO("Added \'%s\': %d/%d @ [%d,%d]", sFilename, iWidth, iHeight, iX, iY);
 		}
 
 

@@ -29,6 +29,14 @@ namespace Neutrino
 	//		Returns the number of levels defined in GameCofig.ini
 	int GetNumLevels();
 
+	int GetTPageWidth(void* pIni);
+
+	int GetTPageHeight(void* pIni);
+
+	int GetTPageSpriteCount(void* pIni_t);
+
+	bool GetSpriteDetailsFromTPageIni(void* pIni_t, int iSprCount, int iWidth, int iHeight, int iX, int iY, const char* sFilename);
+
 	// GetTextureFilename()
 	//		Returns the nth filename defined in GameConfig.ini
 	const char* GetTextureFilename(const int iIndex);

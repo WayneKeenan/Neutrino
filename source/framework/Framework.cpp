@@ -112,6 +112,7 @@ namespace Neutrino
 			return false;
 		}
 
+
 		// Create an SDL window, with audio mixer and an OGL 3 Context and compile standard shaders
 		// 
 		{
@@ -206,6 +207,8 @@ namespace Neutrino
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	bool CoreUpdate()
 	{
 		TimeUpdate();																														// Update the internal clocks
@@ -221,9 +224,8 @@ namespace Neutrino
 		GLUtils::ClearBuffers();																								// This doesn't clear the FBOs!
 		GLUtils::GenerateMVCMatrices(&s_pvCameraPosition);
 
-		if(0 == s_iIsInMode)  // We're in the normal game mode, do the full render path
+		if(0 == s_iIsInMode)		
 		{
-			// Set shader for rendering to a texture
 			SetActiveShader(DEFAULT_SHADER);
 
 			// Render our elements to an offscreen texture and present it to the final viewport
@@ -235,7 +237,7 @@ namespace Neutrino
 				GLUtils::FinishOffScreenRender();
 			}
 		}
-		else  // We're in an editor mode, so do a simplified render path
+		else  
 		{
 			SetActiveShader(DEFAULT_SHADER);
 			DrawSprites(false);
@@ -298,9 +300,6 @@ namespace Neutrino
 	}
 
 
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////

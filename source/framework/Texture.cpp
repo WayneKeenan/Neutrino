@@ -2,11 +2,9 @@
 #include "sdl/sdl_wrapper.h"
 #include "File.h"
 #include "Memory.h"
-#include "libconfig.h"
 #include "Log.h"
 #include "Types.h"
 #include "Sprite.h"
-#include "ConfigFile.h"
 #include "IniFile.h"
 
 #if defined _WIN32
@@ -106,9 +104,11 @@ namespace Neutrino {
 		memcpy(s_aTexturePages[iCount]._sTPageFilename, pTPageFilename, strlen(pTPageFilename) + 1);
 
 		// Get the texture dimensions and sprite count
-		s_aTexturePages[iCount]._iWidth = GetTPageWidth(pIni_t);
-		s_aTexturePages[iCount]._iHeight = GetTPageHeight(pIni_t);
-		if (s_aTexturePages[iCount]._iWidth < 0 || s_aTexturePages[iCount]._iHeight < 0) return false;
+		int iWidth = GetTPageWidth(pIni_t);
+		int iHeight = GetTPageHeight(pIni_t);
+		if (iWidth < 0 || iHeight < 0) return false;
+		s_aTexturePages[iCount]._iWidth = (uint16)iWidth;
+		s_aTexturePages[iCount]._iHeight = (uint16)iHeight;
 		int iSprs = GetTPageSpriteCount(pIni_t);
 
 		// Allocate the TPageSpriteInfo array for this texture page and populate with each sprite's info

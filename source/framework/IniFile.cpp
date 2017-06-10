@@ -113,8 +113,6 @@ namespace Neutrino
 		ini_t *pIni = ini_load(pFileBytes, NULL);
 		free(pFileBytes);
 
-		bool bIniParsed = true;
-
 		int iDefaults = ini_find_section(pIni, "defaults\0", 0);
 
 		int iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalWidth, 0);
@@ -241,7 +239,7 @@ namespace Neutrino
 		if (!ResourceFileExists(pFilename))
 		{
 			LOG_ERROR("Load TPage ini, unable to find %s in resources bundle", pFilename);
-			return false;
+			return NULL;
 		}
 
 		const char* pFileBytes = LoadResourceBytes(pFilename);

@@ -106,7 +106,8 @@ namespace Neutrino {
 		// Get the texture dimensions and sprite count
 		int iWidth = GetTPageWidth(pIni_t);
 		int iHeight = GetTPageHeight(pIni_t);
-		if (iWidth < 0 || iHeight < 0) return false;
+		if (iWidth < 0 || iHeight < 0) 
+			return false;
 		s_aTexturePages[iCount]._iWidth = (uint16)iWidth;
 		s_aTexturePages[iCount]._iHeight = (uint16)iHeight;
 		int iSprs = GetTPageSpriteCount(pIni_t);

@@ -303,12 +303,32 @@ namespace Neutrino
 		int iProperty;
 		*sFilename = ini_section_name((ini_t*)pIni_t, iSectionCount);
 		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "x\0", 0);
+		if(iProperty < 0) 
+		{ 
+			LOG_ERROR("Unable to parse x vaule from sprite tpage..."); 
+			return false;
+		}
 		*iX = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
 		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "y\0", 0);
+		if(iProperty < 0) 
+		{ 
+			LOG_ERROR("Unable to parse y vaule from sprite tpage...");
+			return false;
+		}
 		*iY = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
 		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "width\0", 0);
+		if(iProperty < 0) 
+		{ 
+			LOG_ERROR("Unable to parse width vaule from sprite tpage...");
+			return false;
+		}
 		*iWidth = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
 		iProperty = ini_find_property((ini_t*)pIni_t, iSectionCount, "width\0", 0);
+		if(iProperty < 0) 
+		{ 
+			LOG_ERROR("Unable to parse height vaule from sprite tpage..."); 
+			return false;
+		}
 		*iHeight = atoi(ini_property_value((ini_t*)pIni_t, iSectionCount, iProperty));
 		return true;
 	}

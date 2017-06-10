@@ -10,7 +10,6 @@ Neutrino requires the following code to build and run:
 - SDL2, SDLImage, SDLMixer
 - Box2D
 - The GLM math library
-- Libconfig, C Library to parse config files. 
 - GLEW, GL extension library.
 - PhysFS, pack file manager
 
@@ -28,7 +27,7 @@ The external dependencies folder can be emptied by running:
 
 `./external_dependencies/RemoveDeps.sh`
 
-SDL2, SDLImage, SDLMixer, Libconfig, PhysFS and Box2D are package dependencies that should be installed via your package manager prior to running CMake generation. 
+SDL2, SDLImage, SDLMixer, PhysFS and Box2D are package dependencies that should be installed via your package manager prior to running CMake generation. 
 
 On Windows, Box2D can be cloned from GitHub. It includes a VS2015 solution for compilation. See the README included in the Box2D Repo for more details. 
 
@@ -64,6 +63,9 @@ After manually installing the dependencies (you may have to compile Glew, and yo
 compile and also flag the correct DPI Awareness setting in: "Project->Neutrino Properties->Manifest->Input & Output". "Per monitor DPI Awareness" will probably do what you expect. 
 
 On first run Visual Studio will most likely have ALL_BUILD set as the start-up project. Right click on "Neutrino" and choose "Set as StartUp project" and you'll be able to run and debug from within VS.
+
+To make the resources bundle you will need to install the command line version of 7zip, and then run run `MakePackile_win32.bat` The resources bundle 
+will be left in the Debug build folder by default. If you've selected a release build, you should manually copy the Neutrino.tdi file over to the runtime directory for that build, as the framework will not start without it. 
 
 ## Status And licensing
 

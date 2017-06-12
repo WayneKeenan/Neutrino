@@ -61,7 +61,6 @@ namespace Neutrino
 	{
 		if(	!SDLInit(s_pOrganisation, pGameName) ) return false;
 
-
 		// Create a new prefs struct and populate the default paths
 		s_pNeutrinoPreferences = NEWX(NeutrinoPreferences_t);
 		s_pNeutrinoPreferences->_pPrefsPath = SDLGetPrefPath();
@@ -72,6 +71,12 @@ namespace Neutrino
 		char pPlayerPrefsIniFilename[4096] = { '\0' };
 		sprintf(pPlayerPrefsIniFilename, "%s/%s", s_pNeutrinoPreferences->_pPrefsPath, s_pPrefsIniFilename);
 	
+		// Detect the current monitor settings and get a list of all available display modes
+		if (!SDLPopulateAvailableRenderModes(s_pNeutrinoPreferences->_aRenderModes)) return false;
+
+		// Set the viewport width and height to whatever the current monitor settings are
+		s_pNeutrinoPreferences->_iScreenWidth = SDLGetDisplayWidth();
+		s_pNeutrinoPreferences->_iScreenHeight = SDLGetDisplayHeight();
 
 		// This will get updated with player preferences.
 		InputInitWithDefaults();

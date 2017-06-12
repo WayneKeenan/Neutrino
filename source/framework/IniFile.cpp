@@ -114,38 +114,38 @@ namespace Neutrino
 		free(pFileBytes);
 
 		int iDefaults = ini_find_section(pIni, "defaults\0", 0);
+		int iPropertyIndex;
+		//int iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalWidth, 0);
+		//if (iPropertyIndex == INI_NOT_FOUND)
+		//{
+		//	LOG_ERROR("Unable to find property index for defaults");
+		//	return false;
+		//}
+		//pPreferences->_iInternalWidth = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
 
-		int iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalWidth, 0);
-		if (iPropertyIndex == INI_NOT_FOUND)
-		{
-			LOG_ERROR("Unable to find property index for defaults");
-			return false;
-		}
-		pPreferences->_iInternalWidth = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
+		//iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalHeight, 0);
+		//if (iPropertyIndex == INI_NOT_FOUND)
+		//{
+		//	LOG_ERROR("Unable to find property index for Internal Width");
+		//	return false;
+		//}
+		//pPreferences->_iInternalHeight = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
 
-		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sInternalHeight, 0);
-		if (iPropertyIndex == INI_NOT_FOUND)
-		{
-			LOG_ERROR("Unable to find property index for Internal Width");
-			return false;
-		}
-		pPreferences->_iInternalHeight = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
+		//iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportWidth, 0);
+		//if (iPropertyIndex == INI_NOT_FOUND)
+		//{
+		//	LOG_ERROR("Unable to find property index for Viewport Width");
+		//	return false;
+		//}
+		//pPreferences->_iScreenWidth = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
 
-		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportWidth, 0);
-		if (iPropertyIndex == INI_NOT_FOUND)
-		{
-			LOG_ERROR("Unable to find property index for Viewport Width");
-			return false;
-		}
-		pPreferences->_iScreenWidth = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
-
-		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportHeight, 0);
-		if (iPropertyIndex == INI_NOT_FOUND)
-		{
-			LOG_ERROR("Unable to find property index for Viewport Height");
-			return false;
-		}
-		pPreferences->_iScreenHeight = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
+		//iPropertyIndex = ini_find_property(pIni, iDefaults, s_sViewportHeight, 0);
+		//if (iPropertyIndex == INI_NOT_FOUND)
+		//{
+		//	LOG_ERROR("Unable to find property index for Viewport Height");
+		//	return false;
+		//}
+		//pPreferences->_iScreenHeight = atoi(ini_property_value(pIni, iDefaults, iPropertyIndex));
 
 		iPropertyIndex = ini_find_property(pIni, iDefaults, s_sMasterVolume, 0);
 		if (iPropertyIndex == INI_NOT_FOUND)

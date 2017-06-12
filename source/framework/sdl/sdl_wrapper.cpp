@@ -15,6 +15,7 @@
 namespace Neutrino
 {
 	SDL_Window* pSDL_WindowHandle = NULL;
+	SDL_DisplayMode s_InitialUserDisplaymode;
 	SDL_GLContext SDL_GLContext;
 
 	static const int s_iSDL_MIXER_FLAGS = MIX_INIT_FLAC | MIX_INIT_OGG;
@@ -101,7 +102,69 @@ namespace Neutrino
 		return true;
 	}
 
+	bool SDLPopulateAvailableRenderModes(Rendermode_t* aModes)
+	{
+		static int iDisplayInUse = 0;																						// GNTODO: Need to record the display the player wants to use in playerprefs
 
+		int iModeCount;
+		SDL_DisplayMode mode;
+
+		LOG_INFO("Number of displays detected: %i", SDL_GetNumVideoDisplays());
+		iModeCount = SDL_GetNumDisplayModes(iDisplayInUse);
+
+		if (iModeCount < 1) 
+		{
+			LOG_INFO("SDL_GetNumDisplayModes failed: %s", SDL_GetError());
+			return false;
+		}
+
+		LOG_INFO("Number of display modes for display 0: %i", iModeCount);
+
+		if(iModeCount > _iMAX_RENDERMODES)
+			LOG_ERROR("Display is reporting more render modes than the maximum we track. Some options won't be available to the player!");
+
+
+		// Get a list of all the display modes the graphics card is returning
+		//
+		for (int i = 0; i < iModeCount && i < _iMAX_RENDERMODES; ++i) 
+		{
+			if (SDL_GetDisplayMode(iDisplayInUse, i, &mode) != 0) 
+			{
+				LOG_ERROR("SDL_GetDisplayMode failed: %s", SDL_GetError());
+				return false;
+			}
+			uint32 f = mode.format;
+
+			LOG_INFO(" - Mode %3d\tbpp %i\t%s\t%ix%ipx @ %ihz", i, SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h, mode.refresh_rate);
+
+			aModes[i]._iWidth = mode.w;
+			aModes[i]._iWidth = mode.h;
+			aModes[i]._fRefreshRate = (float)mode.refresh_rate;
+		}
+
+
+		// Get the current display mode that the default monitor is set to
+		//
+		if (SDL_GetCurrentDisplayMode(0, &s_InitialUserDisplaymode) != 0)
+		{
+			LOG_ERROR("Unable to detect the current mode of the default display! Framework has no idea what size window to open :(");
+			return false;
+		}
+		else
+			LOG_INFO("Current display mode for display 0 is: %dx%dpx @ %dhz.", s_InitialUserDisplaymode.w, s_InitialUserDisplaymode.h, s_InitialUserDisplaymode.refresh_rate);
+
+		return true;
+	}
+
+	uint16 SDLGetDisplayWidth()
+	{
+		return s_InitialUserDisplaymode.w;
+	}
+
+	uint16 SDLGetDisplayHeight()
+	{
+		return s_InitialUserDisplaymode.h;
+	}
 
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
 	{
@@ -134,7 +197,7 @@ namespace Neutrino
 			SDL_WINDOWPOS_CENTERED,
 			iScreenWidth,
 			iScreenHeight,
-			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI); // | SDL_WINDOW_FULLSCREEN);
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);// | SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 
 		if (NULL == pSDL_WindowHandle)
@@ -519,8 +582,10 @@ namespace Neutrino
 
 // I'm purposefully using fallthrough in this switch 
 // so disable the GCC warning for it...
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
 		while (SDL_PollEvent(&event) != 0)
 		{
 			ImGui_ImplSdlGL3_ProcessEvent(&event);
@@ -585,7 +650,9 @@ namespace Neutrino
 				break;
 			}
 		}
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif
 // Safe to turn the fallthrough warning back on. 
 	
 		// Set mouse pointer coords and button state

@@ -20,11 +20,15 @@ namespace Neutrino
 	// 		Attempts to open an SDL window of given dimensions with an OGL3.1 context
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight); 	
 
+	bool SDLPopulateAvailableRenderModes(Rendermode_t* aModes);
 
 	bool SDLInitialiseAudio();
 
 	void SDLDeinitialiseAudio();
 
+	uint16 SDLGetDisplayWidth();
+
+	uint16 SDLGetDisplayHeight();
 
 	// SDLPresent()
 	// 		Swap buffer...

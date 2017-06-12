@@ -28,6 +28,7 @@ static const float fTILEMAP_ZPOS = 5.0f;									// Ortho far distance is 10 so 
 
 static const int _iMAX_TEXTURES = 4;											// The intention is for these textures to be 4k ;)
 static const int _iMAX_LEVELS = 16;												// Arbitrary, just picked that out of my arse. 
+static const int _iMAX_RENDERMODES = 128;									// How many display modes do we keep track of?
 static const uint32 _iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick by the looks of things
 static const uint32 _iMAX_BOX2D_SPRITES = 1024 * 16;			// Cap on how many items we can add to a BOX2D Debug Draw VBO. Again, pulled out of arse
 static const uint32 _iMAX_TILEMAP_SPRITES = 1024 * 256;		// These are static draw, so pushed to the GPU once. No real limit needed
@@ -50,11 +51,18 @@ static const uint8 _PARTICLE_ED = 0x04;
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0f / fPI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0f * fPI)
 
+typedef struct Rendermode_t
+{
+	uint16 _iWidth;
+	uint16 _iHeight;
+	float _fRefreshRate;
+} Remdermode_t;
+
 // This struct defines the framework wide preferences that can be saved by the user
 typedef struct NeutrinoPreferences_t {
 	int _iScreenWidth = _iDEFAULT_VIEWPORT_WIDTH;						
 	int _iScreenHeight = _iDEFAULT_VIEWPORT_HEIGHT;
-	int _iInternalWidth = _iDEFAULT_INTERNAL_WIDTH;				
+	int _iInternalWidth = _iDEFAULT_INTERNAL_WIDTH;					// GNTODO: GameConfig.ini should over write these...
 	int _iInternalHeight = _iDEFAULT_INTERNAL_HEIGHT;
 	float _InternalPixelWidth;
 	float _InternalPixelHeight;
@@ -63,6 +71,8 @@ typedef struct NeutrinoPreferences_t {
 	float _fMusicVolume = 1.0f;
 	const char* _pResourcePath;			
 	const char* _pPrefsPath;				
+	Rendermode_t _aRenderModes[_iMAX_RENDERMODES];
 } NeutrinoPreferences_t;
 
 static const char* const s_pPostProcessSettingsFilename = "NeutrinoPost.tdi";
+

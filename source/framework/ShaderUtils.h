@@ -1,6 +1,7 @@
 #pragma once
 #include "GL/glew.h"
 #include "Memory.h"
+#include <glm/glm.hpp> 
 
 
 namespace Neutrino {
@@ -26,8 +27,12 @@ namespace Neutrino {
 		UNIFORM_VSCANLINE,
 		UNIFORM_PIXELBIAS,
 		UNIFORM_BRIGHTNESS,
-		UNIFORM_CONTRAST, 
+		UNIFORM_CONTRAST,
 		UNIFORM_ADDITIVE,
+		UNIFORM_TEXTUREWIDTH,
+		UNIFORM_TEXTUREHEIGHT,
+		UNIFORM_VIEWPORTWIDTH,
+		UNIFORM_VIEWPORTHEIGHT,
 		UNIFORM_THRESHOLD,
 		UNIFORM_THRESBRIGHTSCALER,
 		UNIFORM_BLOOMALPHA, 
@@ -124,7 +129,7 @@ namespace Neutrino {
 	// 		Final output of the lowres render target needs to have its own static camera matrix and custom
 	// 		shader, so this function is used by GLUtils::FinishOffscreenRender to handle setup of the 
 	// 		shader params. 
-	void SetOutputScanlines(float* pCameraMatrix);
+	void SetOutputScanlines(float* pCameraMatrix, const glm::vec2& vViewportDims, const glm::vec2& vInternalDims);
 
 	// SetOutputBloom
 	//		Sets the shader its uniform parameters for compositing the bloom buffer to the final output

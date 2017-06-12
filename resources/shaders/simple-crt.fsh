@@ -5,6 +5,10 @@ uniform float PixelBias;
 uniform float Brightness;
 uniform float Contrast;		// Should never be negative. 
 uniform float AdditiveStrength;
+uniform float TextureWidth;
+uniform float TextureHeight;
+uniform float ViewportWidth;
+uniform float ViewportHeight;
 
 varying vec2 fragmentTextureCoordinates;
 varying vec4 colorVarying;
@@ -19,34 +23,36 @@ void main()
 	vec4 col =  texture2D( texture, fragmentTextureCoordinates.xy );
 	vec4 addCol = col;
  
-	float yPos = mod(gl_FragCoord.y, 4.0);	
-	float xPos = mod(gl_FragCoord.x, 4.0);
+  	vec2 screenCoords = fragmentTextureCoordinates * vec2(ViewportWidth, ViewportHeight);
+
+	int xPos = int(mod(screenCoords.x, ViewportWidth / TextureWidth*0.5));
+	int yPos = int(mod(screenCoords.y, ViewportHeight / TextureHeight*0.5));	
 
 	// Scanline
-	if(int(yPos) == 0 || int(yPos)==3)
+	if(yPos == 0)
 	{
 		col = col * ScanlineDark;
 	}
-	else
+
+
+	// Pixel bias
+	if(xPos == 0)
 	{
-		// Pixel bias
-		if(int(xPos) == 0)
-		{
-			col = col * vRBias;
-		}
-	 	else if(int(xPos) == 1)
-		{
-			col = col * vGBias;
-		}
-		else if(int(xPos) == 2)
-		{
-			col = col * vBBias;
-		}
-	 	else if(int(xPos) == 3)
-		{
-			col = col * VScanlineDark;
-		}
+		col = col * vRBias;
 	}
+ 	else if(xPos == 1)
+	{
+		col = col * vGBias;
+	}
+	else if(xPos == 2)
+	{
+		col = col * vBBias;
+	}
+ 	else if(xPos == 3)
+	{
+		col = col * VScanlineDark;
+	}	
+
  
 	// Add everything up...
 	col = col * vBright;

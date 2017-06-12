@@ -119,8 +119,8 @@ namespace Neutrino {
 			{
 				s_fViewportWidth = (float)iViewportWidth;
 				s_fViewportHeight = (float)iViewportHeight;
-				s_fBlurWidth = s_fViewportWidth / s_fBlurDivisor;
-				s_fBlurHeight = s_fViewportHeight / s_fBlurDivisor;
+				s_fBlurWidth = _iDEFAULT_VIEWPORT_WIDTH / s_fBlurDivisor;
+				s_fBlurHeight = _iDEFAULT_VIEWPORT_HEIGHT / s_fBlurDivisor;
 				s_iInternalWidth = iInternalWidth;
 				s_iInternalHeight = iInternalHeight;
 
@@ -147,6 +147,11 @@ namespace Neutrino {
 		const glm::vec2 GetViewportDimensions()
 		{
 			return glm::vec2(s_fViewportWidth, s_fViewportHeight);
+		}
+
+		const glm::vec2 GetInternalDimensions()
+		{
+			return glm::vec2((float)s_iInternalWidth, (float)s_iInternalHeight);
 		}
 
 		const glm::vec2 GetViewportPixelScale()
@@ -931,6 +936,10 @@ namespace Neutrino {
 
 
 
+			// GNTODO:
+			// If the current viewport dimensions aren't a divisor of 1080p, then add an additional step to render to a 1080p  render target, with scanlines
+			// or look for a way to hack the parameters passed to the shader so scanlines work at any resolution...
+
 			// Stage 4:
 			{
 				// Bind to the screen Viewport, remove the binding to the FBO from StartOffScreenRender
@@ -946,7 +955,7 @@ namespace Neutrino {
 				// Output scanline or clean version of that to the screen
 				{
 					if (s_pPostProcessSettings->_bDoScanlines)
-						SetOutputScanlines(glm::value_ptr(s_mFinalOutputCameraMatrix));
+						SetOutputScanlines(glm::value_ptr(s_mFinalOutputCameraMatrix), GetViewportDimensions(), GetInternalDimensions());
 					else
 						SetActiveShaderWithMatrix(DEFAULT_SHADER, glm::value_ptr(s_mFinalOutputCameraMatrix));
 
@@ -1002,6 +1011,7 @@ namespace Neutrino {
 					ASSERT_GL_ERROR;
 				}
 			}
+
 
 			// Reset clear colour, just in case. 
 			SetClearColour(s_vClearColour.x, s_vClearColour.y, s_vClearColour.z, s_vClearColour.w);

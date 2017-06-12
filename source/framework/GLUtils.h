@@ -63,6 +63,10 @@ namespace Neutrino
 		//		Returns a vector2 for the width and height of the active viewport
 		const glm::vec2 GetViewportDimensions();
 
+		// GetInternalDimensions
+		//		Returns a vector2 for the width and height of the low resolution pixel render target
+		const glm::vec2 GetInternalDimensions();
+
 		// GetPixelScale
 		//		Returns a vector containing the OGL range of a single pixel
 		const glm::vec2 GetViewportPixelScale();

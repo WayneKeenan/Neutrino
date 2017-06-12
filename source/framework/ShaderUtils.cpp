@@ -277,6 +277,10 @@ namespace Neutrino {
 		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BRIGHTNESS] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "Brightness");
 		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_CONTRAST] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "Contrast");
 		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_ADDITIVE] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "AdditiveStrength");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_TEXTUREWIDTH] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "TextureWidth");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_TEXTUREHEIGHT] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "TextureHeight");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_VIEWPORTWIDTH] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "ViewportWidth");
+		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_VIEWPORTHEIGHT] = glGetUniformLocation(s_aLoadedShaders[eShader::OUTPUT_CRT]._ProgramID, "ViewportHeight");
 		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_THRESHOLD] = glGetUniformLocation(s_aLoadedShaders[eShader::THRESHOLD]._ProgramID, "Threshold");
 		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_THRESBRIGHTSCALER] = glGetUniformLocation(s_aLoadedShaders[eShader::THRESHOLD]._ProgramID, "ThresholdBrightScaler");
 		s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_BLOOMALPHA] = glGetUniformLocation(s_aLoadedShaders[eShader::ALPHA_SCALED]._ProgramID, "BloomAlpha");
@@ -340,7 +344,7 @@ namespace Neutrino {
 	}
 
 
-	void SetOutputScanlines(float* pCameraMatrix)
+	void SetOutputScanlines(float* pCameraMatrix, const glm::vec2& vViewportDims, const glm::vec2& vInternalDims )
 	{
 		s_pActiveShader = &s_aLoadedShaders[OUTPUT_CRT];
 		GL_ERROR;
@@ -359,6 +363,16 @@ namespace Neutrino {
 		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_CONTRAST], s_pPostProcessSettings->_fContrast);
 		GL_ERROR;
 		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_ADDITIVE], s_pPostProcessSettings->_fAdditiveStrength);
+		GL_ERROR;
+		// GNTODO: If current display viewport dimensions are not a mulitple of the internal (low resolution pixel dimensions) then 
+		// pass in different params for the InternalDims, so the scanlines work as expected. Current dims / 4?
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_TEXTUREWIDTH], vInternalDims.x);
+		GL_ERROR;
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_TEXTUREHEIGHT], vInternalDims.y);
+		GL_ERROR;
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_VIEWPORTWIDTH], vViewportDims.x);
+		GL_ERROR;
+		glUniform1f(s_pPostProcessSettings->_aUniforms[eCompositeShaderUniforms::UNIFORM_VIEWPORTHEIGHT], vViewportDims.x);
 		GL_ERROR;
 	}
 

@@ -33,6 +33,8 @@ namespace Neutrino {
 		static float s_fViewportHeight;
 		static GLsizei s_iInternalWidth;
 		static GLsizei s_iInternalHeight;
+		static float s_fScanlineShaderWidth;				// GNTODO: This is a bit of a hack for the scanline shader to 
+		static float s_fScanlineShaderHeight;				// support display modes that aren't divisible by 1080p...
 
 		// Pixel scaler for low res render output 
 		static float s_fScaledPixelWidth;
@@ -71,6 +73,10 @@ namespace Neutrino {
 		// Counters
 		static uint8 s_iAllocatedDynamicVBOSets = 0;
 		static uint8 s_iAllocatedTilemapVBOs = 0;
+
+		// Dimensions
+		static glm::vec2 s_vViewportDimensions;
+		static glm::vec2 s_vInternalDimensions;
 
 
 		float* GetCameraMatrix()
@@ -136,6 +142,29 @@ namespace Neutrino {
 				s_fUnscaledPixelHeight = s_fOGL_Y_RANGE / (float)iViewportHeight;
 			}
 
+
+			// Is the viewport a multiple of the internal dimensions? If not, we need to 
+			// pass the scanline shader a clean value so it scales correctly. This is a 
+			// bit of a hack.
+			{
+				if(iViewportWidth % 1920 == 0)
+				{
+					s_fScanlineShaderWidth = (float)iViewportWidth;
+					s_fScanlineShaderHeight = (float)iViewportHeight;
+				}
+				else
+				{
+					s_fScanlineShaderWidth = (float)iViewportWidth / (float)_iSCANLINE_VIEWPORT_DIV;
+					s_fScanlineShaderHeight = (float)iViewportHeight / (float)_iSCANLINE_VIEWPORT_DIV;
+				}
+			}
+
+			// Store dimensions in two vectors we'll pass to the shader uniforms during rendering 
+			s_vViewportDimensions.x = s_fViewportWidth;
+			s_vViewportDimensions.y = s_fViewportHeight;
+			s_vInternalDimensions.x = (float)s_fScanlineShaderWidth;
+			s_vInternalDimensions.y = (float)s_fScanlineShaderHeight;
+
 			// Set the projection matrix for this viewport. 0,0 at TOP LEFT.
 			s_mProjectionMatrix = glm::ortho(0.0f, s_fOGL_X_RANGE, s_fOGL_Y_RANGE, 0.0f, 1.0f, -10.0f);
 
@@ -146,12 +175,12 @@ namespace Neutrino {
 
 		const glm::vec2 GetViewportDimensions()
 		{
-			return glm::vec2(s_fViewportWidth, s_fViewportHeight);
+			return s_vViewportDimensions;
 		}
 
 		const glm::vec2 GetInternalDimensions()
 		{
-			return glm::vec2((float)s_iInternalWidth, (float)s_iInternalHeight);
+			return s_vInternalDimensions;
 		}
 
 		const glm::vec2 GetViewportPixelScale()

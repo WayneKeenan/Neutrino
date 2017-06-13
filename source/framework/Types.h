@@ -26,6 +26,7 @@ static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
 static const float fTILEMAP_ZPOS = 5.0f;									// Ortho far distance is 10 so tilemaps effectively sit in the middle of our z-range
 
+static const int _iSCANLINE_VIEWPORT_DIV = 8;							// If the viewport isn't a multiple of 1080p we need to pass different values to the scanline shader
 static const int _iMAX_TEXTURES = 4;											// The intention is for these textures to be 4k ;)
 static const int _iMAX_LEVELS = 16;												// Arbitrary, just picked that out of my arse. 
 static const int _iMAX_RENDERMODES = 128;									// How many display modes do we keep track of?

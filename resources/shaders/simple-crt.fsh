@@ -22,7 +22,7 @@ void main()
 	int xPos = int(mod(gl_FragCoord.x-0.5, 4.0)); 
 
 	// Scanline
-	if(mod(gl_FragCoord.y-0.5, 2) == 0)
+	if(mod(gl_FragCoord.y-0.5, 2.0) == 0.0)
 	{
 		col = col * ScanlineDark;
 	}

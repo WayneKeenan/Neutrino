@@ -137,8 +137,8 @@ namespace Neutrino
 
 			LOG_INFO(" - Mode %3d\tbpp %i\t%s\t%ix%ipx @ %ihz", i, SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h, mode.refresh_rate);
 
-			aModes[i]._iWidth = mode.w;
-			aModes[i]._iWidth = mode.h;
+			aModes[i]._iWidth = (uint16)mode.w;
+			aModes[i]._iWidth = (uint16)mode.h;
 			aModes[i]._fRefreshRate = (float)mode.refresh_rate;
 		}
 
@@ -158,12 +158,12 @@ namespace Neutrino
 
 	uint16 SDLGetDisplayWidth()
 	{
-		return s_InitialUserDisplaymode.w;
+		return (uint16)s_InitialUserDisplaymode.w;
 	}
 
 	uint16 SDLGetDisplayHeight()
 	{
-		return s_InitialUserDisplaymode.h;
+		return (uint16)s_InitialUserDisplaymode.h;
 	}
 
 	bool SDLCreateWindowAndContext(const int iScreenWidth, const int iScreenHeight)
@@ -197,7 +197,7 @@ namespace Neutrino
 			SDL_WINDOWPOS_CENTERED,
 			iScreenWidth,
 			iScreenHeight,
-			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);// | SDL_WINDOW_FULLSCREEN_DESKTOP);
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 
 		if (NULL == pSDL_WindowHandle)

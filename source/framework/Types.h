@@ -26,20 +26,19 @@ static const float fQUARTER_PI = fPI / 4.0f;
 static const float fTWO_PI = fPI * 2.0f;
 static const float fTILEMAP_ZPOS = 5.0f;									// Ortho far distance is 10 so tilemaps effectively sit in the middle of our z-range
 
-static const int _iSCANLINE_VIEWPORT_DIV = 8;							// If the viewport isn't a multiple of 1080p we need to pass different values to the scanline shader
 static const int _iMAX_TEXTURES = 4;											// The intention is for these textures to be 4k ;)
 static const int _iMAX_LEVELS = 16;												// Arbitrary, just picked that out of my arse. 
 static const int _iMAX_RENDERMODES = 128;									// How many display modes do we keep track of?
 static const uint32 _iMAX_SPRITES = 1024*64;							// Cap here is really how much memory we're pushing each tick by the looks of things
-static const uint32 _iMAX_BOX2D_SPRITES = 1024 * 16;			// Cap on how many items we can add to a BOX2D Debug Draw VBO. Again, pulled out of arse
+static const uint32 _iMAX_BOX2D_SPRITES = _iMAX_SPRITES;	// Cap on how many items we can add to a BOX2D Debug Draw VBO. Again, pulled out of arse
 static const uint32 _iMAX_TILEMAP_SPRITES = 1024 * 256;		// These are static draw, so pushed to the GPU once. No real limit needed
 static const uint8 _iMAX_TILEMAPS = 32;										// We're statically allocating the GLuint VBO IDs, so can have more (static GLuint s_pTilemapVBOs[iMAX_TILEMAPS])
 static const uint8 _iMAX_SAMPLES = 255;
 static const uint8 _iMAX_MUSIC = 32;
 
-static const int _iDEFAULT_VIEWPORT_WIDTH = 1920;					// TODO: When we go FULLSCREEN_WINDOW, this shouldn't matter. No need to open at a fixed resolution?
+static const int _iDEFAULT_VIEWPORT_WIDTH = 1920;					
 static const int _iDEFAULT_VIEWPORT_HEIGHT = 1080;
-static const int _iDEFAULT_INTERNAL_WIDTH = 480;					// TODO: This will be used by the FBO, and game logic should scale to it
+static const int _iDEFAULT_INTERNAL_WIDTH = 480;					
 static const int _iDEFAULT_INTERNAL_HEIGHT = 270;					
 
 // Debug builds will check for function keys to flip the framework into specific editor modes. 

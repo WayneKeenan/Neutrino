@@ -222,7 +222,7 @@ namespace Neutrino
 		s_pvCameraPosition = *GetFlyCamOffset(); // + vGameCameraPosition;			// TODO: remove this, should the framework even know about this?
 #endif
 
-		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state TODO: make status a param to the function
+		s_bRunningStatus = SDLProcessInput(&s_iEditorModeFlag);									// Poll input events, pass controls to IMGUI and capture Quit state 
 		ResetSpriteCount();																											// Must be called each tick, resets base pointers for all the sprites
 		GameStateUpdate();																											// Process whatever is the active game state
 							
@@ -277,7 +277,6 @@ namespace Neutrino
 		if (!UnmountResources(s_pResourcesPath))
 			LOG_ERROR("Unable to unmount resources file: %s", s_pResourcesPath);
 
-		// Remove any singletons we created...
 		CGameGlobals::Destroy();
 		DELETEX(s_pNeutrinoPreferences);
 

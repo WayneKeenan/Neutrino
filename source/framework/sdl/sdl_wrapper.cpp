@@ -62,11 +62,6 @@ namespace Neutrino
 	// TODO: Integrate the community SDL mappings from here:
 	//       https://github.com/gabomdq/SDL_GameControllerDB
 	//       
-	// TODO: The framework needs to detect the current working resolution and open with 
-	//				SDL_FULLSCREEN_DESKTOP. Then use the internal coord system for rendering
-	//				game elements (editors should be unaffected)
-
-	// For the Audio Wave Form in the inspector
 
 
 	// ------------------------------------------------------------------------------------------------------------------
@@ -324,7 +319,6 @@ namespace Neutrino
 
 	void SDLDeinitialiseAudio()
 	{
-		// TODO: Free up any used memory and unload all samples
 		Mix_CloseAudio();
 		Mix_Quit();
 		LOG_INFO("Audio sub-system Deinitialised.");

@@ -31,7 +31,6 @@ void CGameGlobals::SetPlayerPreferences(const NeutrinoPreferences_t* const pPref
 {
 	ASSERT(NULL != pPreferences, "SetPlayerPreferences called with NULL pointer");
 
-	// TODO: Shader preferences should be added to this?
 	m_iInternalWidth = (uint16)pPreferences->_iInternalWidth;
 	m_iInternalHeight = (uint16)pPreferences->_iInternalHeight;
 	m_fPixelWidth = pPreferences->_InternalPixelWidth;

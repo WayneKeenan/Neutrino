@@ -19,6 +19,8 @@ namespace Neutrino
 		bool LoadMusic(const int iID, const char* pFilename);
 		bool PlaySample(const int iID);
 		bool PlayMusic(const int iID);
+		void UnloadAllMusic();
+		void UnloadAllSamples();
 
 	private:
 		Mix_Chunk* m_aLoadedSamples[_iMAX_SAMPLES];

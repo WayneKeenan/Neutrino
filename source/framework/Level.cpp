@@ -83,9 +83,12 @@ namespace Neutrino {
 	{
 		for (int i = 0; i < s_iNumLevelsLoaded; ++i)
 		{
-			//DELETEX s_pFrameworkLevels[i]->_pBackgroundTilemap;
+			DELETEX [] s_pFrameworkLevels[i]->_sLevelName;
+			DELETEX [] s_pFrameworkLevels[i]->_sTilemapFilename;
+			DELETEX [] s_pFrameworkLevels[i]->_pBackgroundTilemap;
+			DELETEX s_pFrameworkLevels[i];
 		}
-		LOG_INFO("TODO: Delete the FrameworkLevels data!");
+		LOG_INFO("Levels Deallocated.");
 		return true;
 	}
 

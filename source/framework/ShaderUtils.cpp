@@ -205,8 +205,7 @@ namespace Neutrino {
 			ASSERT_GL_ERROR;
 
 			// Get uniform locations
-			// TODO: Translate is not used, and position should be a vec3 in the shaders
-			s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "translate");
+			//s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_TRANSLATE] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "translate");
 			s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "texture");
 			s_aLoadedShaders[s_iNumShadersLoaded]._Uniforms[UNIFORM_MATRIX] = glGetUniformLocation(s_aLoadedShaders[s_iNumShadersLoaded]._ProgramID, "matrix");
 		}

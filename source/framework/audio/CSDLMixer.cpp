@@ -81,7 +81,6 @@ namespace Neutrino
 
 		m_aLoadedSamples[iID] = Mix_LoadWAV_RW(pOps, 1);
 		ASSERT(NULL != m_aLoadedSamples[iID], "LoadSample: loading file failed: %s", pFilename);
-		// TODO: should this assert here? We could just ignore it, and continue...
 
 		DELETEX[] pFileBytes;
 		return true;
@@ -124,9 +123,24 @@ namespace Neutrino
 		return true;
 	}
 
+	void CSDLMixer::UnloadAllMusic()
+	{
+		for(int i=0; i<_iMAX_MUSIC; ++i)
+		{
+			if(NULL != m_aLoadedMusic[i])
+				Mix_FreeMusic(m_aLoadedMusic[i]);
+		}
 
+		LOG_INFO("Music Deallocated");
+	}
 
-
-
-
+	void CSDLMixer::UnloadAllSamples()
+	{
+		for(int i=0; i<_iMAX_SAMPLES;++i)
+		{
+			if(NULL != m_aLoadedSamples[i])
+				Mix_FreeChunk(m_aLoadedSamples[i]);
+		}
+		LOG_INFO("Samples Deallocated");
+	}
 }

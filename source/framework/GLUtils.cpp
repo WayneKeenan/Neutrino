@@ -123,8 +123,8 @@ namespace Neutrino {
 			{
 				s_fViewportWidth = (float)iViewportWidth;
 				s_fViewportHeight = (float)iViewportHeight;
-				s_fBlurWidth = _iDEFAULT_VIEWPORT_WIDTH / s_fBlurDivisor;
-				s_fBlurHeight = _iDEFAULT_VIEWPORT_HEIGHT / s_fBlurDivisor;
+				s_fBlurWidth = s_fViewportWidth / s_fBlurDivisor;
+				s_fBlurHeight = s_fViewportHeight / s_fBlurDivisor;
 				s_iInternalWidth = iInternalWidth;
 				s_iInternalHeight = iInternalHeight;
 

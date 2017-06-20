@@ -42,7 +42,6 @@ namespace Neutrino
 	{
 		ASSERT(s_bInitialized, "TimeUpdate called before TimeInit()!");
 
-		// _TODO: Take this out if you don't end up using the timestamp in the logfile output!
 		time(&_Rawtime);
 		s_sTimeStamp = ctime(&_Rawtime);
 

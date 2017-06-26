@@ -67,6 +67,69 @@ On first run Visual Studio will most likely have ALL_BUILD set as the start-up p
 To make the resources bundle you will need to install the command line version of 7zip, and then run run `MakePackile_win32.bat` The resources bundle 
 will be left in the Debug build folder by default. If you've selected a release build, you should manually copy the Neutrino.tdi file over to the runtime directory for that build, as the framework will not start without it. 
 
+## Raspberry Pi
+
+These steps will build, but not yet correctly run (TBD), Neutrono on a Raspberry Pi 3.  
+
+First step is to enable the experimental OpenGL 3.0 support on the Pi using `sudo raspi-config`.
+
+When in `raspi-config` select :
+
++ 7 "Advanced Option
++ A6 GL Driver 
++ G2 GL (Fake KMS)
+
+
+```bash
+sudo apt-get install mesa-utils cmake libx11-dev libgle3-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libphysfs-dev libbox2d-dev libconfig-dev zip 
+```
+
+Run `glxgears` and make sure the output says it's running at ~60+ FPS
+
+
+The current Rasbian is built on Jessie but needs GCC6 from Stretch:
+
+```bash
+sudo nano /etc/apt/sources.list
+```
+
+Replace `jessie` with `stretch` and update:
+
+```bash
+sudo apt-get update
+sudo apt-get install gcc-6 g++-6
+```
+
+
+
+Then carry on as normal for a bit:
+
+```
+git clone https://github.com/TripleEh/Neutrino.git
+./external_dependencies/SetupDeps.sh 
+```
+
+Which will prompt you to run:
+
+```bash
+cd ./glew/auto
+make
+cd ..
+make && sudo make install
+```
+
+
+Build, and run, using GCC v6:
+
+```bash
+cd build/
+export CXX=g++-6 
+export CC=gcc-6 
+
+./FullBuild.sh
+```
+
+
 ## Status And licensing
 
 TBD

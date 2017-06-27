@@ -1,0 +1,11 @@
+language: c++
+sudo: true
+install:
+    - apt-get install mesa-utils cmake libx11-dev libgle3-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libphysfs-dev libbox2d-dev libconfig-dev zip 
+before_script:
+    - ./external_dependencies/SetupDeps.sh 
+script:
+    - export CXX=g++-6 
+    - export CC=gcc-6 
+    - cd build
+    - ./FullBuild.sh

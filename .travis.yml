@@ -1,0 +1,50 @@
+language: cpp
+dist: trusty
+sudo: required
+before_install:
+    # C++14
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo add-apt-repository -y ppa:team-xbmc/ppa
+    - sudo apt-get update -qq
+    - cd $TRAVIS_BUILD_DIR
+    - wget -q https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0.tar.gz
+    - wget -q https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.1.tar.gz
+    - tar xf SDL2_image-*.tar.gz
+    - tar xf SDL2_mixer-*.tar.gz
+
+install:
+    # C++14
+    - sudo apt-get install -qq g++-6
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+    -
+    - sudo apt-get install -y mesa-utils cmake libx11-dev libgle3-dev libsdl2-dev libphysfs-dev libconfig-dev zip  
+    - 
+    - cd external_dependencies
+    - rm -fr glm glew
+    - sh ./SetupDeps.sh 
+    - cd glew/auto
+    - make
+    - cd ..
+    - make && sudo make install
+    -
+    - cd $TRAVIS_BUILD_DIR
+    - cd SDL2_image-* && ./configure && make && sudo make install && cd ..
+    - cd SDL2_mixer-* && ./configure && make && sudo make install && cd ..
+    - 
+    - cd $TRAVIS_BUILD_DIR
+    - git clone https://github.com/flyover/Box2D
+    - cd Box2D 
+    - git checkout tags/v2.3.1 
+    - cd Box2D/Build
+    - cmake -DBOX2D_INSTALL=ON -DBOX2D_BUILD_SHARED=ON  -DBOX2D_BUILD_EXAMPLES=OFF ..
+    - make
+    - sudo make install
+    -
+    - export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib64
+    - 
+    - sudo ldconfig
+script:
+    - cd $TRAVIS_BUILD_DIR
+    - cd build
+    - ./FullBuild.sh
+
